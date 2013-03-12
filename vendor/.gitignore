@@ -4,3 +4,5 @@ composer
 zendframework
 autoload.php
 !/zendframework/
+!/autoload.php
+!/composer/
