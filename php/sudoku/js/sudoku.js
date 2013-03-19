@@ -207,17 +207,16 @@ function Sudoku(data, hidePercentage){
 }
 
 function initSudoku() {
-    if (document.sudokuInit++ == 0){
-        var xmlhttp=new XMLHttpRequest();
-        xmlhttp.open("POST", "sudoku.php", true);
-        xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-        xmlhttp.onreadystatechange=function() {
-            if (xmlhttp.readyState==4) Sudoku(JSON.parse(xmlhttp.responseText), 60);
+    var xmlhttp=new XMLHttpRequest();
+    xmlhttp.open("POST", "sudoku.php", true);
+    xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    xmlhttp.onreadystatechange=function(e) {
+        if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+            xmlhttp.onreadystatechange=null;
+            Sudoku(JSON.parse(xmlhttp.responseText), 60);
         }
-        xmlhttp.send("");    
     }
+    xmlhttp.send("");    
 }
 
-
-document.sudokuInit = 0; // Init status
 loadScript("js/jquery-1.9.0.min.js",initSudoku);
