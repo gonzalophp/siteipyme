@@ -55,8 +55,16 @@ class UserController extends AbstractActionController {
                        ,'nodes' => array())
                     , (object) array(
                         'label' => 'Resources B'
-                        ,'url' => 'http://www.elmundo.es'
-                       ,'nodes' => array()))));
+                        ,'url' => '#/admin/product'
+                       ,'nodes' => array(
+                            (object) array(
+                                'label' => 'Resources B A'
+                                ,'url' => 'http://www.elmundo.es'
+                               ,'nodes' => array())
+                            , (object) array(
+                                'label' => 'Product'
+                                ,'url' => '#/admin/product'
+                               ,'nodes' => array()))))));
 
         $oViewModel->setVariable('XHR_Response', Json::encode($aMenuList));
         return ($oViewModel);
