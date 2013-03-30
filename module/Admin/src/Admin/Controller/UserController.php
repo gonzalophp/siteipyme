@@ -11,62 +11,19 @@ class UserController extends AbstractActionController {
         $oViewModel = new ViewModel();
         $oViewModel->setTerminal(true);
         $oViewModel->setTemplate('xhr/xhr');
-        
-        $aMenuList = array(
-            (object) array(
-                'label' => 'iPyME'
-                ,'url' => 'http://www.elmundo.es'
-                ,'nodes' => array(
-                    (object) array(
-                        'label' => 'Home A'
-                        ,'url' => 'http://www.elmundo.es'
-                       ,'nodes' => array())
-                   ,(object) array(
-                       'label' => 'Home B'
-                       ,'url' => 'http://www.elmundo.es'
-                      ,'nodes' => array(
-                            (object) array(
-                                'label' => 'Home B A'
-                                ,'url' => 'http://www.elmundo.es'
-                              , 'nodes' => array())
-                          , (object) array(
-                              'label' => 'Home B B'
-                              ,'url' => 'http://www.elmundo.es'
-                              , 'nodes' => array())))
-                    ,(object) array(
-                        'label' => 'Product'
-                        ,'url' => '#/admin/product'
-                       ,'nodes' => array())
-                    ,(object) array(
-                        'label' => 'view 1'
-                        ,'url' => '#/view1'
-                       ,'nodes' => array())))
-            , (object) array(
-                'label' => 'Forms'
-                ,'url' => 'http://www.elmundo.es'
-               ,'nodes' => array())
-            , (object) array(
-                'label' => 'Resources'
-                ,'url' => 'http://www.elmundo.es'
-               ,'nodes' => array(
-                    (object) array(
-                        'label' => 'Resources A'
-                        ,'url' => 'http://www.elmundo.es'
-                       ,'nodes' => array())
-                    , (object) array(
-                        'label' => 'Resources B'
-                        ,'url' => '#/admin/product'
-                       ,'nodes' => array(
-                            (object) array(
-                                'label' => 'Resources B A'
-                                ,'url' => 'http://www.elmundo.es'
-                               ,'nodes' => array())
-                            , (object) array(
-                                'label' => 'Product'
-                                ,'url' => '#/admin/product'
-                               ,'nodes' => array()))))));
-
+        $oMenuList = new \Admin\Model\MainMenu;
+        $aMenuList= $oMenuList->aMenuList;
         $oViewModel->setVariable('XHR_Response', Json::encode($aMenuList));
+        return ($oViewModel);
+    }
+
+    function loginAction() {
+        $oViewModel = new ViewModel();
+        $oViewModel->setTerminal(true);
+        $oViewModel->setTemplate('xhr/xhr');
+        $oUser = new \Admin\Model\User;
+        $aLoginData = $oUser->aLoginData;
+        $oViewModel->setVariable('XHR_Response', Json::encode($aLoginData));
         return ($oViewModel);
     }
     
