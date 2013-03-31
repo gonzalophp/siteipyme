@@ -21,9 +21,33 @@ class UserController extends AbstractActionController {
         $oViewModel = new ViewModel();
         $oViewModel->setTerminal(true);
         $oViewModel->setTemplate('xhr/xhr');
-        $oUser = new \Admin\Model\User;
-        $aLoginData = $oUser->aLoginData;
-        $oViewModel->setVariable('XHR_Response', Json::encode($aLoginData));
+
+        $sm = $this->getServiceLocator();
+        $oUser = $sm->get('Admin\Model\User');
+        
+        
+        
+        
+        $request = new \Zend\Http\Request();
+        
+        $sUser_name='AAA';
+        $sUser_password='CCC';
+        
+        if ($this->getRequest()->isXmlHttpRequest() && ($sJSONDataRequest = $this->getRequest()->getContent())) {
+            $oDataRequest = json_decode($sJSONDataRequest);
+            
+            $sUser_name = $oDataRequest->user_name;
+            $sUser_password = $oDataRequest->user_password;
+            $bLogin_remember = $oDataRequest->login_remember;
+            
+            $bLoginCorrect = $oUser->isLoginCorrect($sUser_name,$sUser_password);
+        }
+        else {
+            $bLoginCorrect=false;
+        }
+        
+        $aResponse = array('login_correct' => $bLoginCorrect);
+        $oViewModel->setVariable('XHR_Response', Json::encode($aResponse));
         return ($oViewModel);
     }
     
