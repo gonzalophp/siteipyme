@@ -46,6 +46,11 @@ class Module
     {
         return array(
             'factories' => array(
+                'Admin\Model\UserTable' =>  function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new \Admin\Model\UserTable($dbAdapter);
+                    return $table;
+                },
                 'Admin\Model\User' =>  function($sm) {
                     $tableGateway = $sm->get('UserTableGateway');
                     $table = new UserTable($tableGateway);
@@ -53,12 +58,9 @@ class Module
                 },
                 'UserTableGateway' => function ($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    
-                    $dbAdapter->query("SET search_path TO 'IPYME_FINAL'", 'execute'); 
-                    
                     $resultSetPrototype = new ResultSet();
                     $resultSetPrototype->setArrayObjectPrototype(new User());
-                    return new TableGateway('USER', $dbAdapter, null, $resultSetPrototype);
+                    return new TableGateway(new \Zend\Db\Sql\TableIdentifier('USER','IPYME_FINAL'), $dbAdapter, null, $resultSetPrototype);
                 },
             ),
         );
