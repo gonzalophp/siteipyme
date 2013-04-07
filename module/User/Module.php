@@ -49,10 +49,7 @@ class Module
                     $table = new \Datainterface\Model\UserTable($dbAdapter, $tableIdentifier);
                     return $table;
                 },
-                'User\View\Helper\JSONResponseView' =>  function() {
-                    $oJSONResponseView = new \User\View\Helper\JSONResponseView();
-                    return $oJSONResponseView;
-                },
+              
 //                'User\Model\User' =>  function($sm) {
 //                    $tableGateway = $sm->get('UserTableGateway');
 //                    $table = new UserTable($tableGateway);

@@ -2,10 +2,25 @@
 namespace User\Controller;
 
 class SigninController extends \Zend\Mvc\Controller\AbstractActionController {
+    
+    public function onDispatch(\Zend\Mvc\MvcEvent $e) {
+        $aConfig = $e->getApplication()->getServiceManager()->get('config');
+        $e->getResponse()->getHeaders()->addHeaders(array('Access-Control-Allow-Headers' => 'X-Requested-With'
+                                                         ,'Access-Control-Allow-Credentials' => 'true'
+                                                         ,'Access-Control-Allow-Origin'  => $aConfig['front_end']));
+        if ($e->getRequest()->isOptions()) {
+            $e->setViewModel(new \Zend\View\Model\JsonModel());
+        }
+        else {
+            parent::onDispatch($e);
+        }
+    }
+    
+    
     public function indexAction() {
         parent::indexAction();
-        
-//        $oDataRequest = (object) array('user_name' => 'GONZALO', 'user_password' => 'gonzalo');
+//        $this->getRequest()->setContent('{"user_name":"GONZALO","user_password":"gonzalo","user_remember":false}');
+//        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
         
         $bAuthenticated = false;
         if ($this->getRequest()->isXmlHttpRequest() && ($sJSONDataRequest = $this->getRequest()->getContent())) {
@@ -13,6 +28,7 @@ class SigninController extends \Zend\Mvc\Controller\AbstractActionController {
             
             $sUser_name = $oDataRequest->user_name;
             $sUser_password = $oDataRequest->user_password;
+            $bUser_remember = $oDataRequest->user_remember;
             $sUser_password_hash = sha1($sUser_password);
             
             $oUserTable = $this->getServiceLocator()->get('Datainterface\Model\UserTable');
@@ -21,10 +37,11 @@ class SigninController extends \Zend\Mvc\Controller\AbstractActionController {
                                                 ,'u_status' => 1));
             
             $bAuthenticated = ($aResult['resultset']->count()==1) && $aResult['success'] && ($aResult['error_code']==0);
-            
             if ($bAuthenticated) {
+                
+                if(array_key_exists('PHPSESSID',$_COOKIE)) unset($_COOKIE['PHPSESSID']);
+                if ($bUser_remember) session_set_cookie_params(84600,'/');
                 session_start();
-                session_regenerate_id();
                 
                 $oUser = $aResult['resultset']->current();
                 $oUser->u_session = session_id();
@@ -35,6 +52,6 @@ class SigninController extends \Zend\Mvc\Controller\AbstractActionController {
         }
         $aResponse =  array('u_authenticated'    => ($bAuthenticated ? 1 : 0));
         
-        return $this->getServiceLocator()->get('User\View\Helper\JSONResponseView')->setArrayData($aResponse);
+        return new \Zend\View\Model\JsonModel($aResponse);
     }
 }

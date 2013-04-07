@@ -24,7 +24,7 @@ return array(
                     'route'    => '/user',
                     'defaults' => array(
                         '__NAMESPACE__' => 'User\Controller',
-                        'controller'    => 'Index',
+                        'controller'    => 'Rest',
                         'action'        => 'index',
                     ),
                 ),
@@ -79,6 +79,9 @@ return array(
         ),
         'template_path_stack' => array(
             __DIR__ . '/../view',
+        ),
+        'strategies' => array(
+            'ViewJsonStrategy',
         ),
     ),
 );

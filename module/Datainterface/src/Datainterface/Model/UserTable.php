@@ -25,8 +25,9 @@ class UserTable extends \Zend\Db\TableGateway\AbstractTableGateway {
             $nErrorCode = $e->getPrevious()->getCode();
             $sErrorMessage = $e->getPrevious()->getMessage();
         }
+        error_reporting (0);
         $sSQL = $this->getSql()->getSqlStringForSqlObject($this->getSql()->select()->where($where));
-        
+        error_reporting (E_ALL);
         return array( 'resultset'       => $aResultSet
                     , 'success'         => $bSuccess
                     , 'error_code'      => $nErrorCode

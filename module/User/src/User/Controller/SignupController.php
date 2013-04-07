@@ -60,10 +60,19 @@ class SignupController extends \Zend\Mvc\Controller\AbstractActionController {
         return $this->getServiceLocator()->get('User\View\Helper\JSONResponseView')->setArrayData($aResponse);   
     }
     
+    public function onDispatch(\Zend\Mvc\MvcEvent $e) {
+        $aConfig = $e->getApplication()->getServiceManager()->get('config');
+        $e->getResponse()->getHeaders()->addHeaders(array('Access-Control-Allow-Headers' => 'X-Requested-With'
+                                                         ,'Access-Control-Allow-Origin'  => $aConfig['front_end']));
+        if ($e->getRequest()->isOptions()) {
+            $e->setViewModel(new \Zend\View\Model\JsonModel());
+        }
+        else {
+            parent::onDispatch($e);
+        }
+    }
+
     public function confirmAction() {
-        if ($_SERVER['REQUEST_METHOD']=='OPTIONS') return $this->getServiceLocator()->get('User\View\Helper\JSONResponseView')->setArrayData(NULL); 
-        
-        $this->getRequest()->getMethod();
         $sSessionId =  $this->getEvent()->getRouteMatch()->getParam('id');
         $oUserTable = $this->getServiceLocator()->get('Datainterface\Model\UserTable');
         $aResult = $oUserTable->update(
@@ -76,7 +85,9 @@ class SignupController extends \Zend\Mvc\Controller\AbstractActionController {
             session_start();
         }
         $aResponse = array('signup_confirmation' => ($bConfirmationSuccess?1:0));
-        return $this->getServiceLocator()->get('User\View\Helper\JSONResponseView')->setArrayData($aResponse); 
+
+        
+        return new \Zend\View\Model\JsonModel($aResponse);
     }
     
        
