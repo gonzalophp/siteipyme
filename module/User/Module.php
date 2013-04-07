@@ -18,6 +18,7 @@ class Module
     {
         $e->getApplication()->getServiceManager()->get('translator');
         $eventManager        = $e->getApplication()->getEventManager();
+        $eventManager->attach(\Zend\Mvc\MvcEvent::EVENT_DISPATCH, array($this, 'onDispatch'));
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
     }
@@ -25,6 +26,18 @@ class Module
     public function getConfig()
     {
         return include __DIR__ . '/config/module.config.php';
+    }
+    
+    public function  onDispatch(MvcEvent $e){
+        $aConfig = $e->getApplication()->getServiceManager()->get('config');
+        $e->getResponse()->getHeaders()->addHeaders(array('Access-Control-Allow-Headers' => 'X-Requested-With'
+                                                     ,'Access-Control-Allow-Credentials' => 'true'
+                                                     ,'Access-Control-Allow-Origin'  => $aConfig['front_end']));
+            
+        if ($e->getTarget()->getRequest()->isOptions()) {
+            $e->setViewModel(new \Zend\View\Model\JsonModel());
+        }
+
     }
 
     public function getAutoloaderConfig()
