@@ -6,6 +6,7 @@ return array(
         'Menus',
         'Admin',
         'User',
+        'Shop',
         'Datainterface'
     ),
 

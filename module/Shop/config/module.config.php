@@ -1,5 +1,5 @@
 <?php
-namespace Menus;
+namespace Shop;
 
 return array(
     'router' => array(
@@ -9,7 +9,7 @@ return array(
                 'options' => array(
                     'route'    => '/',
                     'defaults' => array(
-                        'controller' => 'Menus\Controller\Index',
+                        'controller' => 'Shop\Controller\Product',
                         'action'     => 'index',
                     ),
                 ),
@@ -18,12 +18,12 @@ return array(
             // new controllers and actions without needing to create a new
             // module. Simply drop new controllers in, and you can access them
             // using the path /application/:controller/:action
-            'menus' => array(
+            'shop' => array(
                 'type'    => 'Literal',
                 'options' => array(
-                    'route'    => '/menus',
+                    'route'    => '/shop',
                     'defaults' => array(
-                        '__NAMESPACE__' => 'Menus\Controller',
+                        '__NAMESPACE__' => 'Shop\Controller',
                         'controller'    => 'Index',
                         'action'        => 'index',
                     ),
@@ -33,7 +33,7 @@ return array(
                     'default' => array(
                         'type'    => 'Segment',
                         'options' => array(
-                            'route'    => '/[:controller[/:action]]',
+                            'route'    => '/[:controller[/:action[/:id]]]',
                             'constraints' => array(
                                 'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
                                 'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
@@ -61,8 +61,7 @@ return array(
     ),
     'controllers' => array(
         'invokables' => array(
-            'Menus\Controller\Main' => 'Menus\Controller\MainController',
-            'Menus\Controller\Product' => 'Menus\Controller\ProductController',
+            'Shop\Controller\Product' => 'Shop\Controller\ProductController',
         ),
     ),
     'view_manager' => array(

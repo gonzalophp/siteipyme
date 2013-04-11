@@ -31,7 +31,7 @@ CREATE TABLE "IPYME_AUX"."PRODUCT_CATEGORY_VALUE" (
 );
 
 CREATE TABLE "IPYME_AUX"."PRODUCT" (
-    P_ID NUMERIC PRIMARY KEY
+    P_ID BIGSERIAL PRIMARY KEY
     , P_REF VARCHAR(45)
     , P_DESCRIPTION VARCHAR(255)
     , P_LONG_DESCRIPTION VARCHAR(255)
@@ -271,3 +271,11 @@ DROP SCHEMA "IPYME_FINAL" CASCADE;
 ALTER SCHEMA "IPYME_AUX" RENAME TO "IPYME_FINAL";
 
 \dn
+
+
+
+COPY "USER" (u_session, u_last_login, u_email, u_status, u_basket, u_customer, u_name, u_password_hash, u_id) FROM stdin;
+33	2011-12-31 00:00:00+00	123	456	\N	\N	BBB	4ed61e15c9f84e9fc98ae553ff46010035aac24d	222
+9od4p5ehecs9ne451ea0fgnv60	\N	gonzalophp@gmail.com	1	\N	\N	gonzalo	8e43bec6c9a4aba7dc358247a21ab52d301a2840	223
+bqlup9j5bllktbfqiv2u1k6fa5	\N	ddddd	1	\N	\N	ddd	8e43bec6c9a4aba7dc358247a21ab52d301a2840	177
+\.
