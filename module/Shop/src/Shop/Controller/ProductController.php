@@ -36,5 +36,44 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
 //        $aResponse = array('in_product'=>1);
         return new \Zend\View\Model\JsonModel($aResponse);
     }
+    
+    public function SaveAction(){
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            $sJSONDataRequest = $this->getRequest()->getContent();
+            $oRequest = json_decode($sJSONDataRequest);
+            $aRequest = (array)$oRequest;
+            
+            if (array_key_exists('p_id',$aRequest)){
+                $aWhere = array('p_id' => $aRequest['p_id']);
+                unset($aRequest['p_id']);
+                $aSet = array();
+                foreach($aRequest as $sField => $sValue) {
+                    $aSet[$sField] = $sValue;
+                }
+                $oProductTable = $this->getServiceLocator()->get('Datainterface\Model\ProductTable');        
+                $aResult = $oProductTable->update($aSet,$aWhere);
+                $aResponse = array('success' => $aResult['success']);
+            }
+            else {
+                $aInsert = array('p_id' => new \Zend\Db\Sql\Predicate\Expression("DEFAULT"));
+                foreach($aRequest as $sField => $sValue) {
+                    $aInsert[$sField] = $sValue;
+                }
+                $oProductTable = $this->getServiceLocator()->get('Datainterface\Model\ProductTable');        
+                $aResult = $oProductTable->insert($aInsert);
+                $aResponse = array('success' => $aResult['success']);
+            }
+        }
+        else {
+            $aResponse = array('success' => 0);
+        }
+        
+        return new \Zend\View\Model\JsonModel($aResponse);
+    }
+    
+    public function DeleteAction(){
+        $aResponse = array('in_delete' => 1);
+        return new \Zend\View\Model\JsonModel($aResponse);
+    }
 }
 ?>

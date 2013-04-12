@@ -15,7 +15,7 @@ class ProductController extends AbstractActionController {
                                                      ,'readonly'    => 0
                                                      ,'buttons'     => array(array('action' => 'save'
                                                                                  , 'displayName' => 'Save'
-                                                                                 , 'class' => 'btn-danger')
+                                                                                 , 'class' => 'btn-primary')
                                                                             ,array('action' => 'cancel'
                                                                                  , 'displayName' => 'Cancel'
                                                                                  , 'class' => 'btn-default')))
@@ -25,7 +25,7 @@ class ProductController extends AbstractActionController {
                                                      ,'readonly'    => 0
                                                      ,'buttons'     => array(array('action' => 'save'
                                                                                  , 'displayName' => 'Save'
-                                                                                 , 'class' => 'btn-danger')
+                                                                                 , 'class' => 'btn-primary')
                                                                             ,array('action' => 'cancel'
                                                                                  , 'displayName' => 'Cancel'
                                                                                  , 'class' => 'btn-default')))
