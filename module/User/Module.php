@@ -31,8 +31,8 @@ class Module
     public function  onDispatch(MvcEvent $e){
         $aConfig = $e->getApplication()->getServiceManager()->get('config');
         $e->getResponse()->getHeaders()->addHeaders(array('Access-Control-Allow-Headers' => 'X-Requested-With'
-                                                     ,'Access-Control-Allow-Credentials' => 'true'
-                                                     ,'Access-Control-Allow-Origin'  => $aConfig['front_end']));
+                                                        ,'Access-Control-Allow-Credentials' => 'true'
+                                                        ,'Access-Control-Allow-Origin'  => $aConfig['front_end']));
             
         if ($e->getTarget()->getRequest()->isOptions()) {
             $e->setViewModel(new \Zend\View\Model\JsonModel());
@@ -56,24 +56,7 @@ class Module
     {
         return array(
             'factories' => array(
-                'Datainterface\Model\UserTable' =>  function($sm) {
-                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    $tableIdentifier = new \Zend\Db\Sql\TableIdentifier('USER','IPYME_FINAL');
-                    $table = new \Datainterface\Model\UserTable($dbAdapter, $tableIdentifier);
-                    return $table;
-                },
-              
-//                'User\Model\User' =>  function($sm) {
-//                    $tableGateway = $sm->get('UserTableGateway');
-//                    $table = new UserTable($tableGateway);
-//                    return $table;
-//                },
-//                'UserTableGateway' => function ($sm) {
-//                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-//                    $resultSetPrototype = new ResultSet();
-//                    $resultSetPrototype->setArrayObjectPrototype(new User());
-//                    return new TableGateway(new \Zend\Db\Sql\TableIdentifier('USER','IPYME_FINAL'), $dbAdapter, null, $resultSetPrototype);
-//                },
+
             ),
         );
     }

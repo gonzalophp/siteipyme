@@ -24,16 +24,7 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
         foreach($aResult['resultset'] as $oProduct) {
             $aResponse['datagrid'][] = $oProduct;
         }
-                        
-//        var_dump($aResponse['products']);
-//        $aResult = $oProductTable->select(array('u_session'=>session_id()
-//                                            ,'u_status' => 1));
-//
-//        $bAuthenticated = ($aResult['resultset']->count()==1) && $aResult['success'] && ($aResult['error_code']==0);    
-//        $aResponse = array('u_valid_session' => ($bAuthenticated ? 1 :0), 'session_id' => session_id());
-        
-        
-//        $aResponse = array('in_product'=>1);
+
         return new \Zend\View\Model\JsonModel($aResponse);
     }
     
@@ -72,7 +63,25 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
     }
     
     public function DeleteAction(){
-        $aResponse = array('in_delete' => 1);
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            $sJSONDataRequest = $this->getRequest()->getContent();
+            $oRequest = json_decode($sJSONDataRequest);
+            $aRequest = (array)$oRequest;
+            
+            if (array_key_exists('p_id',$aRequest)){
+                $aWhere = array('p_id' => $aRequest['p_id']);
+                $oProductTable = $this->getServiceLocator()->get('Datainterface\Model\ProductTable');        
+                $aResult = $oProductTable->delete($aWhere);
+                $aResponse = array('success' => $aResult['success']);
+            }
+            else {
+                $aResponse = array('success' => 0);
+            }
+        }
+        else {
+            $aResponse = array('success' => 0);
+        }
+        
         return new \Zend\View\Model\JsonModel($aResponse);
     }
 }

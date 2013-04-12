@@ -50,12 +50,7 @@ class Module
     {
         return array(
             'factories' => array(
-                'Datainterface\Model\ProductTable' =>  function($sm) {
-                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    $tableIdentifier = new \Zend\Db\Sql\TableIdentifier('PRODUCT','IPYME_FINAL');
-                    $table = new \Datainterface\Model\ProductTable($dbAdapter, $tableIdentifier);
-                    return $table;
-                },
+
             ),
         );
     }
