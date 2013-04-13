@@ -52,8 +52,8 @@ class MainMenu {
                                 ,'url' => '#/admin/stores'
                                ,'nodes' => array())
                            ,(object) array(
-                                'label' => 'Catalog'
-                                ,'url' => '#/admin/product/catalog'
+                                'label' => 'Products'
+                                ,'url' => '#/admin/list/product'
                                ,'nodes' => array())
                            ,(object) array(
                                 'label' => 'Category'

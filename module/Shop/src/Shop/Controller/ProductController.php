@@ -4,11 +4,6 @@ namespace Shop\Controller;
 class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
     
     public function indexAction() {
-        if ($this->getRequest()->isOptions()) return;
-        
-        $oProductTable = $this->getServiceLocator()->get('Datainterface\Model\ProductTable');
-        $aResult = $oProductTable->select();
-
         $aResponse = array(
             'datagrid' => array(),
             'columnDefs' => array(
@@ -21,6 +16,9 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
             )
         );
         
+        $oTableController = $this->getServiceLocator()->get('Datainterface\Model\TableInterface');
+        $aResult = $oTableController->fetchAll('Datainterface\Model\ProductTable');
+            
         foreach($aResult['resultset'] as $oProduct) {
             $aResponse['datagrid'][] = $oProduct;
         }
@@ -31,58 +29,29 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
     public function SaveAction(){
         if ($this->getRequest()->isXmlHttpRequest()) {
             $sJSONDataRequest = $this->getRequest()->getContent();
-            $oRequest = json_decode($sJSONDataRequest);
-            $aRequest = (array)$oRequest;
-            
-            if (array_key_exists('p_id',$aRequest)){
-                $aWhere = array('p_id' => $aRequest['p_id']);
-                unset($aRequest['p_id']);
-                $aSet = array();
-                foreach($aRequest as $sField => $sValue) {
-                    $aSet[$sField] = $sValue;
-                }
-                $oProductTable = $this->getServiceLocator()->get('Datainterface\Model\ProductTable');        
-                $aResult = $oProductTable->update($aSet,$aWhere);
-                $aResponse = array('success' => $aResult['success']);
-            }
-            else {
-                $aInsert = array('p_id' => new \Zend\Db\Sql\Predicate\Expression("DEFAULT"));
-                foreach($aRequest as $sField => $sValue) {
-                    $aInsert[$sField] = $sValue;
-                }
-                $oProductTable = $this->getServiceLocator()->get('Datainterface\Model\ProductTable');        
-                $aResult = $oProductTable->insert($aInsert);
-                $aResponse = array('success' => $aResult['success']);
-            }
+            $aRequest = (array)json_decode($sJSONDataRequest);
+            $oTableController = $this->getServiceLocator()->get('Datainterface\Model\TableInterface');
+            $bSuccess = $oTableController->save('Datainterface\Model\ProductTable', 'p_id',$aRequest)?1:0;
         }
         else {
-            $aResponse = array('success' => 0);
+            $bSuccess=false;
         }
         
-        return new \Zend\View\Model\JsonModel($aResponse);
+        return new \Zend\View\Model\JsonModel(array('success' => ($bSuccess?1:0)));
     }
     
     public function DeleteAction(){
         if ($this->getRequest()->isXmlHttpRequest()) {
             $sJSONDataRequest = $this->getRequest()->getContent();
-            $oRequest = json_decode($sJSONDataRequest);
-            $aRequest = (array)$oRequest;
-            
-            if (array_key_exists('p_id',$aRequest)){
-                $aWhere = array('p_id' => $aRequest['p_id']);
-                $oProductTable = $this->getServiceLocator()->get('Datainterface\Model\ProductTable');        
-                $aResult = $oProductTable->delete($aWhere);
-                $aResponse = array('success' => $aResult['success']);
-            }
-            else {
-                $aResponse = array('success' => 0);
-            }
+            $aRequest = (array)json_decode($sJSONDataRequest);;
+            $oTableController = $this->getServiceLocator()->get('Datainterface\Model\TableInterface');
+            $bSuccess = $oTableController->delete('Datainterface\Model\ProductTable','p_id',$aRequest);
         }
         else {
-            $aResponse = array('success' => 0);
+            $bSuccess = false;
         }
         
-        return new \Zend\View\Model\JsonModel($aResponse);
+        return new \Zend\View\Model\JsonModel(array('success' => ($bSuccess?1:0)));
     }
 }
 ?>

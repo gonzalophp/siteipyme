@@ -48,6 +48,8 @@ return array(
         'factories' => array(
             'translator' => 'Zend\I18n\Translator\TranslatorServiceFactory',
         ),
+        'invokables' => array(
+        )
     ),
     'translator' => array(
         'locale' => 'en_US',

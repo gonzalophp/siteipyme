@@ -47,6 +47,7 @@ return array(
     'service_manager' => array(
         'factories' => array(
             'translator' => 'Zend\I18n\Translator\TranslatorServiceFactory',
+            'User\Model\UserCredentials' => 'User\Model\UserCredentials'
         ),
     ),
     'translator' => array(
