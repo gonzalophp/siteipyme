@@ -29,7 +29,7 @@ class MainMenu {
                       ,'nodes' => array(
                             (object) array(
                                 'label' => 'Customer'
-                                ,'url' => '#/admin/sale/customer'
+                                ,'url' => '#/admin/list/customer'
                               , 'nodes' => array())
                           , (object) array(
                               'label' => 'Order'

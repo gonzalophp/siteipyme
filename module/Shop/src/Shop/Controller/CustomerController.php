@@ -1,7 +1,7 @@
 <?php
 namespace Shop\Controller;
 
-class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
+class CustomerController extends \Zend\Mvc\Controller\AbstractActionController {
     
     public function indexAction() {
         $aResponse = array(
@@ -16,11 +16,11 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
             )
         );
         
-        $oProductTable = $this->getServiceLocator()->get('Datainterface\Model\TableInterface')->getTableInterface('IPYME_FINAL','PRODUCT');
-        $aResult = $oProductTable->fetchAll();
+        $oTableController = $this->getServiceLocator()->get('Datainterface\Model\TableInterface');
+        $aResult = $oTableController->fetchAll('Datainterface\Model\CustomerTable');
             
-        foreach($aResult['resultset'] as $oProduct) {
-            $aResponse['datagrid'][] = $oProduct;
+        foreach($aResult['resultset'] as $oCustomer) {
+            $aResponse['datagrid'][] = $oCustomer;
         }
 
         return new \Zend\View\Model\JsonModel($aResponse);
@@ -30,8 +30,8 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
         if ($this->getRequest()->isXmlHttpRequest()) {
             $sJSONDataRequest = $this->getRequest()->getContent();
             $aRequest = (array)json_decode($sJSONDataRequest);
-            $oProductTable = $this->getServiceLocator()->get('Datainterface\Model\TableInterface')->getTableInterface('IPYME_FINAL','PRODUCT','p_id',$aRequest);
-            $bSuccess = $oProductTable->save()?1:0;
+            $oTableController = $this->getServiceLocator()->get('Datainterface\Model\TableInterface');
+            $bSuccess = $oTableController->save('Datainterface\Model\CustomerTable', 'p_id',$aRequest)?1:0;
         }
         else {
             $bSuccess=false;
@@ -43,9 +43,9 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
     public function DeleteAction(){
         if ($this->getRequest()->isXmlHttpRequest()) {
             $sJSONDataRequest = $this->getRequest()->getContent();
-            $aRequest = (array)json_decode($sJSONDataRequest);
-            $oProductTable = $this->getServiceLocator()->get('Datainterface\Model\TableInterface')->getTableInterface('IPYME_FINAL','PRODUCT','p_id',$aRequest);
-            $bSuccess = $oProductTable->delete();
+            $aRequest = (array)json_decode($sJSONDataRequest);;
+            $oTableController = $this->getServiceLocator()->get('Datainterface\Model\TableInterface');
+            $bSuccess = $oTableController->delete('Datainterface\Model\CustomerTable','p_id',$aRequest);
         }
         else {
             $bSuccess = false;

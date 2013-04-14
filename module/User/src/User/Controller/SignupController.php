@@ -33,7 +33,7 @@ class SignupController extends \Zend\Mvc\Controller\AbstractActionController {
                 if(array_key_exists('PHPSESSID',$_COOKIE)) unset($_COOKIE['PHPSESSID']);
                 session_start();
                 $sUser_password_hash = sha1($oDataRequest->user_password);
-                $oUserTable = $this->getServiceLocator()->get('Datainterface\Model\UserTable');
+                $oUserTable = $this->getServiceLocator()->get('Datainterface\Model\DataTableGateway')->getTableGateway('IPYME_FINAL','USER');
                 $aResult = $oUserTable->insert(array('u_id' => new \Zend\Db\Sql\Predicate\Expression("DEFAULT")
                                                     ,'u_name'           => new \Zend\Db\Sql\Predicate\Expression("LOWER('".$oDataRequest->user_name."')") 
                                                     ,'u_password_hash'  => $sUser_password_hash

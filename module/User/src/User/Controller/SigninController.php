@@ -3,13 +3,9 @@ namespace User\Controller;
 
 class SigninController extends \Zend\Mvc\Controller\AbstractActionController {
     
-
-    
     public function indexAction() {
-        if ($this->getRequest()->isOptions()) return;
-        parent::indexAction();
-//        $this->getRequest()->setContent('{"user_name":"GONZALO","user_password":"gonzalo","user_remember":false}');
-//        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
+        $this->getRequest()->setContent('{"user_name":"GONZALO","user_password":"gonzalo","user_remember":false}');
+        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
         
         $bAuthenticated = false;
         if ($this->getRequest()->isXmlHttpRequest() && ($sJSONDataRequest = $this->getRequest()->getContent())) {
@@ -20,7 +16,7 @@ class SigninController extends \Zend\Mvc\Controller\AbstractActionController {
             $bUser_remember = $oDataRequest->user_remember;
             $sUser_password_hash = sha1($sUser_password);
             
-            $oUserTable = $this->getServiceLocator()->get('Datainterface\Model\UserTable');
+            $oUserTable = $this->getServiceLocator()->get('Datainterface\Model\DataTableGateway')->getTableGateway('IPYME_FINAL','USER');
             $aResult = $oUserTable->select(array(new \Zend\Db\Sql\Predicate\Literal("lower(u_name)='".strtolower($sUser_name)."'")
                                                , 'u_password_hash'=>$sUser_password_hash
                                                 ,'u_status' => 1));

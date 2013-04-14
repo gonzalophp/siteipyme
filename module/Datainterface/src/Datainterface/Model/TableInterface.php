@@ -3,40 +3,47 @@ namespace Datainterface\Model;
 
 class TableInterface implements \Zend\ServiceManager\FactoryInterface{
     public $serviceLocator;
+    public $oTable;
+    public $id_key;
+    public $aRecordData;
     
     public function createService(\Zend\ServiceManager\ServiceLocatorInterface $serviceLocator) {
         $this->serviceLocator=$serviceLocator;
         return $this;
     }
     
-    public function save($sServiceTable, $id_key, $aRecordData){
-        if (array_key_exists($id_key, $aRecordData)){
-            $aWhere = array($id_key => $aRecordData[$id_key]);
-            unset($aRecordData[$id_key]);
+    public function getTableInterface($sSchema, $sTable, $id_key=null, $aRecordData=null){
+        $this->id_key = $id_key;
+        $this->aRecordData = $aRecordData;
+        $this->oTable = $this->serviceLocator->get('Datainterface\Model\DataTableGateway')->getTableGateway($sSchema,$sTable);
+        return $this;
+    }
+    
+    public function save(){
+        if (array_key_exists($this->id_key, $this->aRecordData)){
+            $aWhere = array($this->id_key => $this->aRecordData[$this->id_key]);
+            unset($this->aRecordData[$this->id_key]);
             $aSet = array();
-            foreach($aRecordData as $sField => $sValue) {
+            foreach($this->aRecordData as $sField => $sValue) {
                 $aSet[$sField] = $sValue;
             }
-            $oTable = $this->serviceLocator->get($sServiceTable);        
-            $aResult = $oTable->update($aSet,$aWhere);
+            $aResult = $this->oTable->update($aSet,$aWhere);
             
         }
         else {
-            $aInsert = array($id_key => new \Zend\Db\Sql\Predicate\Expression("DEFAULT"));
-            foreach($aRecordData as $sField => $sValue) {
+            $aInsert = array($this->id_key => new \Zend\Db\Sql\Predicate\Expression("DEFAULT"));
+            foreach($this->aRecordData as $sField => $sValue) {
                 $aInsert[$sField] = $sValue;
             }
-            $oTable = $this->serviceLocator->get($sServiceTable);        
-            $aResult = $oTable->insert($aInsert);
+            $aResult = $this->oTable->insert($aInsert);
         }
         return $aResult['success'];
     }
     
-    public function delete($sServiceTable, $id_key, $aRecordData){
-        if (array_key_exists($id_key,$aRecordData)){
-            $aWhere = array($id_key => $aRecordData[$id_key]);
-            $oTable = $this->serviceLocator->get($sServiceTable);        
-            $aResult = $oTable->delete($aWhere);
+    public function delete(){
+        if (array_key_exists($this->id_key,$this->aRecordData)){
+            $aWhere = array($this->id_key => $this->aRecordData[$this->id_key]);
+            $aResult = $this->oTable->delete($aWhere);
             return $aResult['success'];
         }
         else {
@@ -44,9 +51,8 @@ class TableInterface implements \Zend\ServiceManager\FactoryInterface{
         }
     }
     
-    public function fetchAll($sServiceTable){
-        $oTable = $this->serviceLocator->get($sServiceTable);
-        return $oTable->select();
+    public function fetchAll(){
+        return $this->oTable->select();
     }
 }
 ?>

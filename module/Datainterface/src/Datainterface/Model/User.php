@@ -12,7 +12,7 @@ class User {
     public $u_customer;
     public $u_name;
     public $u_password_hash;
-            
+
     public function exchangeArray($data) {
         $this->u_id             = (isset($data['u_id'])) ? $data['u_id'] : null;
         $this->u_session        = (isset($data['u_session'])) ? $data['u_session'] : null;

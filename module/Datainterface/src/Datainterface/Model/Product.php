@@ -10,6 +10,10 @@ class Product {
     public $p_weight;
     public $p_size;
             
+    public function __construct() {
+        
+    }
+    
     public function exchangeArray($data) {
         $this->p_id             = (isset($data['p_id'])) ? $data['p_id'] : null;
         $this->p_ref            = (isset($data['p_ref'])) ? $data['p_ref'] : null;
