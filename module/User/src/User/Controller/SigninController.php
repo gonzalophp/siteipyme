@@ -4,8 +4,8 @@ namespace User\Controller;
 class SigninController extends \Zend\Mvc\Controller\AbstractActionController {
     
     public function indexAction() {
-        $this->getRequest()->setContent('{"user_name":"GONZALO","user_password":"gonzalo","user_remember":false}');
-        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
+//        $this->getRequest()->setContent('{"user_name":"GONZALO","user_password":"gonzalo","user_remember":false}');
+//        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
         
         $bAuthenticated = false;
         if ($this->getRequest()->isXmlHttpRequest() && ($sJSONDataRequest = $this->getRequest()->getContent())) {

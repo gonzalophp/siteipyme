@@ -52,7 +52,6 @@ class DataTableGateway extends \Zend\Db\TableGateway\AbstractTableGateway implem
             $sErrorMessage = $e->getPrevious()->getMessage();
         }
         
-        error_reporting (0);
         switch($nQuery){
             case self::QUERY_SELECT:
                 $sSQL = $this->getSql()->getSqlStringForSqlObject($this->getSql()->select()->where($aWhere));
@@ -67,7 +66,6 @@ class DataTableGateway extends \Zend\Db\TableGateway\AbstractTableGateway implem
                 $sSQL = $this->getSql()->getSqlStringForSqlObject($this->getSql()->delete()->where($aWhere));
             break;
         }
-         error_reporting (E_ALL);
         
         return array( 'resultset'       => $aResultSet
                     , 'success'         => $bSuccess

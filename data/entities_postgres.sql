@@ -74,7 +74,7 @@ CREATE TABLE "IPYME_AUX"."ITEM" (
 );
 
 CREATE TABLE "IPYME_AUX"."CURRENCY" (
-    C_ID INT PRIMARY KEY
+    C_ID SERIAL PRIMARY KEY
     , C_NAME VARCHAR(100)
 );
 
@@ -102,17 +102,17 @@ CREATE TABLE "IPYME_AUX"."COUNTRY" (
     , C_NAME VARCHAR(100)
 );
 
-CREATE TABLE "IPYME_AUX"."LEGAL_ENTITY" (
-    LE_ID BIGSERIAL PRIMARY KEY
-    , LE_LEGAL_ID VARCHAR(100)
-    , LE_LEGAL_NAME VARCHAR(100)
+CREATE TABLE "IPYME_AUX"."INVOICE_ENTITY" (
+    IE_ID BIGSERIAL PRIMARY KEY
+    , IE_LEGAL_ID VARCHAR(100) UNIQUE
+    , IE_INVOICE_NAME VARCHAR(100)
 );
 
 CREATE TABLE "IPYME_AUX"."PEOPLE" (
     P_ID BIGSERIAL PRIMARY KEY
     , P_NAME VARCHAR(100)
     , P_SURNAME VARCHAR(100)
-    , P_LEGAL_ENTITY BIGINT REFERENCES "IPYME_AUX"."LEGAL_ENTITY"
+    , P_INVOICE_ENTITY BIGINT REFERENCES "IPYME_AUX"."INVOICE_ENTITY"
 );
 
 CREATE TABLE "IPYME_AUX"."PEOPLE_REPONSIBILITY" (
@@ -123,17 +123,21 @@ CREATE TABLE "IPYME_AUX"."PEOPLE_REPONSIBILITY" (
 
 CREATE TABLE "IPYME_AUX"."COURIER" (
     C_ID BIGSERIAL PRIMARY KEY
-    , C_LEGAL_ENTITY BIGINT REFERENCES "IPYME_AUX"."LEGAL_ENTITY"
+    , C_INVOICE_ENTITY BIGINT REFERENCES "IPYME_AUX"."INVOICE_ENTITY"
 );
 
 CREATE TABLE "IPYME_AUX"."CUSTOMER" (
     C_ID BIGSERIAL PRIMARY KEY
-    , C_LEGAL_ENTITY BIGINT REFERENCES "IPYME_AUX"."LEGAL_ENTITY"
+    , C_CUSTOMER_NAME VARCHAR(100)
+    , C_INVOICE_ENTITY BIGINT REFERENCES "IPYME_AUX"."INVOICE_ENTITY"
+    , CONSTRAINT unique_customer_name_entity UNIQUE(C_CUSTOMER_NAME, C_INVOICE_ENTITY)
 );
 
 CREATE TABLE "IPYME_AUX"."PROVIDER" (
     P_ID BIGSERIAL PRIMARY KEY
-    , P_LEGAL_ENTITY BIGINT REFERENCES "IPYME_AUX"."LEGAL_ENTITY"
+    , P_PROVIDER_NAME VARCHAR(100)
+    , P_INVOICE_ENTITY BIGINT REFERENCES "IPYME_AUX"."INVOICE_ENTITY"
+    , CONSTRAINT unique_provider_name_entity UNIQUE(P_PROVIDER_NAME, P_INVOICE_ENTITY)
 );
 
 CREATE TABLE "IPYME_AUX"."ADDRESS_DETAIL" (
@@ -143,7 +147,7 @@ CREATE TABLE "IPYME_AUX"."ADDRESS_DETAIL" (
     , AD_TOWN VARCHAR(100)
     , AD_COUNTRY INT REFERENCES "IPYME_AUX"."COUNTRY"
     , AD_DESCRIPTION VARCHAR(100)
-    , AD_LEGAL_ENTITY BIGINT REFERENCES "IPYME_AUX"."LEGAL_ENTITY"
+    , AD_INVOICE_ENTITY BIGINT REFERENCES "IPYME_AUX"."INVOICE_ENTITY"
 );
 
 
@@ -154,35 +158,35 @@ CREATE TABLE "IPYME_AUX"."PROVIDER_CATEGORY_LINK" (
 );
 
 CREATE TABLE "IPYME_AUX"."ORDER_CUSTOMER" (
-    OC_ID BIGINT PRIMARY KEY
+    OC_ID BIGSERIAL PRIMARY KEY
     , OD_CUSTOMER BIGINT REFERENCES "IPYME_AUX"."CUSTOMER"
     , OD_DATE TIMESTAMP WITH TIME ZONE
 );
 
 CREATE TABLE "IPYME_AUX"."SALE" (
-    S_ID BIGINT PRIMARY KEY
+    S_ID BIGSERIAL PRIMARY KEY
     , S_ORDER_CUSTOMER BIGINT REFERENCES "IPYME_AUX"."ORDER_CUSTOMER"
 );
 
 CREATE TABLE "IPYME_AUX"."ORDER_PROVIDER" (
-    OP_ID BIGINT PRIMARY KEY
+    OP_ID BIGSERIAL PRIMARY KEY
     , OP_PROVIDER BIGINT REFERENCES "IPYME_AUX"."PROVIDER"
     , OP_DATE TIMESTAMP WITH TIME ZONE
 );
 
 CREATE TABLE "IPYME_AUX"."PURCHASE" (
-    P_ID BIGINT PRIMARY KEY
+    P_ID BIGSERIAL PRIMARY KEY
     , P_ORDER_PROVIDER BIGINT REFERENCES "IPYME_AUX"."ORDER_PROVIDER"
 );
 
 CREATE TABLE "IPYME_AUX"."COMMERCIAL_TRANSACTION" (
-    CT_ID BIGINT PRIMARY KEY
+    CT_ID BIGSERIAL PRIMARY KEY
     ,CT_PURCHASE BIGINT REFERENCES "IPYME_AUX"."PURCHASE"
     ,CT_SALE BIGINT REFERENCES "IPYME_AUX"."SALE"
 );
 
 CREATE TABLE "IPYME_AUX"."DELIVERY" (
-    D_ID BIGINT PRIMARY KEY
+    D_ID BIGSERIAL PRIMARY KEY
     , D_SALE BIGINT REFERENCES "IPYME_AUX"."SALE"
     , D_TRACKING VARCHAR(100)
     , D_WEIGHT NUMERIC(5,3)
@@ -191,13 +195,13 @@ CREATE TABLE "IPYME_AUX"."DELIVERY" (
 );
 
 CREATE TABLE "IPYME_AUX"."CARD_VENDOR" (
-    CV_ID INT PRIMARY KEY
+    CV_ID SERIAL PRIMARY KEY
     , CV_NAME VARCHAR(100)
 );
 
 CREATE TABLE "IPYME_AUX"."CARD" (
-    C_ID BIGINT PRIMARY KEY
-    , C_LEGAL_ENTITY BIGINT REFERENCES "IPYME_AUX"."LEGAL_ENTITY"
+    C_ID BIGSERIAL PRIMARY KEY
+    , C_INVOICE_ENTITY BIGINT REFERENCES "IPYME_AUX"."INVOICE_ENTITY"
     , C_DESCRIPTION VARCHAR(100)
     , C_CARD_NUMBER VARCHAR(20)
     , C_NAME VARCHAR(100)
@@ -207,13 +211,13 @@ CREATE TABLE "IPYME_AUX"."CARD" (
 );
 
 CREATE TABLE "IPYME_AUX"."BANK_ACCOUNT" (
-    BA_ID BIGINT PRIMARY KEY
-    , BA_LEGAL_ENTITY BIGINT REFERENCES "IPYME_AUX"."LEGAL_ENTITY"
+    BA_ID BIGSERIAL PRIMARY KEY
+    , BA_INVOICE_ENTITY BIGINT REFERENCES "IPYME_AUX"."INVOICE_ENTITY"
     , BA_NUMER VARCHAR(100)
 );
 
 CREATE TABLE "IPYME_AUX"."PAYMENT" (
-    P_ID BIGINT PRIMARY KEY
+    P_ID BIGSERIAL PRIMARY KEY
     , P_CARD BIGINT REFERENCES "IPYME_AUX"."CARD"
     , P_AMOUNT NUMERIC(8,3)
     , P_CURRENCY INT REFERENCES "IPYME_AUX"."CURRENCY"
@@ -224,7 +228,7 @@ CREATE TABLE "IPYME_AUX"."PAYMENT" (
 );
 
 CREATE TABLE "IPYME_AUX"."PRODUCT_LIST" (
-    PL_ID BIGINT PRIMARY KEY
+    PL_ID BIGSERIAL PRIMARY KEY
     , PL_ORDER_CUSTOMER BIGINT REFERENCES "IPYME_AUX"."ORDER_CUSTOMER"
     , PL_ORDER_PROVIDER BIGINT REFERENCES "IPYME_AUX"."ORDER_PROVIDER"
     , PL_PRODUCT BIGINT REFERENCES "IPYME_AUX"."PRODUCT"
@@ -237,7 +241,7 @@ CREATE TABLE "IPYME_AUX"."PRODUCT_LIST" (
 
 
 CREATE TABLE "IPYME_AUX"."ITEM_HISTORY" (
-    IH_ID BIGINT PRIMARY KEY 
+    IH_ID BIGSERIAL PRIMARY KEY 
     , IH_ITEM BIGINT REFERENCES "IPYME_AUX"."ITEM"
     , IH_PRODUCT_LIST BIGINT REFERENCES "IPYME_AUX"."PRODUCT_LIST"
     , IH_DATE TIMESTAMP WITH TIME ZONE
@@ -280,8 +284,240 @@ p2baa	oooo77788	bbbbbbbbbb	4534.000	433
 \.
 
 
+COPY "CURRENCY" (C_NAME) FROM stdin;
+GBP
+EUR
+USD
+\.
+
+
 DROP SCHEMA "IPYME_FINAL" CASCADE;
 
 ALTER SCHEMA "IPYME_AUX" RENAME TO "IPYME_FINAL";
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_customer(IN p_c_id bigint)
+  RETURNS TABLE(c_id bigint, c_customer_name varchar, c_invoice_entity bigint, ie_id bigint, ie_legal_id character varying, ie_invoice_name character varying) AS
+$BODY$
+DECLARE
+BEGIN
+	--
+	IF p_c_id IS NULL THEN
+		RETURN QUERY select c.c_id
+			, c.c_customer_name
+			, c.c_invoice_entity
+			, ie.ie_id
+			, ie.ie_legal_id
+			, ie.ie_invoice_name 
+		from "IPYME_FINAL"."CUSTOMER" c
+			,"IPYME_FINAL"."INVOICE_ENTITY" ie
+		WHERE c.c_invoice_entity=ie.ie_id;
+	ELSE
+		RETURN QUERY select c.c_id
+			, c.c_customer_name
+			, c.c_invoice_entity
+			, ie.ie_id
+			, ie.ie_legal_id
+			, ie.ie_invoice_name 
+		from "IPYME_FINAL"."CUSTOMER" c
+			,"IPYME_FINAL"."INVOICE_ENTITY" ie
+		WHERE c.c_invoice_entity=ie.ie_id
+		and c.c_id=p_c_id;
+	END IF;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_invoice_entity(p_ie_id bigint, p_ie_legal_id character varying, p_ie_invoice_name character varying)
+  RETURNS record AS
+$BODY$
+DECLARE
+v_ie_id BIGINT;
+v_create_invoice_entity BOOLEAN;
+v_record RECORD;
+BEGIN
+	--
+	v_create_invoice_entity := TRUE;
+	--
+	IF (p_ie_id > 0) THEN
+		--
+		SELECT IE.IE_ID
+		INTO v_ie_id
+		FROM "IPYME_FINAL"."INVOICE_ENTITY" IE
+		WHERE IE.IE_ID = p_ie_id;
+		--
+		IF FOUND THEN
+			v_create_invoice_entity := FALSE;
+		END IF;
+		--
+	END IF;
+	--
+	IF (v_create_invoice_entity = TRUE) THEN
+		--
+		SELECT NEXTVAL('"IPYME_FINAL"."INVOICE_ENTITY_ie_id_seq"') INTO v_ie_id ;
+		INSERT INTO "IPYME_FINAL"."INVOICE_ENTITY" (ie_id
+							, ie_legal_id
+							, ie_invoice_name)
+						VALUES(v_ie_id
+							, p_ie_legal_id
+							, p_ie_invoice_name);
+		--
+	ELSE
+		--
+		UPDATE "IPYME_FINAL"."INVOICE_ENTITY"
+		SET 	ie_legal_id = p_ie_legal_id
+			, ie_invoice_name = p_ie_invoice_name
+		WHERE ie_id = v_ie_id;
+		--
+	END IF;
+	--
+	--
+	v_record := (v_ie_id, p_ie_legal_id, p_ie_invoice_name);
+	--
+	--
+	RETURN v_record;
+	--
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_customer(p_c_id bigint
+						, p_c_customer_name character varying
+						, p_ie_id BIGINT
+						, p_ie_legal_id character varying
+						, p_ie_invoice_name character varying)
+RETURNS TABLE(success boolean
+, v_c_id bigint
+, v_ie_id bigint) AS
+$BODY$
+DECLARE
+v_c_id BIGINT;
+v_ie_id BIGINT;
+v_create_customer BOOLEAN;
+v_create_invoice_entity BOOLEAN;
+BEGIN
+	--
+	v_create_invoice_entity := TRUE;
+	--
+	--
+	SELECT IE.IE_ID
+	INTO v_ie_id
+	FROM "IPYME_FINAL"."INVOICE_ENTITY" IE
+	WHERE IE.IE_ID = p_ie_id
+	OR IE.IE_LEGAL_ID = p_ie_legal_id;
+	--
+	IF FOUND THEN
+		v_create_invoice_entity := FALSE;
+	END IF;
+	--
+	IF (v_create_invoice_entity = TRUE) THEN
+		--
+		SELECT NEXTVAL('"IPYME_FINAL"."INVOICE_ENTITY_ie_id_seq"') INTO v_ie_id ;
+		INSERT INTO "IPYME_FINAL"."INVOICE_ENTITY" (ie_id
+							, ie_legal_id
+							, ie_invoice_name)
+						VALUES(v_ie_id
+							, p_ie_legal_id
+							, p_ie_invoice_name);
+		--
+	ELSE
+		--
+		UPDATE "IPYME_FINAL"."INVOICE_ENTITY" IE
+		SET 	ie_legal_id = p_ie_legal_id
+			, ie_invoice_name = p_ie_invoice_name
+		WHERE ie_id = v_ie_id;
+		--
+	END IF;
+	--
+	--
+	v_create_customer := TRUE;
+	--
+	SELECT C.C_ID
+	INTO v_c_id
+	FROM "IPYME_FINAL"."CUSTOMER" C
+	WHERE ((C.C_ID = p_c_id) AND (C.c_invoice_entity = v_ie_id)) 
+	OR ((C.c_invoice_entity = v_ie_id) AND (C.c_customer_name = p_c_customer_name));
+	--
+	IF FOUND THEN
+		v_create_customer := FALSE;
+	END IF;
+	--
+	IF (v_create_customer = TRUE) THEN
+		--
+		SELECT NEXTVAL('"IPYME_FINAL"."CUSTOMER_c_id_seq"') INTO v_c_id ;
+		--
+		INSERT INTO "IPYME_FINAL"."CUSTOMER" (c_id
+						  ,c_customer_name 
+						  ,c_invoice_entity)
+					VALUES ( v_c_id
+						  ,p_c_customer_name 
+						  ,v_ie_id);
+		--
+	ELSE
+		--
+		UPDATE "IPYME_FINAL"."CUSTOMER"
+		SET 	c_customer_name = p_c_customer_name
+		WHERE c_id = v_c_id
+		AND c_invoice_entity = v_ie_id;
+		--
+	END IF;
+	--
+	--
+	RETURN QUERY SELECT TRUE, v_c_id, v_ie_id;
+	--
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_provider(IN p_p_id bigint)
+  RETURNS TABLE(p_id bigint, p_provider_name character varying, p_invoice_entity bigint, ie_id bigint, ie_legal_id character varying, ie_invoice_name character varying) AS
+$BODY$
+DECLARE
+BEGIN
+	--
+	IF p_p_id IS NULL THEN
+		RETURN QUERY select p.p_id
+			, p.p_provider_name
+			, p.p_invoice_entity
+			, ie.ie_id
+			, ie.ie_legal_id
+			, ie.ie_invoice_name 
+		from "IPYME_FINAL"."PROVIDER" p
+			,"IPYME_FINAL"."INVOICE_ENTITY" ie
+		WHERE p.p_invoice_entity=ie.ie_id;
+	ELSE
+		RETURN QUERY select p.p_id
+			, p.p_provider_name
+			, p.p_invoice_entity
+			, ie.ie_id
+			, ie.ie_legal_id
+			, ie.ie_invoice_name 
+		from "IPYME_FINAL"."PROVIDER" p
+			,"IPYME_FINAL"."INVOICE_ENTITY" ie
+		WHERE p.p_invoice_entity=ie.ie_id
+		and p.p_id=p_p_id;
+	END IF;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
+
 
 \dn

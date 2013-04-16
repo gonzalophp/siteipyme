@@ -1,22 +1,21 @@
 <?php
 namespace Shop\Controller;
 
-class CustomerController extends \Zend\Mvc\Controller\AbstractActionController {
+class ProviderController extends \Zend\Mvc\Controller\AbstractActionController {
     
     public function indexAction() {
         $aResponse = array(
             'datagrid' => array(),
             'columnDefs' => array(
-                array('field' => "c_id", 'displayName' => "ID", 'width' => 30),
-                array('field' => "c_customer_name", 'displayName' => "Customer", 'width' => 150),
+                array('field' => "p_id", 'displayName' => "ID", 'width' => 30),
+                array('field' => "p_provider_name", 'displayName' => "Provider", 'width' => 150),
                 array('field' => "ie_legal_id", 'displayName' => "Legal ID", 'width' => 100),
                 array('field' => "ie_invoice_name", 'displayName' => "Invoice Name", 'width' => 150),
             )
         );
         
         $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
-        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_customer', array(':id' => null));
-        
+        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_provider', array(':id' => null));
         foreach($oResultSet as $aRow) {
             $aResponse['datagrid'][] = $aRow;
         }

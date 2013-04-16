@@ -64,6 +64,9 @@ return array(
     'controllers' => array(
         'invokables' => array(
             'Shop\Controller\Product' => 'Shop\Controller\ProductController',
+            'Shop\Controller\Customer' => 'Shop\Controller\CustomerController',
+            'Shop\Controller\User' => 'Shop\Controller\UserController',
+            'Shop\Controller\Provider' => 'Shop\Controller\ProviderController',
         ),
     ),
     'view_manager' => array(

@@ -1,18 +1,31 @@
 <?php
 namespace Shop\Controller;
 
-class CustomerController extends \Zend\Mvc\Controller\AbstractActionController {
+class UserController extends \Zend\Mvc\Controller\AbstractActionController {
     
     public function indexAction() {
         $aResponse = array(
             'datagrid' => array(),
             'columnDefs' => array(
-                array('field' => "c_id", 'displayName' => "ID", 'width' => 30),
-                array('field' => "c_customer_name", 'displayName' => "Customer", 'width' => 150),
-                array('field' => "ie_legal_id", 'displayName' => "Legal ID", 'width' => 100),
-                array('field' => "ie_invoice_name", 'displayName' => "Invoice Name", 'width' => 150),
+                array('field' => "u_id", 'displayName' => "ID", 'width' => 50),
+                array('field' => "u_session", 'displayName' => "Session", 'width' => 250),
+                array('field' => "u_last_login", 'displayName' => "Last Loged In", 'width' => 100),
+                array('field' => "u_email", 'displayName' => "EMail", 'width' => 150),
+                array('field' => "u_status", 'displayName' => "Status", 'width' => 50),
+                array('field' => "u_basket", 'displayName' => "Basket", 'width' => 70),
             )
         );
+                
+        $oUserTable = $this->getServiceLocator()->get('Datainterface\Model\TableInterface')->getTableInterface('IPYME_FINAL','USER');
+        $aResult = $oUserTable->fetchAll();
+            
+        foreach($aResult['resultset'] as $oUser) {
+            $aResponse['datagrid'][] = $oUser;
+        }
+
+        return new \Zend\View\Model\JsonModel($aResponse);
+        
+        
         
         $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
         $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_customer', array(':id' => null));

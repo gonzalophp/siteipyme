@@ -63,6 +63,9 @@ return array(
         'invokables' => array(
             'Menus\Controller\Main' => 'Menus\Controller\MainController',
             'Menus\Controller\Product' => 'Menus\Controller\ProductController',
+            'Menus\Controller\Customer' => 'Menus\Controller\CustomerController',
+            'Menus\Controller\User' => 'Menus\Controller\UserController',
+            'Menus\Controller\Provider' => 'Menus\Controller\ProviderController',
         ),
     ),
     'view_manager' => array(

@@ -17,7 +17,7 @@ class MainMenu {
                        ,'nodes' => array(
                             (object) array(
                                 'label' => 'Provider'
-                                ,'url' => '#/admin/purchase/provider'
+                                ,'url' => '#/admin/list/provider'
                               , 'nodes' => array())
                           , (object) array(
                               'label' => 'Order'
@@ -69,7 +69,7 @@ class MainMenu {
                        ,'nodes' => array(
                            (object) array(
                                 'label' => 'Users'
-                                ,'url' => '#/admin/user'
+                                ,'url' => '#/admin/list/user'
                                ,'nodes' => array())))))
             , (object) array(
                 'label' => 'Sign In'

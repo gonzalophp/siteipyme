@@ -6,6 +6,7 @@ return array(
         'factories' => array(
             'Datainterface\Model\DataTableGateway' => 'Datainterface\Model\DataTableGateway',
             'Datainterface\Model\TableInterface' =>  '\Datainterface\Model\TableInterface',
+            'Datainterface\Model\DataFunctionGateway' => 'Datainterface\Model\DataFunctionGateway',
         ),
         'invokables' => array(
             'Datainterface\Model\User' => 'Datainterface\Model\User',
