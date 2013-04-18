@@ -16,9 +16,10 @@ class CustomerController extends \Zend\Mvc\Controller\AbstractActionController {
         
         $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
         $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_customer', array(':id' => null));
-        
-        foreach($oResultSet as $aRow) {
-            $aResponse['datagrid'][] = $aRow;
+            
+        foreach($oResultSet as $aCustomer) {
+            $aCustomer['grid_id'] = $aCustomer['c_id'];
+            $aResponse['datagrid'][] = $aCustomer;
         }
 
         return new \Zend\View\Model\JsonModel($aResponse);
@@ -29,6 +30,7 @@ class CustomerController extends \Zend\Mvc\Controller\AbstractActionController {
             $sJSONDataRequest = $this->getRequest()->getContent();
             $aRequest = (array)json_decode($sJSONDataRequest);
             
+            
             $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
             $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'set_customer'
                     , array( ':p_c_id'              => array_key_exists('c_id',$aRequest)?$aRequest['c_id']:null
@@ -36,29 +38,41 @@ class CustomerController extends \Zend\Mvc\Controller\AbstractActionController {
                             ,':p_ie_id'             => array_key_exists('ie_id',$aRequest)?$aRequest['ie_id']:null
                             ,':p_ie_legal_id'       => $aRequest['ie_legal_id']
                             ,':p_ie_invoice_name'   => $aRequest['ie_invoice_name']));
-                    
-            $aResultSet = $oResultSet->current();
-            $bSuccess = $aResultSet['success'];
+            
+            $aResponse = $oResultSet->current();
+            if ($oResultSet->count()==1){
+                $aResponse['success'] = ($oResultSet->count()==1)?1:0;
+                $aResponse['grid_id'] = $aResponse['c_id'];
+            }
+            else {
+                $aResponse = array('success' => 0);
+            }
         }
         else {
-            $bSuccess=false;
+           $aResponse = array('success' => 0);
         }
         
-        return new \Zend\View\Model\JsonModel(array('success' => ($bSuccess?1:0)));
+        return new \Zend\View\Model\JsonModel($aResponse);
     }
     
     public function DeleteAction(){
         if ($this->getRequest()->isXmlHttpRequest()) {
             $sJSONDataRequest = $this->getRequest()->getContent();
-            $aRequest = (array)json_decode($sJSONDataRequest);;
-            $oTableController = $this->getServiceLocator()->get('Datainterface\Model\TableInterface');
-            $bSuccess = $oTableController->delete('Datainterface\Model\CustomerTable','p_id',$aRequest);
+            $aRequest = (array)json_decode($sJSONDataRequest);
+            
+            
+            $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+            $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'delete_customer'
+                    , array( ':p_c_id'              => array_key_exists('c_id',$aRequest)?$aRequest['c_id']:null));
+                    
+            $aResponse = $oResultSet->current();
+            $aResponse['success'] = ($oResultSet->count()==1)?1:0;
         }
         else {
-            $bSuccess = false;
+            $aResponse = array('success' => 0);
         }
         
-        return new \Zend\View\Model\JsonModel(array('success' => ($bSuccess?1:0)));
+        return new \Zend\View\Model\JsonModel($aResponse);
     }
     
     public function testAction() {

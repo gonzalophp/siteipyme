@@ -13,11 +13,12 @@ class ProviderController extends \Zend\Mvc\Controller\AbstractActionController {
                 array('field' => "ie_invoice_name", 'displayName' => "Invoice Name", 'width' => 150),
             )
         );
-        
         $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
         $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_provider', array(':id' => null));
-        foreach($oResultSet as $aRow) {
-            $aResponse['datagrid'][] = $aRow;
+            
+        foreach($oResultSet as $aProvider) {
+            $aProvider['grid_id'] = $aProvider['p_id'];
+            $aResponse['datagrid'][] = $aProvider;
         }
 
         return new \Zend\View\Model\JsonModel($aResponse);
@@ -28,36 +29,49 @@ class ProviderController extends \Zend\Mvc\Controller\AbstractActionController {
             $sJSONDataRequest = $this->getRequest()->getContent();
             $aRequest = (array)json_decode($sJSONDataRequest);
             
+            
             $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
-            $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'set_customer'
-                    , array( ':p_c_id'              => array_key_exists('c_id',$aRequest)?$aRequest['c_id']:null
-                            ,':p_c_customer_name'   => $aRequest['c_customer_name']
+            $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'set_provider'
+                    , array( ':p_p_id'              => array_key_exists('p_id',$aRequest)?$aRequest['p_id']:null
+                            ,':p_p_provider_name'   => $aRequest['p_provider_name']
                             ,':p_ie_id'             => array_key_exists('ie_id',$aRequest)?$aRequest['ie_id']:null
                             ,':p_ie_legal_id'       => $aRequest['ie_legal_id']
                             ,':p_ie_invoice_name'   => $aRequest['ie_invoice_name']));
-                    
-            $aResultSet = $oResultSet->current();
-            $bSuccess = $aResultSet['success'];
+            
+            $aResponse = $oResultSet->current();
+            if ($oResultSet->count()==1){
+                $aResponse['success'] = ($oResultSet->count()==1)?1:0;
+                $aResponse['grid_id'] = $aResponse['p_id'];
+            }
+            else {
+                $aResponse = array('success' => 0);
+            }
         }
         else {
-            $bSuccess=false;
+           $aResponse = array('success' => 0);
         }
         
-        return new \Zend\View\Model\JsonModel(array('success' => ($bSuccess?1:0)));
+        return new \Zend\View\Model\JsonModel($aResponse);
     }
     
     public function DeleteAction(){
+        
         if ($this->getRequest()->isXmlHttpRequest()) {
             $sJSONDataRequest = $this->getRequest()->getContent();
-            $aRequest = (array)json_decode($sJSONDataRequest);;
-            $oTableController = $this->getServiceLocator()->get('Datainterface\Model\TableInterface');
-            $bSuccess = $oTableController->delete('Datainterface\Model\CustomerTable','p_id',$aRequest);
+            $aRequest = (array)json_decode($sJSONDataRequest);
+            
+            $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+            $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'delete_provider'
+                    , array( ':p_p_id'              => array_key_exists('p_id',$aRequest)?$aRequest['p_id']:null));
+                    
+            $aResponse = $oResultSet->current();
+            $aResponse['success'] = ($oResultSet->count()==1)?1:0;
         }
         else {
-            $bSuccess = false;
+            $aResponse = array('success' => 0);
         }
         
-        return new \Zend\View\Model\JsonModel(array('success' => ($bSuccess?1:0)));
+        return new \Zend\View\Model\JsonModel($aResponse);
     }
     
     public function testAction() {

@@ -32,7 +32,7 @@ CREATE TABLE "IPYME_AUX"."PRODUCT_CATEGORY_VALUE" (
 
 CREATE TABLE "IPYME_AUX"."PRODUCT" (
     P_ID BIGSERIAL PRIMARY KEY
-    , P_REF VARCHAR(45)
+    , P_REF VARCHAR(45) UNIQUE NOT NULL
     , P_DESCRIPTION VARCHAR(255)
     , P_LONG_DESCRIPTION VARCHAR(255)
     , P_WEIGHT NUMERIC(8,3)
@@ -511,6 +511,48 @@ BEGIN
 		WHERE p.p_invoice_entity=ie.ie_id
 		and p.p_id=p_p_id;
 	END IF;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".delete_customer(IN p_c_id bigint)
+  RETURNS SETOF boolean AS
+$BODY$
+DECLARE
+v_c_id BIGINT;
+v_c_invoice_entity BIGINT;
+BEGIN
+	--
+	--
+	SELECT C.c_invoice_entity
+	INTO v_c_invoice_entity
+	FROM "IPYME_FINAL"."CUSTOMER" C
+	WHERE C.c_id = p_c_id;
+	--
+	RAISE INFO '% - %',p_c_id,v_c_invoice_entity;
+	--
+	DELETE FROM "IPYME_FINAL"."CUSTOMER"
+	WHERE c_id = p_c_id;
+	--
+	begin
+	DELETE FROM "IPYME_FINAL"."INVOICE_ENTITY"
+	WHERE ie_id = v_c_invoice_entity;
+	exception
+		when others then
+			null;
+	end;
+	--
+	--
+	RETURN QUERY SELECT TRUE;
+	--
+	EXCEPTION 
+		WHEN OTHERS THEN
+			RETURN QUERY SELECT FALSE;
+	--
 	--
 END;
 $BODY$

@@ -16,42 +16,71 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
             )
         );
         
-        $oProductTable = $this->getServiceLocator()->get('Datainterface\Model\TableInterface')->getTableInterface('IPYME_FINAL','PRODUCT');
-        $aResult = $oProductTable->fetchAll();
+        $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_product', array(':id' => null));
             
-        foreach($aResult['resultset'] as $oProduct) {
-            $aResponse['datagrid'][] = $oProduct;
+        foreach($oResultSet as $aProduct) {
+            $aProduct['grid_id'] = $aProduct['p_id'];
+            $aResponse['datagrid'][] = $aProduct;
         }
 
         return new \Zend\View\Model\JsonModel($aResponse);
     }
     
     public function SaveAction(){
+        
         if ($this->getRequest()->isXmlHttpRequest()) {
             $sJSONDataRequest = $this->getRequest()->getContent();
             $aRequest = (array)json_decode($sJSONDataRequest);
-            $oProductTable = $this->getServiceLocator()->get('Datainterface\Model\TableInterface')->getTableInterface('IPYME_FINAL','PRODUCT','p_id',$aRequest);
-            $bSuccess = $oProductTable->save()?1:0;
+            
+            $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+            $oResultSet = $oDataFunctionGateway->getDataRecordSet(
+                'IPYME_FINAL'
+                , 'set_product'
+                , array(':p_p_id'                => array_key_exists('p_id',$aRequest)?$aRequest['p_id']:null
+                        ,':p_p_ref'              => $aRequest['p_ref']
+                        ,':p_p_description'      => $aRequest['p_description']
+                        ,':p_p_long_description' => $aRequest['p_long_description']
+                        ,':p_p_weight'           => $aRequest['p_weight']
+                        ,':p_p_size'             => $aRequest['p_size']));
+
+            $aResponse = $oResultSet->current();
+            if ($oResultSet->count()==1){
+                $aResponse['success'] = ($oResultSet->count()==1)?1:0;
+                $aResponse['grid_id'] = $aResponse['p_id'];
+            }
+            else {
+                $aResponse = array('success' => 0);
+            }
+            
         }
         else {
-            $bSuccess=false;
+            $aResponse = array('success' => 0);
         }
         
-        return new \Zend\View\Model\JsonModel(array('success' => ($bSuccess?1:0)));
+        return new \Zend\View\Model\JsonModel($aResponse);
     }
     
     public function DeleteAction(){
         if ($this->getRequest()->isXmlHttpRequest()) {
             $sJSONDataRequest = $this->getRequest()->getContent();
             $aRequest = (array)json_decode($sJSONDataRequest);
-            $oProductTable = $this->getServiceLocator()->get('Datainterface\Model\TableInterface')->getTableInterface('IPYME_FINAL','PRODUCT','p_id',$aRequest);
-            $bSuccess = $oProductTable->delete();
+            
+            $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+            $oResultSet = $oDataFunctionGateway->getDataRecordSet(
+                'IPYME_FINAL'
+                , 'delete_product'
+                , array(':p_p_id'                => array_key_exists('p_id',$aRequest)?$aRequest['p_id']:null));
+            
+            
+            $aResponse = $oResultSet->current();
+            $aResponse['success'] = ($oResultSet->count()==1)?1:0;
         }
         else {
-            $bSuccess = false;
+            $aResponse = array('success' => 0);
         }
         
-        return new \Zend\View\Model\JsonModel(array('success' => ($bSuccess?1:0)));
+        return new \Zend\View\Model\JsonModel($aResponse);
     }
 }
 ?>
