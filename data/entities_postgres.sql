@@ -296,23 +296,207 @@ DROP SCHEMA "IPYME_FINAL" CASCADE;
 ALTER SCHEMA "IPYME_AUX" RENAME TO "IPYME_FINAL";
 
 
+
+-- Function: "IPYME_FINAL".delete_customer(bigint)
+
+-- DROP FUNCTION "IPYME_FINAL".delete_customer(bigint);
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".delete_customer(IN p_c_id bigint)
+  RETURNS TABLE(c_id bigint, c_customer_name character varying, c_invoice_entity bigint, ie_id bigint, ie_legal_id character varying, ie_invoice_name character varying) AS
+$BODY$
+DECLARE
+v_customer "IPYME_FINAL"."CUSTOMER"%ROWTYPE;
+v_invoice_entity "IPYME_FINAL"."INVOICE_ENTITY"%ROWTYPE;
+BEGIN
+	--
+	SELECT *
+	INTO v_customer
+	FROM "IPYME_FINAL"."CUSTOMER" C
+	WHERE C.c_id = p_c_id;
+	--
+	IF FOUND THEN
+		--
+		DELETE FROM "IPYME_FINAL"."CUSTOMER" C
+		WHERE C.c_id = v_customer.c_id;
+		--
+		SELECT *
+		INTO v_invoice_entity
+		FROM "IPYME_FINAL"."INVOICE_ENTITY" IE
+		WHERE IE.ie_id = v_customer.c_invoice_entity;
+		--
+	ELSE
+		RETURN;
+	END IF;
+	--
+	RAISE INFO '% - %',p_c_id,v_customer;
+	--
+	IF FOUND THEN
+		--
+		BEGIN
+			--
+			DELETE FROM "IPYME_FINAL"."INVOICE_ENTITY" IE
+			WHERE IE.ie_id = v_invoice_entity.ie_id;
+			--
+			EXCEPTION
+				WHEN OTHERS THEN
+					NULL;
+			--
+		END;
+		--
+	END IF;
+	--
+	--
+	RETURN QUERY SELECT v_customer.c_id
+									, v_customer.c_customer_name
+									, v_customer.c_invoice_entity
+									, v_invoice_entity.ie_id
+									, v_invoice_entity.ie_legal_id
+									, v_invoice_entity.ie_invoice_name;
+	--
+	EXCEPTION 
+		WHEN OTHERS THEN
+			RETURN;
+	--
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION "IPYME_FINAL".delete_customer(bigint)
+  OWNER TO postgres;
+
+
+
+-- Function: "IPYME_FINAL".delete_product(bigint)
+
+-- DROP FUNCTION "IPYME_FINAL".delete_product(bigint);
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".delete_product(p_p_id bigint)
+  RETURNS SETOF "IPYME_FINAL"."PRODUCT" AS
+$BODY$
+DECLARE
+v_row_product "IPYME_FINAL"."PRODUCT"%ROWTYPE;
+BEGIN
+	--
+	SELECT P.p_id
+				,P.p_ref
+				,P.p_description
+				,P.p_long_description
+				,P.p_weight
+				,P.p_size
+				INTO v_row_product
+	FROM "IPYME_FINAL"."PRODUCT" P
+	WHERE P.p_id = p_p_id;
+	--
+	IF NOT FOUND THEN
+		--
+		RETURN;
+		--
+	ELSE
+		--
+		DELETE FROM "IPYME_FINAL"."PRODUCT" P
+		WHERE P.p_id = p_p_id;
+		--
+		RETURN QUERY SELECT v_row_product.p_id 
+											,v_row_product.p_ref
+											,v_row_product.p_description
+											,v_row_product.p_long_description
+											,v_row_product.p_weight
+											,v_row_product.p_size;
+		--
+	END IF;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION "IPYME_FINAL".delete_product(bigint)
+  OWNER TO postgres;
+
+
+
+-- Function: "IPYME_FINAL".delete_provider(bigint)
+
+-- DROP FUNCTION "IPYME_FINAL".delete_provider(bigint);
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".delete_provider(IN p_p_id bigint)
+  RETURNS TABLE(p_id bigint, p_provider_name character varying, p_invoice_entity bigint, ie_id bigint, ie_legal_id character varying, ie_invoice_name character varying) AS
+$BODY$
+DECLARE
+v_provider "IPYME_FINAL"."PROVIDER"%ROWTYPE;
+v_invoice_entity "IPYME_FINAL"."INVOICE_ENTITY"%ROWTYPE;
+BEGIN
+	--
+	SELECT *
+	INTO v_provider
+	FROM "IPYME_FINAL"."PROVIDER" P
+	WHERE P.p_id = p_p_id;
+	--
+	IF FOUND THEN
+		--
+		DELETE FROM "IPYME_FINAL"."PROVIDER" P
+		WHERE p.p_id = v_provider.p_id;
+		--
+		SELECT *
+		INTO v_invoice_entity
+		FROM "IPYME_FINAL"."INVOICE_ENTITY" IE
+		WHERE IE.ie_id = v_provider.p_invoice_entity;
+		--
+	ELSE
+		RETURN;
+	END IF;
+	--
+	RAISE INFO '% - %',p_p_id,v_provider;
+	--
+	IF FOUND THEN
+		--
+		BEGIN
+			--
+			DELETE FROM "IPYME_FINAL"."INVOICE_ENTITY" IE
+			WHERE IE.ie_id = v_invoice_entity.ie_id;
+			--
+			EXCEPTION
+				WHEN OTHERS THEN
+					NULL;
+			--
+		END;
+		--
+	END IF;
+	--
+	--
+	RETURN QUERY SELECT v_provider.p_id
+									, v_provider.p_provider_name
+									, v_provider.p_invoice_entity
+									, v_invoice_entity.ie_id
+									, v_invoice_entity.ie_legal_id
+									, v_invoice_entity.ie_invoice_name;
+	--
+	EXCEPTION 
+		WHEN OTHERS THEN
+			RETURN;
+	--
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION "IPYME_FINAL".delete_provider(bigint)
+  OWNER TO postgres;
+
+
+-- Function: "IPYME_FINAL".get_customer(bigint)
+
+-- DROP FUNCTION "IPYME_FINAL".get_customer(bigint);
+
 CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_customer(IN p_c_id bigint)
-  RETURNS TABLE(c_id bigint, c_customer_name varchar, c_invoice_entity bigint, ie_id bigint, ie_legal_id character varying, ie_invoice_name character varying) AS
+  RETURNS TABLE(c_id bigint, c_customer_name character varying, c_invoice_entity bigint, ie_id bigint, ie_legal_id character varying, ie_invoice_name character varying) AS
 $BODY$
 DECLARE
 BEGIN
 	--
-	IF p_c_id IS NULL THEN
-		RETURN QUERY select c.c_id
-			, c.c_customer_name
-			, c.c_invoice_entity
-			, ie.ie_id
-			, ie.ie_legal_id
-			, ie.ie_invoice_name 
-		from "IPYME_FINAL"."CUSTOMER" c
-			,"IPYME_FINAL"."INVOICE_ENTITY" ie
-		WHERE c.c_invoice_entity=ie.ie_id;
-	ELSE
 		RETURN QUERY select c.c_id
 			, c.c_customer_name
 			, c.c_invoice_entity
@@ -322,15 +506,349 @@ BEGIN
 		from "IPYME_FINAL"."CUSTOMER" c
 			,"IPYME_FINAL"."INVOICE_ENTITY" ie
 		WHERE c.c_invoice_entity=ie.ie_id
-		and c.c_id=p_c_id;
-	END IF;
+		and ((c.c_id=p_c_id) or (p_c_id is null));
 	--
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
+ALTER FUNCTION "IPYME_FINAL".get_customer(bigint)
+  OWNER TO postgres;
 
+
+-- Function: "IPYME_FINAL".get_product(bigint)
+
+-- DROP FUNCTION "IPYME_FINAL".get_product(bigint);
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_product(p_p_id bigint)
+  RETURNS SETOF "IPYME_FINAL"."PRODUCT" AS
+$BODY$
+DECLARE
+BEGIN
+	--
+	RETURN QUERY SELECT P.p_id
+											,P.p_ref
+											,P.p_description
+											,P.p_long_description
+											,P.p_weight
+											,P.p_size
+								FROM "IPYME_FINAL"."PRODUCT" P
+								WHERE P.p_id = p_p_id 
+									OR p_p_id IS NULL;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION "IPYME_FINAL".get_product(bigint)
+  OWNER TO postgres;
+
+
+-- Function: "IPYME_FINAL".get_provider(bigint)
+
+-- DROP FUNCTION "IPYME_FINAL".get_provider(bigint);
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_provider(IN p_p_id bigint)
+  RETURNS TABLE(p_id bigint, p_provider_name character varying, p_invoice_entity bigint, ie_id bigint, ie_legal_id character varying, ie_invoice_name character varying) AS
+$BODY$
+DECLARE
+BEGIN
+	--
+		RETURN QUERY select p.p_id
+			, p.p_provider_name
+			, p.p_invoice_entity
+			, ie.ie_id
+			, ie.ie_legal_id
+			, ie.ie_invoice_name 
+		from "IPYME_FINAL"."PROVIDER" p
+			,"IPYME_FINAL"."INVOICE_ENTITY" ie
+		WHERE p.p_invoice_entity=ie.ie_id
+		and ((p.p_id=p_p_id) or (p_p_id is null));
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION "IPYME_FINAL".get_provider(bigint)
+  OWNER TO postgres;
+
+
+-- Function: "IPYME_FINAL".set_customer(bigint, character varying, bigint, character varying, character varying)
+
+-- DROP FUNCTION "IPYME_FINAL".set_customer(bigint, character varying, bigint, character varying, character varying);
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_customer(IN p_c_id bigint, IN p_c_customer_name character varying, IN p_ie_id bigint, IN p_ie_legal_id character varying, IN p_ie_invoice_name character varying)
+  RETURNS TABLE(c_id bigint, c_customer_name character varying, c_invoice_entity bigint, ie_id bigint, ie_legal_id character varying, ie_invoice_name character varying) AS
+$BODY$
+#variable_conflict use_column
+DECLARE
+v_c_id BIGINT;
+v_ie_id BIGINT;
+v_create_customer BOOLEAN;
+v_create_invoice_entity BOOLEAN;
+BEGIN
+	--
+	v_create_invoice_entity := TRUE;
+	--
+	--
+	SELECT IE.IE_ID
+	INTO v_ie_id
+	FROM "IPYME_FINAL"."INVOICE_ENTITY" IE
+	WHERE IE.IE_ID = p_ie_id
+	OR IE.IE_LEGAL_ID = p_ie_legal_id;
+	--
+	IF FOUND THEN
+		v_create_invoice_entity := FALSE;
+	END IF;
+	--
+	IF (v_create_invoice_entity = TRUE) THEN
+		--
+		SELECT NEXTVAL('"IPYME_FINAL"."INVOICE_ENTITY_ie_id_seq"') INTO v_ie_id ;
+		INSERT INTO "IPYME_FINAL"."INVOICE_ENTITY" (ie_id
+							, ie_legal_id
+							, ie_invoice_name)
+						VALUES(v_ie_id
+							, p_ie_legal_id
+							, p_ie_invoice_name);
+		--
+	ELSE
+		--
+		UPDATE "IPYME_FINAL"."INVOICE_ENTITY" 
+		SET 	ie_legal_id = p_ie_legal_id
+			, ie_invoice_name = p_ie_invoice_name
+		WHERE ie_id = v_ie_id;
+		--
+	END IF;
+	--
+	--
+	v_create_customer := TRUE;
+	--
+	SELECT C.C_ID
+	INTO v_c_id
+	FROM "IPYME_FINAL"."CUSTOMER" C
+	WHERE ((C.C_ID = p_c_id) AND (C.c_invoice_entity = v_ie_id)) 
+	OR ((C.c_invoice_entity = v_ie_id) AND (C.c_customer_name = p_c_customer_name));
+	--
+	IF FOUND THEN
+		v_create_customer := FALSE;
+	END IF;
+	--
+	IF (v_create_customer = TRUE) THEN
+		--
+		SELECT NEXTVAL('"IPYME_FINAL"."CUSTOMER_c_id_seq"') INTO v_c_id ;
+		--
+		INSERT INTO "IPYME_FINAL"."CUSTOMER" (c_id
+						  ,c_customer_name 
+						  ,c_invoice_entity)
+					VALUES ( v_c_id
+						  ,p_c_customer_name 
+						  ,v_ie_id);
+		--
+	ELSE
+		--
+		UPDATE "IPYME_FINAL"."CUSTOMER"
+		SET 	c_customer_name = p_c_customer_name
+		WHERE c_id = v_c_id
+		AND c_invoice_entity = v_ie_id;
+		--
+	END IF;
+	--
+	--
+	RETURN QUERY select c.c_id as c_id
+			, c.c_customer_name as c_customer_name
+			, c.c_invoice_entity as c_invoice_entity
+			, ie.ie_id as ie_id
+			, ie.ie_legal_id as ie_legal_id
+			, ie.ie_invoice_name  as ie_invoice_name
+		from "IPYME_FINAL"."CUSTOMER" c
+			,"IPYME_FINAL"."INVOICE_ENTITY" ie
+		WHERE c.c_invoice_entity=ie.ie_id
+		and (c.c_id=v_c_id);
+	--
+	--
+	EXCEPTION 
+		WHEN OTHERS THEN
+			RETURN;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION "IPYME_FINAL".set_customer(bigint, character varying, bigint, character varying, character varying)
+  OWNER TO postgres;
+
+
+-- Function: "IPYME_FINAL".set_product(bigint, character varying, character varying, character varying, numeric, character varying)
+
+-- DROP FUNCTION "IPYME_FINAL".set_product(bigint, character varying, character varying, character varying, numeric, character varying);
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_product(p_p_id bigint, p_p_ref character varying, p_p_description character varying, p_p_long_description character varying, p_p_weight numeric, p_p_size character varying)
+  RETURNS SETOF "IPYME_FINAL"."PRODUCT" AS
+$BODY$
+DECLARE
+v_p_id "IPYME_FINAL"."PRODUCT"."p_id"%TYPE;
+BEGIN
+	--
+	IF p_p_id IS NULL THEN
+		--
+		SELECT NEXTVAL('"IPYME_FINAL"."PRODUCT_p_id_seq"') INTO v_p_id;
+		--
+		INSERT INTO "IPYME_FINAL"."PRODUCT" (p_id
+																				,p_ref 
+																				,p_description 
+																				,p_long_description 
+																				,p_weight 
+																				,p_size)
+																	VALUES(v_p_id
+																			, p_p_ref 
+																			, p_p_description
+																			, p_p_long_description
+																			, p_p_weight
+																			, p_p_size);
+		--
+	ELSE
+		--
+		v_p_id := p_p_id;
+		--
+		UPDATE "IPYME_FINAL"."PRODUCT" 
+		SET  p_ref 							= p_p_ref
+				,p_description 			= p_p_description
+				,p_long_description = p_p_long_description
+				,p_weight 					= p_p_weight
+				,p_size 						= p_p_size 
+		WHERE p_id = v_p_id;
+		--
+	END IF;
+	--
+	RETURN  QUERY SELECT * 
+	FROM "IPYME_FINAL"."PRODUCT" 
+	WHERE p_id = v_p_id;
+	--
+	EXCEPTION
+		WHEN OTHERS THEN
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION "IPYME_FINAL".set_product(bigint, character varying, character varying, character varying, numeric, character varying)
+  OWNER TO postgres;
+
+
+-- Function: "IPYME_FINAL".set_provider(bigint, character varying, bigint, character varying, character varying)
+
+-- DROP FUNCTION "IPYME_FINAL".set_provider(bigint, character varying, bigint, character varying, character varying);
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_provider(IN p_p_id bigint, IN p_p_provider_name character varying, IN p_ie_id bigint, IN p_ie_legal_id character varying, IN p_ie_invoice_name character varying)
+  RETURNS TABLE(p_id bigint, p_provider_name character varying, p_invoice_entity bigint, ie_id bigint, ie_legal_id character varying, ie_invoice_name character varying) AS
+$BODY$
+#variable_conflict use_column
+DECLARE
+v_p_id BIGINT;
+v_ie_id BIGINT;
+v_create_provider BOOLEAN;
+v_create_invoice_entity BOOLEAN;
+BEGIN
+	--
+	v_create_invoice_entity := TRUE;
+	--
+	--
+	SELECT IE.IE_ID
+	INTO v_ie_id
+	FROM "IPYME_FINAL"."INVOICE_ENTITY" IE
+	WHERE IE.IE_ID = p_ie_id
+	OR IE.IE_LEGAL_ID = p_ie_legal_id;
+	--
+	IF FOUND THEN
+		v_create_invoice_entity := FALSE;
+	END IF;
+	--
+	IF (v_create_invoice_entity = TRUE) THEN
+		--
+		SELECT NEXTVAL('"IPYME_FINAL"."INVOICE_ENTITY_ie_id_seq"') INTO v_ie_id ;
+		INSERT INTO "IPYME_FINAL"."INVOICE_ENTITY" (ie_id
+							, ie_legal_id
+							, ie_invoice_name)
+						VALUES(v_ie_id
+							, p_ie_legal_id
+							, p_ie_invoice_name);
+		--
+	ELSE
+		--
+		UPDATE "IPYME_FINAL"."INVOICE_ENTITY" 
+		SET 	ie_legal_id = p_ie_legal_id
+			, ie_invoice_name = p_ie_invoice_name
+		WHERE ie_id = v_ie_id;
+		--
+	END IF;
+	--
+	--
+	v_create_provider := TRUE;
+	--
+	SELECT P.P_ID
+	INTO v_p_id
+	FROM "IPYME_FINAL"."PROVIDER" P
+	WHERE ((P.P_ID = p_p_id) AND (P.p_invoice_entity = v_ie_id)) 
+	OR ((P.p_invoice_entity = v_ie_id) AND (P.p_provider_name = p_p_provider_name));
+	--
+	IF FOUND THEN
+		v_create_provider := FALSE;
+	END IF;
+	--
+	IF (v_create_provider = TRUE) THEN
+		--
+		SELECT NEXTVAL('"IPYME_FINAL"."PROVIDER_p_id_seq"') INTO v_p_id ;
+		--
+		INSERT INTO "IPYME_FINAL"."PROVIDER" (p_id
+						  ,p_provider_name 
+						  ,p_invoice_entity)
+					VALUES ( v_p_id
+						  ,p_p_provider_name 
+						  ,v_ie_id);
+		--
+	ELSE
+		--
+		UPDATE "IPYME_FINAL"."PROVIDER"
+		SET 	p_provider_name = p_p_provider_name
+		WHERE p_id = v_p_id
+		AND p_invoice_entity = v_ie_id;
+		--
+	END IF;
+	--
+	--
+	RETURN QUERY select p.p_id as p_id
+			, p.p_provider_name as p_provider_name
+			, p.p_invoice_entity as p_invoice_entity
+			, ie.ie_id as ie_id
+			, ie.ie_legal_id as ie_legal_id
+			, ie.ie_invoice_name  as ie_invoice_name
+		from "IPYME_FINAL"."PROVIDER" p
+			,"IPYME_FINAL"."INVOICE_ENTITY" ie
+		WHERE p.p_invoice_entity=ie.ie_id
+		and (p.p_id=v_p_id);
+	--
+	--
+	EXCEPTION 
+		WHEN OTHERS THEN
+			RETURN;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION "IPYME_FINAL".set_provider(bigint, character varying, bigint, character varying, character varying)
+  OWNER TO postgres;
+
+
+-- Function: "IPYME_FINAL".set_invoice_entity(bigint, character varying, character varying)
+
+-- DROP FUNCTION "IPYME_FINAL".set_invoice_entity(bigint, character varying, character varying);
 
 CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_invoice_entity(p_ie_id bigint, p_ie_legal_id character varying, p_ie_invoice_name character varying)
   RETURNS record AS
@@ -386,179 +904,9 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+ALTER FUNCTION "IPYME_FINAL".set_invoice_entity(bigint, character varying, character varying)
+  OWNER TO postgres;
 
-
-
-
-
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_customer(p_c_id bigint
-						, p_c_customer_name character varying
-						, p_ie_id BIGINT
-						, p_ie_legal_id character varying
-						, p_ie_invoice_name character varying)
-RETURNS TABLE(success boolean
-, v_c_id bigint
-, v_ie_id bigint) AS
-$BODY$
-DECLARE
-v_c_id BIGINT;
-v_ie_id BIGINT;
-v_create_customer BOOLEAN;
-v_create_invoice_entity BOOLEAN;
-BEGIN
-	--
-	v_create_invoice_entity := TRUE;
-	--
-	--
-	SELECT IE.IE_ID
-	INTO v_ie_id
-	FROM "IPYME_FINAL"."INVOICE_ENTITY" IE
-	WHERE IE.IE_ID = p_ie_id
-	OR IE.IE_LEGAL_ID = p_ie_legal_id;
-	--
-	IF FOUND THEN
-		v_create_invoice_entity := FALSE;
-	END IF;
-	--
-	IF (v_create_invoice_entity = TRUE) THEN
-		--
-		SELECT NEXTVAL('"IPYME_FINAL"."INVOICE_ENTITY_ie_id_seq"') INTO v_ie_id ;
-		INSERT INTO "IPYME_FINAL"."INVOICE_ENTITY" (ie_id
-							, ie_legal_id
-							, ie_invoice_name)
-						VALUES(v_ie_id
-							, p_ie_legal_id
-							, p_ie_invoice_name);
-		--
-	ELSE
-		--
-		UPDATE "IPYME_FINAL"."INVOICE_ENTITY" IE
-		SET 	ie_legal_id = p_ie_legal_id
-			, ie_invoice_name = p_ie_invoice_name
-		WHERE ie_id = v_ie_id;
-		--
-	END IF;
-	--
-	--
-	v_create_customer := TRUE;
-	--
-	SELECT C.C_ID
-	INTO v_c_id
-	FROM "IPYME_FINAL"."CUSTOMER" C
-	WHERE ((C.C_ID = p_c_id) AND (C.c_invoice_entity = v_ie_id)) 
-	OR ((C.c_invoice_entity = v_ie_id) AND (C.c_customer_name = p_c_customer_name));
-	--
-	IF FOUND THEN
-		v_create_customer := FALSE;
-	END IF;
-	--
-	IF (v_create_customer = TRUE) THEN
-		--
-		SELECT NEXTVAL('"IPYME_FINAL"."CUSTOMER_c_id_seq"') INTO v_c_id ;
-		--
-		INSERT INTO "IPYME_FINAL"."CUSTOMER" (c_id
-						  ,c_customer_name 
-						  ,c_invoice_entity)
-					VALUES ( v_c_id
-						  ,p_c_customer_name 
-						  ,v_ie_id);
-		--
-	ELSE
-		--
-		UPDATE "IPYME_FINAL"."CUSTOMER"
-		SET 	c_customer_name = p_c_customer_name
-		WHERE c_id = v_c_id
-		AND c_invoice_entity = v_ie_id;
-		--
-	END IF;
-	--
-	--
-	RETURN QUERY SELECT TRUE, v_c_id, v_ie_id;
-	--
-	--
-END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
-
-
-
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_provider(IN p_p_id bigint)
-  RETURNS TABLE(p_id bigint, p_provider_name character varying, p_invoice_entity bigint, ie_id bigint, ie_legal_id character varying, ie_invoice_name character varying) AS
-$BODY$
-DECLARE
-BEGIN
-	--
-	IF p_p_id IS NULL THEN
-		RETURN QUERY select p.p_id
-			, p.p_provider_name
-			, p.p_invoice_entity
-			, ie.ie_id
-			, ie.ie_legal_id
-			, ie.ie_invoice_name 
-		from "IPYME_FINAL"."PROVIDER" p
-			,"IPYME_FINAL"."INVOICE_ENTITY" ie
-		WHERE p.p_invoice_entity=ie.ie_id;
-	ELSE
-		RETURN QUERY select p.p_id
-			, p.p_provider_name
-			, p.p_invoice_entity
-			, ie.ie_id
-			, ie.ie_legal_id
-			, ie.ie_invoice_name 
-		from "IPYME_FINAL"."PROVIDER" p
-			,"IPYME_FINAL"."INVOICE_ENTITY" ie
-		WHERE p.p_invoice_entity=ie.ie_id
-		and p.p_id=p_p_id;
-	END IF;
-	--
-END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100
-  ROWS 1000;
-
-
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".delete_customer(IN p_c_id bigint)
-  RETURNS SETOF boolean AS
-$BODY$
-DECLARE
-v_c_id BIGINT;
-v_c_invoice_entity BIGINT;
-BEGIN
-	--
-	--
-	SELECT C.c_invoice_entity
-	INTO v_c_invoice_entity
-	FROM "IPYME_FINAL"."CUSTOMER" C
-	WHERE C.c_id = p_c_id;
-	--
-	RAISE INFO '% - %',p_c_id,v_c_invoice_entity;
-	--
-	DELETE FROM "IPYME_FINAL"."CUSTOMER"
-	WHERE c_id = p_c_id;
-	--
-	begin
-	DELETE FROM "IPYME_FINAL"."INVOICE_ENTITY"
-	WHERE ie_id = v_c_invoice_entity;
-	exception
-		when others then
-			null;
-	end;
-	--
-	--
-	RETURN QUERY SELECT TRUE;
-	--
-	EXCEPTION 
-		WHEN OTHERS THEN
-			RETURN QUERY SELECT FALSE;
-	--
-	--
-END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100
-  ROWS 1000;
 
 
 
