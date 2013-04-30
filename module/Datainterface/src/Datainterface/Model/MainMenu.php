@@ -57,7 +57,7 @@ class MainMenu {
                                ,'nodes' => array())
                            ,(object) array(
                                 'label' => 'Category'
-                                ,'url' => '#/admin/product/category'
+                                ,'url' => '#/admin/category'
                                ,'nodes' => array())
                            ,(object) array(
                                 'label' => 'Item'

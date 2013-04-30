@@ -68,6 +68,7 @@ return array(
             'Shop\Controller\Customer' => 'Shop\Controller\CustomerController',
             'Shop\Controller\User' => 'Shop\Controller\UserController',
             'Shop\Controller\Provider' => 'Shop\Controller\ProviderController',
+            'Shop\Controller\Category' => 'Shop\Controller\CategoryController',
         ),
     ),
     'view_manager' => array(
