@@ -26,7 +26,7 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
     
     public function newCategoryAction(){
         $aResponse = array(
-            'children' => array(array('title' => "Item 1"
+            'tree' => array(array('title' => "Item 1"
                                     ,'toma' => 'aa'
                                     , 'key' => '__1')
                                ,array('title' => "Item 2"
@@ -78,28 +78,26 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
     
     public function SaveTreeAction(){
         
-        $this->getRequest()->setContent('{"title":null,"key":"_1","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"Item 1","key":"__1","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"toma":"aa"},{"title":"Item 2","key":"__2","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"item 2.1","key":"__21","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false},{"title":"item 2.2","key":"__22","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"item2.2.1","key":"_2","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":true,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false}]},{"title":"item 2.3","key":"__23","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false}],"toma":"bb"},{"title":"Item 3","key":"__3","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"toma":"cc"}]}');
-        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
+//        $this->getRequest()->setContent('{"title":null,"key":"_1","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"XXXXXXXXXXX","key":"__1","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false},{"title":"Item 2","key":"__2","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"item 2.1","key":"__21","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false},{"title":"item 2.2","key":"__22","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"item2.2.1","key":"_2","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"item 2.3","key":"__23","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"Item 3","key":"__3","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":true,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"XXXXXXXXXXX","key":"__1","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"toma":"aa"}]}]}]}]}]}]}');
+//        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
        
         
         
         if ($this->getRequest()->isXmlHttpRequest()) {
             $sJSONDataRequest = $this->getRequest()->getContent();
             $aRequest = (array)json_decode($sJSONDataRequest);
-            $aResponse = $aRequest;
             
             $aTableTree = $this->getTableTree($aRequest);
-            var_dump($aTableTree);
+//            var_dump($aTableTree);
             
-            $aTree = $this->fromTableTreeToTree($aTableTree);
-            var_dump($aTree);
-            exit;
-            var_dump($aConvertedTree);
-            exit;
-            $aResponse = $aConvertedTree;
-//            var_dump($aConvertedTree);
-//            
-//            var_dump($aRequest);
+            $aTree = $this->getTree($aTableTree);
+            
+ 
+                    
+                    
+                    
+//            var_dump($aTree);
+            $aResponse = array('tree' =>  $aTree);
 //            $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
 //            $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'set_provider'
 //                    , array( ':p_p_id'              => array_key_exists('p_id',$aRequest)?$aRequest['p_id']:null
@@ -153,80 +151,46 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
         exit;
     }
     
-    public function fromTableTreeToTree($aTableTree, $sBaseNodePath=''){
-        $aNodeStack = array();
+    public function getTree($aTableTree){
+//        var_dump($aTableTree);
         $sSeparator = ' > ';
-        $aTree = array();
         
-        $aRoot = $aTree;
-        $aNodeStack[0] = &$aRoot;
-        $sBaseAndSeparator = $sBaseNodePath.$sSeparator;
-        $nStrLen = strlen($sBaseAndSeparator);
+        $aRoot =  array();
+        $aNodeStack = array(&$aRoot);
+        $sBaseAndSeparator = $sSeparator;
             
         foreach($aTableTree as $sKey => $sNodePath) {
-            if (strpos($sNodePath, $sBaseAndSeparator)!==0){
-                $n=0;
-                echo "\n --------- $sBaseAndSeparator";
-                while(!empty($sBaseAndSeparator) && (strpos($sNodePath, $sBaseAndSeparator)!==0) && ($n<10)){
-                    $n++;
-                    
+//            echo "\nNodePath\"$sNodePath\"";
+//            echo "\nBaseSeparator\"$sBaseAndSeparator\"";
+            if (strpos($sNodePath, $sBaseAndSeparator) !== 0){
+                do {
                     $sBaseAndSeparator = substr($sBaseAndSeparator, 0, strrpos($sBaseAndSeparator,$sSeparator));
-                    echo "\n --------- $sBaseAndSeparator";
-                }
-                
-                for($n--;$n>0;$n--,array_pop($aNodeStack));
+                } while((strcmp($sBaseAndSeparator, $sSeparator)>0) && (strpos($sNodePath, $sBaseAndSeparator)!==0) && array_pop($aNodeStack));
                 
                 $sBaseAndSeparator .= $sSeparator;
-                echo '77777777777';
-                echo "\n - n: $n -------- $sBaseAndSeparator";
-                $nStrLen = strlen($sBaseAndSeparator);
             }
-            if (strpos($sNodePath, $sBaseAndSeparator)===0){
-                echo 333;
-                if (strlen($sNodePath) > $nStrLen){
-                    if (strpos($sNodePath, $sSeparator, $nStrLen) === FALSE){
-                        echo '111111';
-                        echo $sBaseAndSeparator;
-                        $aTree = &$aNodeStack[count($aNodeStack)-1];
-                        $aTree[] = array('title' => substr($sNodePath, $nStrLen)
-                                         ,'key'   => $sKey);
-                        
-                    }
-                    else {
-                        echo '222222';
-                        
-                        $sBaseAndSeparator = substr($sNodePath, 0, strrpos($sNodePath, $sSeparator)).$sSeparator;
-                        echo $sBaseAndSeparator;
-                        $nStrLen = strlen($sBaseAndSeparator);
-                        $aChildren = array( 0 => array('title' => substr($sNodePath, strlen($sBaseAndSeparator))
-                                                      ,'key'   => $sKey));
-                        $aTree = &$aNodeStack[count($aNodeStack)-1];
-                        $aTree[count($aTree)-1]['children'] = $aChildren;
-                        
-                        
-//                        $aTree[] = &$aChildren;
-                        $aNodeStack[] = &$aTree[count($aTree)-1]['children'];
-                        
-                        
-//                        $aTree = &$aTree[count($aTree)-1]['children'];
-//                        $aNodeStack[] = &$aTree[count($aTree)-1]['children'];
-//                        $aTree = $aNodeStack[\count($aNodeStack)-1];
-                        
-//                        $aTree[count($aTree)-1]['children'] = $this->fromTableTreeToTree($aTableTree, $sBaseAndSeparator);
-                    }
-                }
+//            echo "\nBaseSeparator\"$sBaseAndSeparator\"";
+            $nBaseAndSeparatorLength = strlen($sBaseAndSeparator);
+            $aTree = &$aNodeStack[count($aNodeStack)-1];
+            if (strpos($sNodePath, $sSeparator, $nBaseAndSeparatorLength) !== FALSE){
+//                        echo "\nBBBBBBChildren";
+                $sBaseAndSeparator = substr($sNodePath, 0, strrpos($sNodePath, $sSeparator)).$sSeparator;
+//                        echo "\n$sBaseAndSeparator";
+                $nBaseAndSeparatorLength = strlen($sBaseAndSeparator);
+                $aTree[count($aTree)-1]['children'] = array();
+                $aTree = &$aTree[count($aTree)-1]['children'];
+                $aNodeStack[] = &$aTree;
             }
+
+//                    echo "\nAAAAASibbling";
+//                    echo "\n$sBaseAndSeparator";
+            $aTree[] = array('title' => substr($sNodePath, $nBaseAndSeparatorLength)
+                             ,'key'   => $sKey);
+
             
-            echo "\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n$sNodePath\n";
-            var_dump($aRoot);
-//            var_dump($aTree);
-            
-            echo "\n\n ";
+//            var_dump($aRoot);
         }
         
-        echo "\n\n\ZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
-        
-        exit;
         return $aRoot;
     }
     
@@ -242,6 +206,7 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
             $sNodePath  = substr($sNode, 0, $nKeySeparator);
             $aTableTree[$sKey] = $sNodePath;
         }
+        sort($aTableTree);
         
         return $aTableTree;
     }
