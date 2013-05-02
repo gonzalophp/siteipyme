@@ -7,25 +7,6 @@ GRANT ALL ON SCHEMA "IPYME_AUX" TO postgres;
 
 \set ON_ERROR_STOP true;
 
-
-CREATE TABLE "IPYME_AUX"."CATEGORY" (
-	C_ID BIGSERIAL PRIMARY KEY
-	, C_REFERENCE VARCHAR(50) NOT NULL
-	, C_DESCRIPTION VARCHAR(255)
-	, C_TAX NUMERIC(8,3)
-	, C_PARENT BIGINT
-	,CONSTRAINT "UNIQUE_CATEGORY_1" UNIQUE(C_REFERENCE, C_PARENT)
-);
-
-ALTER TABLE "IPYME_AUX"."CATEGORY"
-  ADD CONSTRAINT "CATEGORY_c_parent_fkey" FOREIGN KEY (c_parent)
-      REFERENCES "IPYME_AUX"."CATEGORY" (c_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION;
-
-CREATE UNIQUE INDEX "UNIQUE_CATEGORY_2" ON "IPYME_AUX"."CATEGORY" (c_reference) WHERE c_parent IS NULL;
-
-
-
 CREATE TABLE "IPYME_AUX"."LANGUAGE" (
     "L_ID" NUMERIC PRIMARY KEY
     , "L_1" VARCHAR(255)
@@ -36,18 +17,6 @@ CREATE TABLE "IPYME_AUX"."COMPANY" (
     , "C_NAME" VARCHAR(255)
     , "C_DATE" TIMESTAMP WITH TIME ZONE);
 
-
-CREATE TABLE "IPYME_AUX"."PRODUCT_CATEGORY_DETAILS" (
-    PCD_ID BIGSERIAL PRIMARY KEY
-    , PCD_TAX_RATE NUMERIC
-    , PCD_DESCRIPTION VARCHAR(255));
-
-CREATE TABLE "IPYME_AUX"."PRODUCT_CATEGORY_VALUE" (
-    PCV_ID BIGSERIAL PRIMARY KEY
-    , PCV_CATEGORY_DETAILS BIGINT REFERENCES "IPYME_AUX"."PRODUCT_CATEGORY_DETAILS"
-    , PCV_VALUE VARCHAR(255)
-);
-
 CREATE TABLE "IPYME_AUX"."PRODUCT" (
     P_ID BIGSERIAL PRIMARY KEY
     , P_REF VARCHAR(45) UNIQUE NOT NULL
@@ -57,6 +26,19 @@ CREATE TABLE "IPYME_AUX"."PRODUCT" (
     , P_SIZE VARCHAR(50)
 );
 
+CREATE TABLE "IPYME_AUX"."PRODUCT_CATEGORY" (
+    PC_ID BIGSERIAL PRIMARY KEY,
+    PC_TAX_RATE NUMERIC(8,3),
+    PC_DESCRIPTION TEXT,
+    PC_PATH TEXT UNIQUE
+);
+
+CREATE TABLE "IPYME_AUX"."PRODUCT_CATEGORY_VALUE" (
+    PCV_ID BIGSERIAL PRIMARY KEY,
+    PCV_PRODUCT_CATEGORY BIGINT REFERENCES "IPYME_AUX"."PRODUCT_CATEGORY",
+    PCV_VALUE TEXT,
+    CONSTRAINT unique_product_category_value UNIQUE(PCV_PRODUCT_CATEGORY, PCV_VALUE)
+);
 
 CREATE TABLE "IPYME_AUX"."PRODUCT_CATEGORY_LINK" (
 PCL_PRODUCT BIGINT REFERENCES "IPYME_AUX"."PRODUCT",
@@ -936,6 +918,265 @@ ALTER FUNCTION "IPYME_FINAL".set_invoice_entity(bigint, character varying, chara
   OWNER TO postgres;
 
 
+/*
+-- Function: "IPYME_FINAL".set_category_tree(bigint, character varying, character varying, numeric, bigint)
 
+-- DROP FUNCTION "IPYME_FINAL".set_category_tree(bigint, character varying, character varying, numeric, bigint);
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_category_tree(p_c_id bigint, p_c_reference character varying, p_c_description character varying, p_c_tax numeric, p_c_parent bigint)
+  RETURNS SETOF "IPYME_FINAL"."CATEGORY" AS
+$BODY$
+DECLARE
+v_category "IPYME_FINAL"."CATEGORY"%ROWTYPE;
+v_dummy INT;
+BEGIN
+	--
+	IF (p_c_reference IS NULL) OR (LENGTH(p_c_reference) = 0) THEN
+		RETURN;
+	END IF;
+	--
+	v_category.c_reference 		:= p_c_reference;
+	v_category.c_description 	:= p_c_description;
+	v_category.c_tax 					:= p_c_tax;
+	--
+	IF p_c_parent IS NULL THEN -- IT IS A ROOT NODE 
+		--
+		v_category.c_parent 			:= NULL;
+		--
+		IF p_c_id IS NULL THEN
+			--
+			SELECT NEXTVAL('"IPYME_FINAL"."CATEGORY_c_id_seq"') INTO v_category.c_id;			
+			--
+			INSERT INTO "IPYME_FINAL"."CATEGORY" (c_id
+																					, c_reference
+																					, c_description
+																					, c_tax
+																					, c_parent)		
+																		VALUES (v_category.c_id
+																					, v_category.c_reference
+																					, v_category.c_description
+																					, v_category.c_tax
+																					, v_category.c_parent);
+			--
+		ELSE
+			--
+			v_category.c_id := p_c_id;
+			--
+			UPDATE "IPYME_FINAL"."CATEGORY" 
+			SET c_reference = v_category.c_reference
+				, c_description = v_category.c_description
+				, c_tax = v_category.c_tax
+				, c_parent = v_category.c_parent
+			WHERE c_id = v_category.c_id;
+			--
+		END IF;
+		--
+	ELSE
+		--
+		v_category.c_parent 			:= p_c_parent;
+		--
+		SELECT c_id
+		INTO v_category.c_id
+		FROM "IPYME_FINAL"."CATEGORY" 
+		WHERE c_reference = v_category.c_reference
+		AND c_parent = v_category.c_parent;
+		--
+		IF FOUND THEN
+			--
+			IF ((p_c_id IS NULL) OR (p_c_id <> v_category.c_id)) THEN
+				RETURN;
+			END IF;
+			--
+			UPDATE "IPYME_FINAL"."CATEGORY" 
+				SET c_description = v_category.c_description
+					, c_tax = v_category.c_tax
+				WHERE c_id = v_category.c_id;
+			--
+		ELSE
+			--
+			SELECT NEXTVAL('"IPYME_FINAL"."CATEGORY_c_id_seq"') INTO v_category.c_id;
+			--
+			INSERT INTO "IPYME_FINAL"."CATEGORY" (c_id
+																					, c_reference
+																					, c_description
+																					, c_tax
+																					, c_parent)		
+																		VALUES (v_category.c_id
+																					, v_category.c_reference
+																					, v_category.c_description
+																					, v_category.c_tax
+																					, v_category.c_parent);
+			--
+		END IF;
+		--
+	END IF;
+	--
+	RETURN QUERY SELECT v_category.c_id
+										, v_category.c_reference
+										, v_category.c_description
+										, v_category.c_tax
+										, v_category.c_parent;
+	--
+	EXCEPTION
+		WHEN OTHERS THEN
+			RETURN;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION "IPYME_FINAL".set_category_tree(bigint, character varying, character varying, numeric, bigint)
+  OWNER TO postgres;
+
+
+
+-- Function: "IPYME_FINAL".get_category_tree(bigint)
+
+-- DROP FUNCTION "IPYME_FINAL".get_category_tree(bigint);
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_category_tree(p_c_id bigint)
+  RETURNS SETOF t_category AS
+$BODY$
+DECLARE
+
+--CREATE TYPE t_category as (
+--c_id bigint
+--,c_reference character varying(50)
+--,c_description character varying(255)
+--,c_tax numeric(8,3)
+--,c_parent bigint
+--,c_depth int
+--);
+
+v_category t_category;
+v_c_id BIGINT;
+a_category t_category[];
+v_i integer;
+BEGIN
+	--
+	v_c_id := p_c_id;
+	--
+	LOOP
+		--
+		SELECT *
+		INTO v_category
+		FROM "IPYME_FINAL"."CATEGORY" C
+		WHERE C.c_id = v_c_id;
+		--
+		IF NOT FOUND THEN
+			EXIT;
+		ELSE
+			--
+			IF a_category @> ARRAY[v_category] THEN
+				RETURN; -- CIRCULAR REFERENCES ARE NOT ALLOWED
+			ELSE
+				--
+				a_category := a_category || v_category;
+				v_c_id := v_category.c_parent;
+				--
+			END IF;
+			--
+		END IF;
+		--
+	END LOOP;
+	--
+	IF a_category IS NOT NULL THEN
+		--
+		FOR v_i IN array_lower(a_category,1)..array_upper(a_category,1) LOOP
+			--
+			v_category := a_category[v_i];
+			v_category.c_depth := array_upper(a_category,1)+1-v_i;
+			RETURN NEXT v_category;
+			--
+		END LOOP;
+		RETURN;
+		--
+	END IF;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION "IPYME_FINAL".get_category_tree(bigint)
+  OWNER TO postgres;
+
+
+*/
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_product_category(p_pc_id bigint)
+  RETURNS SETOF "IPYME_FINAL"."PRODUCT_CATEGORY" AS
+$BODY$
+DECLARE
+BEGIN
+	--
+		RETURN QUERY select PC.pc_id
+											, PC.pc_tax_rate
+											, PC.pc_description
+											, PC.pc_path
+		from "IPYME_FINAL"."PRODUCT_CATEGORY" PC
+		WHERE ((PC.pc_id = p_pc_id) or (p_pc_id is null));
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
+
+
+-- Function: "IPYME_FINAL".get_provider(bigint)
+
+-- DROP FUNCTION "IPYME_FINAL".get_provider(bigint);
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_product_category(p_pc_id bigint, p_pc_tax_rate numeric, p_pc_description text, p_pc_path text)
+  RETURNS SETOF "IPYME_FINAL"."PRODUCT_CATEGORY" AS
+$BODY$
+DECLARE
+v_product_category "IPYME_FINAL"."PRODUCT_CATEGORY";
+BEGIN
+	--
+	v_product_category.pc_tax_rate := p_pc_tax_rate;
+	v_product_category.pc_description = p_pc_description;
+	v_product_category.pc_path := p_pc_path;
+	--																						
+	IF p_pc_id IS NULL THEN
+		--
+		SELECT NEXTVAL('"IPYME_FINAL"."PRODUCT_CATEGORY_pc_id_seq"') INTO v_product_category.pc_id;
+		--
+		INSERT INTO "IPYME_FINAL"."PRODUCT_CATEGORY" (pc_id
+																								, pc_tax_rate
+																								, pc_description
+																								, pc_path)
+																				VALUES (v_product_category.pc_id
+																								, v_product_category.pc_tax_rate
+																								, v_product_category.pc_description
+																								, v_product_category.pc_path);
+		--
+	ELSE
+		--
+		v_product_category.pc_id := p_pc_id;
+		UPDATE "IPYME_FINAL"."PRODUCT_CATEGORY" PC
+		SET PC.pc_tax_rate = v_product_category.pc_id
+			, PC.pc_description = v_product_category.pc_id
+			, PC.pc_path = v_product_category.pc_id
+		WHERE PC.pc_id = v_product_category.pc_id;												
+		--
+	END IF;
+	--
+	RETURN QUERY SELECT v_product_category.pc_id
+										, v_product_category.pc_tax_rate
+										, v_product_category.pc_description
+										, v_product_category.pc_path;
+	--
+	EXCEPTION
+		WHEN OTHERS THEN 
+			NULL;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
 
 \dn

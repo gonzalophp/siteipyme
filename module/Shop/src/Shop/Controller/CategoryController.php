@@ -2,6 +2,8 @@
 namespace Shop\Controller;
 
 class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
+    public $sPathSeparator = ' > ';
+    public $sPropertySeparator = '^^^';
     
     public function indexAction() {
         $aResponse = array(
@@ -24,11 +26,11 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
         return new \Zend\View\Model\JsonModel($aResponse);
     }
     
-    public function newCategoryAction(){
+    public function getAction(){
         $aResponse = array(
             'tree' => array(array('title' => "Item 1"
                                     ,'toma' => 'aa'
-                                    , 'key' => '__1')
+                                    , 'key' => '77__1')
                                ,array('title' => "Item 2"
                                     ,'toma' => 'bb'
                                     ,'isFolder' => true
@@ -41,8 +43,19 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
                                ,array('title' => "Item 3"
                                      ,'toma' => 'cc'
                                    , 'key' => '__3')
-                )
-            );
+            )
+        );
+        
+        $sCategoryId =  $this->getEvent()->getRouteMatch()->getParam('id');
+        
+//        $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+//        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_category'
+//                , array( ':p_c_id'              => $sCategoryId));
+//
+//        $aTree = $this->getTree($aTableTree);
+        $aTree = array();
+        $aResponse = array('tree' => $aTree);
+                
         return new \Zend\View\Model\JsonModel($aResponse);
     }
     
@@ -78,7 +91,8 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
     
     public function SaveTreeAction(){
         
-//        $this->getRequest()->setContent('{"title":null,"key":"_1","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"XXXXXXXXXXX","key":"__1","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false},{"title":"Item 2","key":"__2","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"item 2.1","key":"__21","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false},{"title":"item 2.2","key":"__22","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"item2.2.1","key":"_2","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"item 2.3","key":"__23","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"Item 3","key":"__3","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":true,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"XXXXXXXXXXX","key":"__1","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"toma":"aa"}]}]}]}]}]}]}');
+//        $this->getRequest()->setContent('{"title":null,"key":"_1","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"aaa","key":"_2","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"bbb","key":"_3","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"ddd","key":"_4","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"eee","key":"_5","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"edited":true}],"edited":true}],"edited":true},{"title":"ggg","key":"_6","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"edited":true},{"title":"ggg","key":"_7","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":true,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"hhh","key":"_9","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"edited":true}],"edited":true},{"title":"uuuuu","key":"_8","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"edited":true}],"edited":true}]}');
+//        $this->getRequest()->setContent('{"title":null,"key":"_1","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"electronics","key":"_2","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"computers","key":"_3","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":true,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"edited":true}],"edited":true}]}');
 //        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
        
         
@@ -88,16 +102,35 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
             $aRequest = (array)json_decode($sJSONDataRequest);
             
             $aTableTree = $this->getTableTree($aRequest);
-//            var_dump($aTableTree);
+            var_dump($aTableTree);
+            $aCategories = array();
+            foreach($aTableTree as $sNodeProperties => $sNodePath) {
+                list($sNodeKey, $sNodeEdited) = explode($this->sPropertySeparator, $sNodeProperties);
+                $aCategories[] = array('key' => $sNodeKey
+                                        ,'edited' => $sNodeEdited
+                                        ,'path' => $sNodePath);
+            }
             
-            $aTree = $this->getTree($aTableTree);
+            $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+            foreach($aCategories as $aCategory) {
+                if ($aCategory['edited'] == 1) {
+                    $nCategoryId = ((strpos($aCategory['key'],'_'))===0) ? NULL : $aCategory['key'];
+                    $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'set_product_category'
+                        , array(':p_pc_id'            => $nCategoryId
+                                , ':p_pc_tax_rate'      => 0
+                                , ':p_pc_description'   => ''
+                                , ':p_pc_path'          => $aCategory['path']));
+                }
+            }
             
- 
-                    
-                    
-                    
+            
+            
+            exit;
+//            $aTree = $this->getTree($aTableTree);
 //            var_dump($aTree);
-            $aResponse = array('tree' =>  $aTree);
+//            $aResponse = array('tree' =>  $aTree);
+            
+            
 //            $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
 //            $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'set_provider'
 //                    , array( ':p_p_id'              => array_key_exists('p_id',$aRequest)?$aRequest['p_id']:null
@@ -153,28 +186,27 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
     
     public function getTree($aTableTree){
 //        var_dump($aTableTree);
-        $sSeparator = ' > ';
         
         $aRoot =  array();
         $aNodeStack = array(&$aRoot);
-        $sBaseAndSeparator = $sSeparator;
+        $sBaseAndSeparator = $this->sPathSeparator;
             
         foreach($aTableTree as $sKey => $sNodePath) {
 //            echo "\nNodePath\"$sNodePath\"";
 //            echo "\nBaseSeparator\"$sBaseAndSeparator\"";
             if (strpos($sNodePath, $sBaseAndSeparator) !== 0){
                 do {
-                    $sBaseAndSeparator = substr($sBaseAndSeparator, 0, strrpos($sBaseAndSeparator,$sSeparator));
-                } while((strcmp($sBaseAndSeparator, $sSeparator)>0) && (strpos($sNodePath, $sBaseAndSeparator)!==0) && array_pop($aNodeStack));
+                    $sBaseAndSeparator = substr($sBaseAndSeparator, 0, strrpos($sBaseAndSeparator,$this->sPathSeparator));
+                } while((strcmp($sBaseAndSeparator, $this->sPathSeparator)>0) && (strpos($sNodePath, $sBaseAndSeparator)!==0) && array_pop($aNodeStack));
                 
-                $sBaseAndSeparator .= $sSeparator;
+                $sBaseAndSeparator .= $this->sPathSeparator;
             }
 //            echo "\nBaseSeparator\"$sBaseAndSeparator\"";
             $nBaseAndSeparatorLength = strlen($sBaseAndSeparator);
             $aTree = &$aNodeStack[count($aNodeStack)-1];
-            if (strpos($sNodePath, $sSeparator, $nBaseAndSeparatorLength) !== FALSE){
+            if (strpos($sNodePath, $this->sPathSeparator, $nBaseAndSeparatorLength) !== FALSE){
 //                        echo "\nBBBBBBChildren";
-                $sBaseAndSeparator = substr($sNodePath, 0, strrpos($sNodePath, $sSeparator)).$sSeparator;
+                $sBaseAndSeparator = substr($sNodePath, 0, strrpos($sNodePath, $this->sPathSeparator)).$this->sPathSeparator;
 //                        echo "\n$sBaseAndSeparator";
                 $nBaseAndSeparatorLength = strlen($sBaseAndSeparator);
                 $aTree[count($aTree)-1]['children'] = array();
@@ -195,18 +227,16 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
     }
     
     public function getTableTree($aTree){
-        $sSeparator = ' > ';
-        
         $aTableTree = array();
-        $aConvertedTree = $this->fromTreeToTableTree($aTree);
-        $nSeparatorLength = strlen($sSeparator);
-        foreach($aConvertedTree as $sNode) {
-            $nKeySeparator = strrpos($sNode, $sSeparator);
-            $sKey       = substr($sNode, $nKeySeparator+$nSeparatorLength);
-            $sNodePath  = substr($sNode, 0, $nKeySeparator);
+        $aTableTreePhase1 = $this->fromTreeToTableTree($aTree);
+        sort($aTableTreePhase1);
+        $nSeparatorLength = strlen($this->sPathSeparator);
+        foreach($aTableTreePhase1 as $sNodeLine) {
+            $nKeySeparator = strrpos($sNodeLine, $this->sPathSeparator);
+            $sKey       = substr($sNodeLine, $nKeySeparator+$nSeparatorLength);
+            $sNodePath  = substr($sNodeLine, 0, $nKeySeparator);
             $aTableTree[$sKey] = $sNodePath;
         }
-        sort($aTableTree);
         
         return $aTableTree;
     }
@@ -216,26 +246,28 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
             $sTitle = $aTree['title'];
             $aChildren = array_key_exists('children', $aTree) ? $aTree['children']:array();
             $sKey = $aTree['key'];
+            $nEdited = array_key_exists('edited', $aTree) ? $aTree['edited']:0;
         }
         else {
             $sTitle = $aTree->title;
             $aChildren = isset($aTree->children)?$aTree->children:array();
             $sKey = $aTree->key;
+            $nEdited = isset($aTree->edited)?$aTree->edited:0;
         }
         
         $aTableTree = array();
         if (!empty($aChildren)){
-            if (!is_null($sTitle)) $aTableTree[] = $sTitle. ' > '.$sKey;
+            if (!is_null($sTitle)) $aTableTree[] = "$sTitle$this->sPathSeparator$sKey$this->sPropertySeparator$nEdited";
             foreach($aChildren as $child){
                 $aSub = $this->fromTreeToTableTree($child);
                 
                 foreach($aSub as $sub){
-                    $aTableTree[] = $sTitle. ' > '. $sub;
+                    $aTableTree[] = "$sTitle$this->sPathSeparator$sub";
                 }
             }
         }
         else {
-            $aTableTree = array($sTitle. ' > '.$sKey);
+            $aTableTree = array("$sTitle$this->sPathSeparator$sKey$this->sPropertySeparator$nEdited");
         }
         
         return $aTableTree;
