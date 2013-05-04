@@ -1,21 +1,21 @@
 <?php
 namespace Shop\Controller;
 
-class ProductCategoryValueController extends \Zend\Mvc\Controller\AbstractActionController {
+class ProductCategoryAttributeController extends \Zend\Mvc\Controller\AbstractActionController {
     
     public function getAction(){
         
         $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
         $nProductCategoryId =  $this->getEvent()->getRouteMatch()->getParam('id');
-        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_product_category_values'
+        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_product_category_attribute'
             , array(':p_pc_id'            => $nProductCategoryId));
         
-        $aCategoryValues = array();
+        $aCategoryAttribute = array();
         foreach($oResultSet as $aRow) {
-            $aCategoryValues[] = $aRow;
+            $aCategoryAttribute[] = array('pca_id' => $aRow['pca_id'] ,'pca_value' => $aRow['pca_value']);
         }
 //        var_dump($nCategoryId);
-        $aResponse = array('success' => 1, 'category_values' => $aCategoryValues);
+        $aResponse = array('success' => 1, 'category_attribute' => $aCategoryAttribute);
                 
         return new \Zend\View\Model\JsonModel($aResponse);
     }
@@ -23,47 +23,47 @@ class ProductCategoryValueController extends \Zend\Mvc\Controller\AbstractAction
     public function saveAction(){
         
 //        $this->getRequest()->setContent('{"title":null,"key":"_1","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"aaa","key":"_2","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"bbb","key":"_3","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"ddd","key":"_4","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"eee","key":"_5","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"edited":true}],"edited":true}],"edited":true},{"title":"ggg","key":"_6","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"edited":true},{"title":"ggg","key":"_7","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":true,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"hhh","key":"_9","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"edited":true}],"edited":true},{"title":"uuuuu","key":"_8","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"edited":true}],"edited":true}]}');
-//        $this->getRequest()->setContent('{"removed":["18"],"tree":{"title":null,"key":"_1","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"electronics","key":"11","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"computers","key":"12","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false}]},{"title":"abc","key":"_3","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"def","key":"_4","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"efg","key":"_5","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":true,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"edited":1}],"edited":1}],"edited":1}]}}');
+//        $this->getRequest()->setContent('{"category_id":"2","category_attributes":[{"key":-1,"value":"aaaa"},{"key":-1,"value":"bbbb"},{"key":-1,"value":"cccc"}]}');
 //        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
        
+//         $aResponse = array('success' => 333);
+//          return new \Zend\View\Model\JsonModel($aResponse);
+         
         if ($this->getRequest()->isXmlHttpRequest()) {
             $sJSONDataRequest = $this->getRequest()->getContent();
             $aRequest = (array)json_decode($sJSONDataRequest);
             $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
             
+//            $aSavedAttributes = array();
+//            foreach($aRequest['category_attributes']['values'] as $oCategoryAttribute){
+//                $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'set_product_category_attribute'
+//                    , array(':p_pca_id'                  => ($oCategoryAttribute->pca_id != -1) ? $oCategoryAttribute->pca_id: NULL
+//                            ,':p_pca_product_category'   => $aRequest['category_id']
+//                            ,':p_pca_value'              => $oCategoryAttribute->pca_value));
+//                $aSavedAttributes[] = $oResultSet->current();
+//            }
             
-            $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'set_product_category_values'
-                    , array(':p_pcv_id'                  => (array_key_exists('p_pcv_id', $aRequest) ? $aRequest['p_pcv_id']:NULL)
-                            ,':p_pcv_product_category'   => $aRequest['p_pcv_product_category']
-                            ,':p_pcv_value'              => $aRequest['p_pcv_value']));
+            $aRemovedAttributes = array();
+            foreach($aRequest['category_attributes']['removed'] as $oCategoryAttribute){
+                $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'set_product_category_attribute'
+                    , array(':p_pca_id'                  => ($oCategoryAttribute->pca_id != -1) ? $oCategoryAttribute->pca_id: NULL
+                            ,':p_pca_product_category'   => $aRequest['category_id']
+                            ,':p_pca_value'              => $oCategoryAttribute->pca_value));
+                $aSavedAttributes[] = $oResultSet->current();
+            }
+            
                 
             
-            $aTableTree = $this->getTableTree($aRequest['tree']);
-            $aCategories = array();
-            foreach($aTableTree as $sNodeProperties => $sNodePath) {
-                list($sNodeKey, $sNodeEdited) = explode($this->sPropertySeparator, $sNodeProperties);
-                $aCategories[] = array('key' => $sNodeKey
-                                        ,'edited' => $sNodeEdited
-                                        ,'path' => $sNodePath);
-            }
+//            $aTableTree = $this->getTableTree($aRequest['tree']);
+//            $aCategories = array();
+//            foreach($aTableTree as $sNodeProperties => $sNodePath) {
+//                list($sNodeKey, $sNodeEdited) = explode($this->sPropertySeparator, $sNodeProperties);
+//                $aCategories[] = array('key' => $sNodeKey
+//                                        ,'edited' => $sNodeEdited
+//                                        ,'path' => $sNodePath);
+//            }
             
-            $aResponse = array('success' => 1, 'saved_categories' => array());
-            
-            foreach($aCategories as $aCategory) {
-                if ($aCategory['edited'] == 1) {
-                    $nCategoryId = ((strpos($aCategory['key'],'_'))===0) ? NULL : $aCategory['key'];
-                    $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'set_product_category'
-                        , array(':p_pc_id'            => $nCategoryId
-                                , ':p_pc_tax_rate'      => 0
-                                , ':p_pc_description'   => ''
-                                , ':p_pc_path'          => $aCategory['path']));
-                    foreach($oResultSet as $row){
-                        $aResponse['saved_categories'][] = array('old_key' =>  $aCategory['key']
-                                                                ,'new_key' => $row['pc_id']);
-                    }
-                }
-            }
-            
+            $aResponse = array('success' => 1, 'removed_attributes' => $aRemovedAttributes, 'saved_attributes' => $aSavedAttributes);
         }
         else {
            $aResponse = array('success' => 0);

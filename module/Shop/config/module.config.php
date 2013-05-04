@@ -69,7 +69,7 @@ return array(
             'Shop\Controller\User' => 'Shop\Controller\UserController',
             'Shop\Controller\Provider' => 'Shop\Controller\ProviderController',
             'Shop\Controller\Category' => 'Shop\Controller\CategoryController',
-            'Shop\Controller\ProductCategoryValue' => 'Shop\Controller\ProductCategoryValueController',
+            'Shop\Controller\ProductCategoryAttribute' => 'Shop\Controller\ProductCategoryAttributeController',
         ),
     ),
     'view_manager' => array(

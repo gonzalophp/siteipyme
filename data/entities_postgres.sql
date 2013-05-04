@@ -33,17 +33,17 @@ CREATE TABLE "IPYME_AUX"."PRODUCT_CATEGORY" (
     PC_PATH TEXT UNIQUE
 );
 
-CREATE TABLE "IPYME_AUX"."PRODUCT_CATEGORY_VALUE" (
-    PCV_ID BIGSERIAL PRIMARY KEY,
-    PCV_PRODUCT_CATEGORY BIGINT REFERENCES "IPYME_AUX"."PRODUCT_CATEGORY",
-    PCV_VALUE TEXT,
-    CONSTRAINT unique_product_category_value UNIQUE(PCV_PRODUCT_CATEGORY, PCV_VALUE)
+CREATE TABLE "IPYME_AUX"."PRODUCT_CATEGORY_ATTRIBUTE" (
+    PCA_ID BIGSERIAL PRIMARY KEY,
+    PCA_PRODUCT_CATEGORY BIGINT REFERENCES "IPYME_AUX"."PRODUCT_CATEGORY",
+    PCA_VALUE TEXT,
+    CONSTRAINT unique_product_category_attribute UNIQUE(PCA_PRODUCT_CATEGORY, PCA_VALUE)
 );
 
 CREATE TABLE "IPYME_AUX"."PRODUCT_CATEGORY_LINK" (
 PCL_PRODUCT BIGINT REFERENCES "IPYME_AUX"."PRODUCT",
-PCL_PRODUCT_CATEGORY_VALUE BIGINT REFERENCES "IPYME_AUX"."PRODUCT_CATEGORY_VALUE",
-PRIMARY KEY (PCL_PRODUCT, PCL_PRODUCT_CATEGORY_VALUE)
+PCL_PRODUCT_CATEGORY_ATTRIBUTE BIGINT REFERENCES "IPYME_AUX"."PRODUCT_CATEGORY_ATTRIBUTE",
+PRIMARY KEY (PCL_PRODUCT, PCL_PRODUCT_CATEGORY_ATTRIBUTE)
 );
 
 CREATE TABLE "IPYME_AUX"."STORE_TYPE" (
@@ -1116,14 +1116,14 @@ BEGIN
 											, PC.pc_description
 											, PC.pc_path
 		from "IPYME_FINAL"."PRODUCT_CATEGORY" PC
-		WHERE ((PC.pc_id = p_pc_id) or (p_pc_id is null));
+		WHERE ((PC.pc_id = p_pc_id) or (p_pc_id is null))
+		ORDER BY PC.pc_path;
 	--
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
-
 
 
 -- Function: "IPYME_FINAL".get_provider(bigint)
@@ -1157,11 +1157,11 @@ BEGIN
 	ELSE
 		--
 		v_product_category.pc_id := p_pc_id;
-		UPDATE "IPYME_FINAL"."PRODUCT_CATEGORY" PC
-		SET PC.pc_tax_rate = v_product_category.pc_id
-			, PC.pc_description = v_product_category.pc_id
-			, PC.pc_path = v_product_category.pc_id
-		WHERE PC.pc_id = v_product_category.pc_id;												
+		UPDATE "IPYME_FINAL"."PRODUCT_CATEGORY"
+		SET pc_tax_rate = v_product_category.pc_tax_rate
+			, pc_description = v_product_category.pc_description
+			, pc_path = v_product_category.pc_path
+		WHERE pc_id = v_product_category.pc_id;												
 		--
 	END IF;
 	--
@@ -1178,5 +1178,67 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
+
+
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_product_category_attribute(p_pca_product_category bigint)
+  RETURNS SETOF "IPYME_FINAL"."PRODUCT_CATEGORY_ATTRIBUTE" AS
+$BODY$
+DECLARE
+BEGIN
+	--
+	RETURN QUERY 	SELECT *
+								FROM "IPYME_FINAL"."PRODUCT_CATEGORY_ATTRIBUTE"
+								WHERE pca_product_category = p_pca_product_category;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_product_category_attribute(p_pca_id bigint, p_pca_product_category bigint, p_pca_value text)
+  RETURNS SETOF "IPYME_FINAL"."PRODUCT_CATEGORY_ATTRIBUTE" AS
+$BODY$
+DECLARE
+v_product_category_attribute "IPYME_FINAL"."PRODUCT_CATEGORY_ATTRIBUTE";
+BEGIN
+	--
+	v_product_category_attribute.pca_product_category := p_pca_product_category;
+	v_product_category_attribute.pca_value := p_pca_value;
+	--
+	IF p_pca_id IS NULL THEN
+		--
+		SELECT NEXTVAL('"IPYME_FINAL"."PRODUCT_CATEGORY_ATTRIBUTE_pca_id_seq"') INTO v_product_category_attribute.pca_id;
+		--
+		INSERT INTO "IPYME_FINAL"."PRODUCT_CATEGORY_ATTRIBUTE" (p_pca_id
+																											, p_pca_product_category
+																											, p_pca_value )
+																								VALUES (v_product_category_attribute.pca_id
+																											, v_product_category_attribute.p_pca_product_category
+																											, v_product_category_attribute.p_pca_value );
+		--
+	ELSE
+		--
+		v_product_category_attribute.pca_id := p_pca_id;
+		--
+		UPDATE "IPYME_FINAL"."PRODUCT_CATEGORY_ATTRIBUTE" 
+		SET p_pca_product_category = v_product_category_attribute.p_pca_product_category
+					, p_pca_value = v_product_category_attribute.p_pca_value
+		WHERE p_pca_id = v_product_category_attribute.pca_id;
+		--
+	END IF;
+	--
+	RETURN QUERY 	SELECT v_product_category_attribute.*;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
 
 \dn
