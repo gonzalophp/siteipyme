@@ -46,21 +46,21 @@ return array(
     ),
     'service_manager' => array(
         'factories' => array(
-            'translator' => 'Zend\I18n\Translator\TranslatorServiceFactory',
+//            'translator' => 'Zend\I18n\Translator\TranslatorServiceFactory',
         ),
         'invokables' => array(
         )
     ),
-    'translator' => array(
-        'locale' => 'en_US',
-        'translation_file_patterns' => array(
-            array(
-                'type'     => 'gettext',
-                'base_dir' => __DIR__ . '/../language',
-                'pattern'  => '%s.mo',
-            ),
-        ),
-    ),
+//    'translator' => array(
+//        'locale' => 'en_US',
+//        'translation_file_patterns' => array(
+//            array(
+//                'type'     => 'gettext',
+//                'base_dir' => __DIR__ . '/../language',
+//                'pattern'  => '%s.mo',
+//            ),
+//        ),
+//    ),
     'controllers' => array(
         'invokables' => array(
             'Shop\Controller\Menu' => 'Shop\Controller\MenuController',
