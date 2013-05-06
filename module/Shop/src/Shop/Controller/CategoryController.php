@@ -65,7 +65,7 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
     }
     
     public function saveAction(){
-//        $this->getRequest()->setContent('{"tree":{"title":null,"key":"_1","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"ELECTRONICS","key":"1","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false},{"title":"food","key":"3","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"cat1","key":"4","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false},{"title":"cat2","key":"5","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false}]},{"title":"newnew","key":"6","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"newnew2","key":"7","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":true,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false}]}]},"removed_nodes":[],"added_nodes":[],"updated_nodes":[{"editing":1,"key":"7","attributes":{"removed":[],"values":[{"pca_id":-1,"pca_value":"aaaaaaaaa"}]}}]}');
+//        $this->getRequest()->setContent('{"tree":{"title":null,"key":"_1","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"ELECTRONICS","key":"1","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false}]},"removed_nodes":["3","6"],"added_nodes":[{"key":"_2","attributes":{"removed":[],"values":[{"pca_id":-1,"pca_value":"aaa"},{"pca_id":-1,"pca_value":"bbb"}]}}],"updated_nodes":[{"editing":1,"key":"5","attributes":{"removed":[29,30],"values":[{"pca_id":28,"pca_value":"qqqqqqqqq"}]}},{"editing":1,"key":"7","attributes":{"removed":[],"values":[{"pca_id":26,"pca_value":"aaaaaaaaa"},{"pca_id":-1,"pca_value":"iiiojfdsojdsf"},{"pca_id":-1,"pca_value":"sdafsdfsd"}]}}]}');
 //        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
         
         if ($this->getRequest()->isXmlHttpRequest()) {
@@ -80,6 +80,16 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
 //        var_dump($aRequest);
             $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
             
+            
+            
+            $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_product_category'
+            , array(':p_pc_id'            => NULL));
+        
+            $aRemovedCategories = array();
+            foreach($oResultSet as $aRow) {
+                $aRemovedCategories[$aRow['pc_id']] = $aRow['pc_id'];
+            }
+            
             $aTableTree = $this->getTableTree($aRequest['tree']);
             $aCategories = array();
             foreach($aTableTree as $sNodeProperties => $sNodePath) {
@@ -87,6 +97,17 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
                 $aCategories[] = array('key' => $sNodeKey
                                         ,'edited' => $sNodeEdited
                                         ,'path' => $sNodePath);
+                if ((strpos($sNodeKey,'_'))!==0){
+                    if (array_key_exists($sNodeKey, $aRemovedCategories)){
+                        unset($aRemovedCategories[$sNodeKey]);
+                    }
+                }
+            }
+            
+            // Remove categories
+            foreach($aRemovedCategories as $nProductCategoryId) {
+                $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'delete_product_category'
+                        , array(':p_pc_id'            => $nProductCategoryId));
             }
             
             $aKeyMap = array();
@@ -109,35 +130,34 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
             
 //            var_dump($aTableTree,$aRequest);
 //            exit;
-            // Remove categories
-            foreach($aRequest['removed_nodes'] as $nProductCategoryId) {
-//                var_dump($nProductCategoryId);
-                $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'delete_product_category'
-                        , array(':p_pc_id'            => $nProductCategoryId));
-            }
+            
             
             // Added categories
             foreach($aRequest['added_nodes'] as $oCategory) {
-                foreach($oCategory->attributes->values as $oAttribute){
-                    $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'set_product_category_attribute'
-                        , array(':p_pca_id'                  => NULL
-                                ,':p_pca_product_category'   => $aKeyMap[$oCategory->key]
-                                ,':p_pca_value'              => $oAttribute->pca_value));
+                if (array_key_exists($oCategory->key, $aKeyMap)){
+                    foreach($oCategory->attributes->values as $oAttribute){
+                        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'set_product_category_attribute'
+                            , array(':p_pca_id'                  => NULL
+                                    ,':p_pca_product_category'   => $aKeyMap[$oCategory->key]
+                                    ,':p_pca_value'              => $oAttribute->pca_value));
+                    }
                 }
             }
             
             
             // Updated categories
             foreach($aRequest['updated_nodes'] as $oCategory) {
-                foreach($oCategory->attributes->removed as $nAttributeId){
-                    $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'delete_product_category_attribute'
-                        , array(':p_pca_id'                  => $nAttributeId));
-                }
-                foreach($oCategory->attributes->values as $oAttribute){
-                    $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'set_product_category_attribute'
-                        , array(':p_pca_id'                  => (($oAttribute->pca_id != -1) ? $oAttribute->pca_id:NULL)
-                                ,':p_pca_product_category'   => $oCategory->key
-                                ,':p_pca_value'              => $oAttribute->pca_value));
+                if (!array_key_exists($oCategory->key,$aRemovedCategories)){
+                    foreach($oCategory->attributes->removed as $nAttributeId){
+                        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'delete_product_category_attribute'
+                            , array(':p_pca_id'                  => $nAttributeId));
+                    }
+                    foreach($oCategory->attributes->values as $oAttribute){
+                        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'set_product_category_attribute'
+                            , array(':p_pca_id'                  => (($oAttribute->pca_id != -1) ? $oAttribute->pca_id:NULL)
+                                    ,':p_pca_product_category'   => $oCategory->key
+                                    ,':p_pca_value'              => $oAttribute->pca_value));
+                    }
                 }
             }
             
@@ -239,15 +259,6 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
         return new \Zend\View\Model\JsonModel($aResponse);
     }
     
-    public function testAction() {
-        $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
-        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_customer', array(':id' => null));
-        
-        foreach($oResultSet as $aRow) {
-            var_dump($aRow);
-        }
-        exit;
-    }
     
     public function getTree($aTableTree){
 //        asort($aTableTree);
