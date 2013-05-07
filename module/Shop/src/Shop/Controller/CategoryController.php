@@ -26,28 +26,23 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
         return new \Zend\View\Model\JsonModel($aResponse);
     }
     
+    public function getAttributeAction(){
+        
+        $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+        $nProductCategoryId =  $this->getEvent()->getRouteMatch()->getParam('id');
+        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_product_category_attribute'
+            , array(':p_pc_id'            => $nProductCategoryId));
+        
+        $aCategoryAttribute = array();
+        foreach($oResultSet as $aRow) {
+            $aCategoryAttribute[] = array('pca_id' => $aRow['pca_id'] ,'pca_value' => $aRow['pca_value']);
+        }
+        $aResponse = array('success' => 1, 'category_attribute' => $aCategoryAttribute);
+                
+        return new \Zend\View\Model\JsonModel($aResponse);
+    }
+    
     public function getAction(){
-        $aResponse = array(
-            'tree' => array(array('title' => "Item 1"
-                                    ,'toma' => 'aa'
-                                    , 'key' => '77__1')
-                               ,array('title' => "Item 2"
-                                    ,'toma' => 'bb'
-                                    ,'isFolder' => true
-                                   , 'key' => '__2'
-                                    ,'children' => array(
-                                        array('title'=>'item 2.1', 'key' => '__21')
-                                       ,array('title'=>'item 2.2', 'key' => '__22')
-                                       ,array('title'=>'item 2.3', 'key' => '__23')
-                                    ))
-                               ,array('title' => "Item 3"
-                                     ,'toma' => 'cc'
-                                   , 'key' => '__3')
-            )
-        );
-        
-        
-        
         $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
         $nCategoryId =  $this->getEvent()->getRouteMatch()->getParam('id');
         $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_product_category'

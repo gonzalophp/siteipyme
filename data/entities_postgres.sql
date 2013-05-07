@@ -1180,6 +1180,36 @@ $BODY$
   ROWS 1000;
 
 
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".delete_product_category(p_pc_id bigint)
+  RETURNS SETOF "IPYME_FINAL"."PRODUCT_CATEGORY" AS
+$BODY$
+DECLARE
+v_row_product_category "IPYME_FINAL"."PRODUCT_CATEGORY"%ROWTYPE;
+BEGIN
+	--
+	SELECT *
+	INTO v_row_product_category
+	FROM "IPYME_FINAL"."PRODUCT_CATEGORY" PC
+	WHERE PC.pc_id = p_pc_id;
+	--
+	IF NOT FOUND THEN
+		--
+		RETURN;
+		--
+	ELSE
+		--
+		DELETE FROM "IPYME_FINAL"."PRODUCT_CATEGORY" PC
+		WHERE PC.pc_id = p_pc_id;
+		--
+		RETURN QUERY SELECT v_row_product_category.*;
+		--
+	END IF;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
 
 
 CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_product_category_attribute(p_pca_product_category bigint)
@@ -1214,25 +1244,60 @@ BEGIN
 		--
 		SELECT NEXTVAL('"IPYME_FINAL"."PRODUCT_CATEGORY_ATTRIBUTE_pca_id_seq"') INTO v_product_category_attribute.pca_id;
 		--
-		INSERT INTO "IPYME_FINAL"."PRODUCT_CATEGORY_ATTRIBUTE" (p_pca_id
-																											, p_pca_product_category
-																											, p_pca_value )
+		INSERT INTO "IPYME_FINAL"."PRODUCT_CATEGORY_ATTRIBUTE" (pca_id
+																											, pca_product_category
+																											, pca_value )
 																								VALUES (v_product_category_attribute.pca_id
-																											, v_product_category_attribute.p_pca_product_category
-																											, v_product_category_attribute.p_pca_value );
+																											, v_product_category_attribute.pca_product_category
+																											, v_product_category_attribute.pca_value );
 		--
 	ELSE
 		--
 		v_product_category_attribute.pca_id := p_pca_id;
 		--
 		UPDATE "IPYME_FINAL"."PRODUCT_CATEGORY_ATTRIBUTE" 
-		SET p_pca_product_category = v_product_category_attribute.p_pca_product_category
-					, p_pca_value = v_product_category_attribute.p_pca_value
-		WHERE p_pca_id = v_product_category_attribute.pca_id;
+		SET pca_product_category = v_product_category_attribute.pca_product_category
+					, pca_value = v_product_category_attribute.pca_value
+		WHERE pca_id = v_product_category_attribute.pca_id;
 		--
 	END IF;
 	--
 	RETURN QUERY 	SELECT v_product_category_attribute.*;
+	--
+	EXCEPTION
+			WHEN OTHERS THEN
+				NULL;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".delete_product_category_attribute(p_pca_id bigint)
+  RETURNS SETOF "IPYME_FINAL"."PRODUCT_CATEGORY_ATTRIBUTE" AS
+$BODY$
+DECLARE
+v_row_product_category_attribute "IPYME_FINAL"."PRODUCT_CATEGORY_ATTRIBUTE"%ROWTYPE;
+BEGIN
+	--
+	SELECT *
+	INTO v_row_product_category_attribute
+	FROM "IPYME_FINAL"."PRODUCT_CATEGORY_ATTRIBUTE" PCA
+	WHERE PCA.pca_id = p_pca_id;
+	--
+	IF NOT FOUND THEN
+		--
+		RETURN;
+		--
+	ELSE
+		--
+		DELETE FROM "IPYME_FINAL"."PRODUCT_CATEGORY_ATTRIBUTE" PCA
+		WHERE PCA.pca_id = p_pca_id;
+		--
+		RETURN QUERY SELECT v_row_product_category_attribute.*;
+		--
+	END IF;
 	--
 END;
 $BODY$
