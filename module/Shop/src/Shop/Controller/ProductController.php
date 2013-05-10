@@ -27,7 +27,24 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
         return new \Zend\View\Model\JsonModel($aResponse);
     }
     
+    public function getProductsByCategoryAction() {
+        $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+        $nProductCategoryId =  $this->getEvent()->getRouteMatch()->getParam('id');
+        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_product_by_category', array(':pc_id' => $nProductCategoryId));
+            
+        foreach($oResultSet as $aProduct) {
+            $aProduct['grid_id'] = $aProduct['p_id'];
+            $aResponse['datagrid'][] = $aProduct;
+        }
+
+        return new \Zend\View\Model\JsonModel($aResponse);
+    }
+    
+    
     public function SaveAction(){
+//        $this->getRequest()->setContent('{"p_id":4,"p_ref":"p2baa","p_description":"oooo77788","p_long_description":"xxxxx","p_weight":"4534.000","p_size":"433","p_category":null,"grid_id":4}');
+//        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
+        
         
         if ($this->getRequest()->isXmlHttpRequest()) {
             $sJSONDataRequest = $this->getRequest()->getContent();
@@ -42,7 +59,8 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
                         ,':p_p_description'      => $aRequest['p_description']
                         ,':p_p_long_description' => $aRequest['p_long_description']
                         ,':p_p_weight'           => $aRequest['p_weight']
-                        ,':p_p_size'             => $aRequest['p_size']));
+                        ,':p_p_size'             => $aRequest['p_size']
+                        ,':p_p_category'         => $aRequest['p_category']));
 
             $aResponse = $oResultSet->current();
             if ($oResultSet->count()==1){

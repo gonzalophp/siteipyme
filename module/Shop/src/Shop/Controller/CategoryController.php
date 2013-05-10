@@ -15,13 +15,6 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
                 array('field' => "c_tax", 'displayName' => "Tax", 'width' => 150),
             )
         );
-//        $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
-//        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_provider', array(':id' => null));
-//            
-//        foreach($oResultSet as $aProvider) {
-//            $aProvider['grid_id'] = $aProvider['p_id'];
-//            $aResponse['datagrid'][] = $aProvider;
-//        }
 
         return new \Zend\View\Model\JsonModel($aResponse);
     }
@@ -35,12 +28,59 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
         
         $aCategoryAttribute = array();
         foreach($oResultSet as $aRow) {
-            $aCategoryAttribute[] = array('pca_id' => $aRow['pca_id'] ,'pca_value' => $aRow['pca_value']);
+            $aCategoryAttribute[] = array('pca_id' => $aRow['pca_id'] ,'pca_attribute' => $aRow['pca_attribute']);
         }
         $aResponse = array('success' => 1, 'category_attribute' => $aCategoryAttribute);
                 
         return new \Zend\View\Model\JsonModel($aResponse);
     }
+    
+    public function getAttributeRelatedAction(){
+        
+        $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+        $nProductCategoryId =  $this->getEvent()->getRouteMatch()->getParam('id');
+        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_product_attribute_related'
+            , array(':p_pc_id'            => $nProductCategoryId));
+        
+        $aCategoryAttribute = array();
+        foreach($oResultSet as $aRow) {
+            $aCategoryAttribute[] = array('pca_id' => $aRow['pca_id'] ,'pca_attribute' => $aRow['pca_attribute']);
+        }
+        $aResponse = array('success' => 1, 'category_attribute' => $aCategoryAttribute);
+                
+        return new \Zend\View\Model\JsonModel($aResponse);
+    }
+    
+    
+    public function getAttributeValuesRelatedAction(){
+        
+        $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+        $nProductCategoryId =  $this->getEvent()->getRouteMatch()->getParam('id');
+        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_attribute_value_related'
+            , array(':p_pc_id'            => $nProductCategoryId));
+        
+        $aCategoryAttribute = array();
+        foreach($oResultSet as $aRow) {
+            if (!array_key_exists($aRow['pca_id'], $aCategoryAttribute)){
+                $aCategoryAttribute[$aRow['pca_id']] = array('pca_id'           => $aRow['pca_id'] 
+                                                            ,'pca_attribute'    => $aRow['pca_attribute']
+                                                            ,'attribute_value_selected' => ''
+                                                            ,'attribute_values' => array());
+            }
+            
+            if (!is_null($aRow['pav_id'])){
+                $aCategoryAttribute[$aRow['pca_id']]['attribute_values'][] = array('pav_id'                         => $aRow['pav_id']
+                                                                                , 'pav_product_category_attribute'  => $aRow['pav_product_category_attribute']
+                                                                                , 'pav_value'                       => $aRow['pav_value']);
+            }
+        }
+        
+        $aResponse = array('success' => 1, 'category_attribute' => $aCategoryAttribute);
+                
+        return new \Zend\View\Model\JsonModel($aResponse);
+    }
+    
+    
     
     public function getAction(){
         $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
@@ -60,22 +100,14 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
     }
     
     public function saveAction(){
-//        $this->getRequest()->setContent('{"tree":{"title":null,"key":"_1","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"ELECTRONICS","key":"1","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false}]},"removed_nodes":["3","6"],"added_nodes":[{"key":"_2","attributes":{"removed":[],"values":[{"pca_id":-1,"pca_value":"aaa"},{"pca_id":-1,"pca_value":"bbb"}]}}],"updated_nodes":[{"editing":1,"key":"5","attributes":{"removed":[29,30],"values":[{"pca_id":28,"pca_value":"qqqqqqqqq"}]}},{"editing":1,"key":"7","attributes":{"removed":[],"values":[{"pca_id":26,"pca_value":"aaaaaaaaa"},{"pca_id":-1,"pca_value":"iiiojfdsojdsf"},{"pca_id":-1,"pca_value":"sdafsdfsd"}]}}]}');
+//        $this->getRequest()->setContent('{"tree":{"title":null,"key":"_1","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"drinks","key":"12","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"alcohol","key":"13","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"url":""}],"url":""},{"title":"food","key":"1","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"breakfast","key":"5","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"url":""},{"title":"cupboard","key":"8","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"snacks","key":"9","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"nuts","key":"10","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"cashews","key":"11","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"url":""}],"url":""}],"url":""}],"url":""},{"title":"frozen","key":"4","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"fish","key":"7","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"url":""},{"title":"meat","key":"6","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":true,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"url":""},{"title":"vegetables","key":"21","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"url":""}],"url":""},{"title":"jars","key":"3","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"url":""},{"title":"vegetables","key":"2","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"url":""}],"url":""},{"title":"PCHARDWARE","key":"14","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"COMPONENTS","key":"15","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"CPU","key":"20","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"url":""},{"title":"MEMORY","key":"16","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"DDR2","key":"17","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"url":""},{"title":"DDR3","key":"18","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"url":""}],"url":""},{"title":"MOTHERBOARD","key":"19","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"url":""}],"url":""}],"url":""}]},"added_nodes":[],"updated_nodes":[{"editing":1,"key":"21","attributes":{"removed":[17],"values":[]}},{"editing":1,"key":"10","attributes":{"removed":[-1,-1],"values":[]}},{"editing":1,"key":"2","attributes":{"removed":[],"values":[{"pca_id":1,"pca_attribute":"garden peas"},{"pca_id":4,"pca_attribute":"carrots"},{"pca_id":5,"pca_attribute":"spinach"},{"pca_id":6,"pca_attribute":"green beans"}]}},{"editing":1,"key":"6","attributes":{"removed":[],"values":[{"pca_id":-1,"pca_attribute":"chicken"}]}}]}');
 //        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
         
         if ($this->getRequest()->isXmlHttpRequest()) {
             $sJSONDataRequest = $this->getRequest()->getContent();
             $aRequest = (array)json_decode($sJSONDataRequest);
         
-//            tree:$scope.model.tree.toDict()
-//            , removed_nodes: $scope.model.removed_nodes
-//            , added_nodes: $scope.model.added_nodes
-//            , updated_nodes: $scope.model.updated_nodes})
-            
-//        var_dump($aRequest);
             $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
-            
-            
             
             $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_product_category'
             , array(':p_pc_id'            => NULL));
@@ -123,10 +155,6 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
                 }
             }
             
-//            var_dump($aTableTree,$aRequest);
-//            exit;
-            
-            
             // Added categories
             foreach($aRequest['added_nodes'] as $oCategory) {
                 if (array_key_exists($oCategory->key, $aKeyMap)){
@@ -134,7 +162,7 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
                         $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'set_product_category_attribute'
                             , array(':p_pca_id'                  => NULL
                                     ,':p_pca_product_category'   => $aKeyMap[$oCategory->key]
-                                    ,':p_pca_value'              => $oAttribute->pca_value));
+                                    ,':p_pca_attribute'              => $oAttribute->pca_attribute));
                     }
                 }
             }
@@ -151,15 +179,10 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
                         $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'set_product_category_attribute'
                             , array(':p_pca_id'                  => (($oAttribute->pca_id != -1) ? $oAttribute->pca_id:NULL)
                                     ,':p_pca_product_category'   => $oCategory->key
-                                    ,':p_pca_value'              => $oAttribute->pca_value));
+                                    ,':p_pca_attribute'              => $oAttribute->pca_attribute));
                     }
                 }
             }
-            
-    
-                    
-                    
-            
             
             // Reading all category tree
             $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_product_category'
@@ -181,87 +204,24 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
         return new \Zend\View\Model\JsonModel($aResponse);
     }
     
-    public function SaveTreeAction(){
-        
-//        $this->getRequest()->setContent('{"title":null,"key":"_1","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"aaa","key":"_2","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"bbb","key":"_3","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"ddd","key":"_4","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"eee","key":"_5","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"edited":true}],"edited":true}],"edited":true},{"title":"ggg","key":"_6","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"edited":true},{"title":"ggg","key":"_7","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":true,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"hhh","key":"_9","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"edited":true}],"edited":true},{"title":"uuuuu","key":"_8","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"edited":true}],"edited":true}]}');
-//        $this->getRequest()->setContent('{"removed":["18"],"tree":{"title":null,"key":"_1","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"electronics","key":"11","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"computers","key":"12","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false}]},{"title":"abc","key":"_3","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"def","key":"_4","isFolder":true,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":false,"focus":false,"expand":true,"select":false,"hideCheckbox":false,"unselectable":false,"children":[{"title":"efg","key":"_5","isFolder":false,"isLazy":false,"tooltip":null,"href":null,"icon":null,"addClass":null,"noLink":false,"activate":true,"focus":false,"expand":false,"select":false,"hideCheckbox":false,"unselectable":false,"edited":1}],"edited":1}],"edited":1}]}}');
-//        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
-       
-        if ($this->getRequest()->isXmlHttpRequest()) {
-            $sJSONDataRequest = $this->getRequest()->getContent();
-            $aRequest = (array)json_decode($sJSONDataRequest);
-            $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
-            
-
-            
-            foreach($aRequest['removed'] as $nProductCategory) {
-                $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'delete_product_category'
-                        , array(':p_pc_id'            => $nProductCategory));
-                
-            }
-            
-            
-            $aTableTree = $this->getTableTree($aRequest['tree']);
-            $aCategories = array();
-            foreach($aTableTree as $sNodeProperties => $sNodePath) {
-                list($sNodeKey, $sNodeEdited) = explode($this->sPropertySeparator, $sNodeProperties);
-                $aCategories[] = array('key' => $sNodeKey
-                                        ,'edited' => $sNodeEdited
-                                        ,'path' => $sNodePath);
-            }
-            
-            $aResponse = array('success' => 1, 'saved_categories' => array());
-            
-            foreach($aCategories as $aCategory) {
-                if ($aCategory['edited'] == 1) {
-                    $nCategoryId = ((strpos($aCategory['key'],'_'))===0) ? NULL : $aCategory['key'];
-                    $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'set_product_category'
-                        , array(':p_pc_id'            => $nCategoryId
-                                , ':p_pc_tax_rate'      => 0
-                                , ':p_pc_description'   => ''
-                                , ':p_pc_path'          => $aCategory['path']));
-                    foreach($oResultSet as $row){
-                        $aResponse['saved_categories'][] = array('old_key' =>  $aCategory['key']
-                                                                ,'new_key' => $row['pc_id']);
-                    }
-                }
-            }
-            
-        }
-        else {
-           $aResponse = array('success' => 0);
-        }
-        return new \Zend\View\Model\JsonModel($aResponse);
-    }
     
-    public function DeleteAction(){
-        
-        if ($this->getRequest()->isXmlHttpRequest()) {
-            $sJSONDataRequest = $this->getRequest()->getContent();
-            $aRequest = (array)json_decode($sJSONDataRequest);
-            
-            $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
-            $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'delete_provider'
-                    , array( ':p_p_id'              => array_key_exists('p_id',$aRequest)?$aRequest['p_id']:null));
-                    
-            $aResponse = $oResultSet->current();
-            $aResponse['success'] = ($oResultSet->count()==1)?1:0;
-        }
-        else {
-            $aResponse = array('success' => 0);
-        }
-        
-        return new \Zend\View\Model\JsonModel($aResponse);
-    }
-    
-    
-    public function getTree($aTableTree){
+    public function getTree($aTableTree, $nTreeDepth=0, $bMenuOutput=false){
 //        asort($aTableTree);
         $aRoot =  array();
         $aNodeStack = array(&$aRoot);
         $sBaseAndSeparator = $this->sPathSeparator;
+        
+        if ($bMenuOutput){
+            $aIndexes = array('nodes' => 'nodes'
+                             ,'label' => 'label');
+        }
+        else {
+            $aIndexes = array('nodes' => 'children'
+                             ,'label' => 'title');
+        }
             
         foreach($aTableTree as $sKey => $sNodePath) {
+            if ($nTreeDepth && (substr_count($sNodePath, $this->sPathSeparator)>$nTreeDepth)) continue;
             if (strpos($sNodePath, $sBaseAndSeparator) !== 0){
                 do {
                     $sBaseAndSeparator = substr($sBaseAndSeparator, 0, strrpos($sBaseAndSeparator,$this->sPathSeparator));
@@ -275,13 +235,14 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
                 $sBaseAndSeparator = substr($sNodePath, 0, strrpos($sNodePath, $this->sPathSeparator)).$this->sPathSeparator;
                 $nBaseAndSeparatorLength = strlen($sBaseAndSeparator);
                 $aTree[count($aTree)-1]['isFolder'] = true;
-                $aTree[count($aTree)-1]['children'] = array();
-                $aTree = &$aTree[count($aTree)-1]['children'];
+                $aTree[count($aTree)-1][$aIndexes['nodes']] = array();
+                $aTree = &$aTree[count($aTree)-1][$aIndexes['nodes']];
                 $aNodeStack[] = &$aTree;
             }
 
-            $aTree[] = array('title' => substr($sNodePath, $nBaseAndSeparatorLength)
-                             ,'key'   => $sKey);
+            $aTree[] = array($aIndexes['label'] => substr($sNodePath, $nBaseAndSeparatorLength)
+                            ,'key'      => $sKey
+                            ,'url'      => '');
         }
         
         return $aRoot;
@@ -290,7 +251,6 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
     public function getTableTree($aTree){
         $aTableTree = array();
         $aTableTreePhase1 = $this->fromTreeToTableTree($aTree);
-//        sort($aTableTreePhase1);
         $nSeparatorLength = strlen($this->sPathSeparator);
         foreach($aTableTreePhase1 as $sNodeLine) {
             $nKeySeparator = strrpos($sNodeLine, $this->sPathSeparator);
@@ -332,6 +292,118 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
         }
         
         return $aTableTree;
+    }
+    
+    public function menuAction() {
+        
+        $aMenuList = array(
+            (object) array(
+                'label' => 'iPyME'
+                , 'url' => ''
+                , 'nodes' => array(
+                    (object) array(
+                        'label' => 'Purchase'
+                        , 'url' => '#/admin/purchase'
+                        , 'nodes' => array(
+                            (object) array(
+                                'label' => 'Provider'
+                                , 'url' => '#/admin/list/provider'
+                                , 'nodes' => array())
+                            , (object) array(
+                                'label' => 'Order'
+                                , 'url' => '#/admin/purchase/order'
+                                , 'nodes' => array())))
+                    , (object) array(
+                        'label' => 'Sale'
+                        , 'url' => '#/admin/sale'
+                        , 'nodes' => array(
+                            (object) array(
+                                'label' => 'Customer'
+                                , 'url' => '#/admin/list/customer'
+                                , 'nodes' => array())
+                            , (object) array(
+                                'label' => 'Order'
+                                , 'url' => '#/admin/sale/order'
+                                , 'nodes' => array())
+                            , (object) array(
+                                'label' => 'Delivery'
+                                , 'url' => '#/admin/sale/delivery'
+                                , 'nodes' => array())
+                            , (object) array(
+                                'label' => 'Payment'
+                                , 'url' => '#/admin/sale/payment'
+                                , 'nodes' => array())))
+                    , (object) array(
+                        'label' => 'Product'
+                        , 'url' => ''
+                        , 'nodes' => array(
+                            (object) array(
+                                'label' => 'Stores'
+                                , 'url' => '#/admin/stores'
+                                , 'nodes' => array())
+                            , (object) array(
+                                'label' => 'Products'
+                                , 'url' => '#/admin/list/product'
+                                , 'nodes' => array())
+                            , (object) array(
+                                'label' => 'Category'
+                                , 'url' => '#/admin/category'
+                                , 'nodes' => array())
+                            , (object) array(
+                                'label' => 'Item'
+                                , 'url' => '#/admin/product/item'
+                                , 'nodes' => array())))
+                    , (object) array(
+                        'label' => 'Settings'
+                        , 'url' => '#/admin/settings'
+                        , 'nodes' => array(
+                            (object) array(
+                                'label' => 'Users'
+                                , 'url' => '#/admin/list/user'
+                                , 'nodes' => array())))))
+            , (object) array(
+                'label' => 'Sign In'
+                , 'url' => '#/user/signin'
+                , 'nodes' => array())
+            , (object) array(
+                'label' => 'Basket'
+                , 'url' => '#/user/basket'
+                , 'nodes' => array())
+            , (object) array(
+                'label' => 'Resources'
+                , 'url' => 'http://www.elmundo.es'
+                , 'nodes' => array(
+                    (object) array(
+                        'label' => 'Resources A'
+                        , 'url' => 'http://www.elmundo.es'
+                        , 'nodes' => array())
+                    , (object) array(
+                        'label' => 'Resources B'
+                        , 'url' => '#/admin/product'
+                        , 'nodes' => array(
+                            (object) array(
+                                'label' => 'Resources B A'
+                                , 'url' => 'http://www.elmundo.es'
+                                , 'nodes' => array())
+                            , (object) array(
+                                'label' => 'Product'
+                                , 'url' => '#/admin/product'
+                                , 'nodes' => array()))))));
+        
+        
+        $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+        $nCategoryId =  $this->getEvent()->getRouteMatch()->getParam('id');
+        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_product_category'
+            , array(':p_pc_id'            => NULL));
+        
+        $aTableTree = array();
+        foreach($oResultSet as $aRow) {
+            $aTableTree[$aRow['pc_id']] = "{$aRow['pc_path']}";
+        }
+        
+        $aTree = $this->getTree($aTableTree,3, true);
+        
+        return new \Zend\View\Model\JsonModel($aTree);
     }
 }
 ?>
