@@ -10,8 +10,6 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
                 array('field' => "p_id", 'displayName' => "ID", 'width' => 30, 'pinned' => true),
                 array('field' => "p_ref", 'displayName' => "Reference", 'width' => 100),
                 array('field' => "p_description", 'displayName' => "Description", 'width' => 150),
-                array('field' => "p_size", 'displayName' => "Size", 'width' => 70),
-                array('field' => "p_weight", 'displayName' => "Weight", 'width' => 70),
                 array('field' => "p_long_description", 'displayName' => "Long Description", 'width' => 200),
             )
         );
@@ -31,7 +29,8 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
         $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
         $nProductCategoryId =  $this->getEvent()->getRouteMatch()->getParam('id');
         $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_product_by_category', array(':pc_id' => $nProductCategoryId));
-            
+        
+        $aResponse = array('success' =>1);
         foreach($oResultSet as $aProduct) {
             $aProduct['grid_id'] = $aProduct['p_id'];
             $aResponse['datagrid'][] = $aProduct;
@@ -42,35 +41,42 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
     
     
     public function SaveAction(){
-//        $this->getRequest()->setContent('{"p_id":4,"p_ref":"p2baa","p_description":"oooo77788","p_long_description":"xxxxx","p_weight":"4534.000","p_size":"433","p_category":null,"grid_id":4}');
+//        $this->getRequest()->setContent('{"fields":{"p_ref":"ddr232mb","p_description":"ddr2 32mb","p_long_description":"ddr2"},"categoryselected":{"id":"17","category":"DDR2"},"category_attribute":{"7":{"pca_id":7,"pca_attribute":"RETAIL","attribute_value_selected":"oem","attribute_values":[]},"12":{"pca_id":12,"pca_attribute":"SIZE","attribute_value_selected":"32","attribute_values":[]},"13":{"pca_id":13,"pca_attribute":"SPEED","attribute_value_selected":"800","attribute_values":[]},"14":{"pca_id":14,"pca_attribute":"ECC","attribute_value_selected":"no","attribute_values":[]},"16":{"pca_id":16,"pca_attribute":"BRAND","attribute_value_selected":"corsair","attribute_values":[]}}}');
 //        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
-        
-        
+//        
         if ($this->getRequest()->isXmlHttpRequest()) {
             $sJSONDataRequest = $this->getRequest()->getContent();
-            $aRequest = (array)json_decode($sJSONDataRequest);
-            
+            $aRequest = (array)json_decode($sJSONDataRequest, true);
+//            var_dump($aRequest);
+//            exit;
             $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+            $nProductId = array_key_exists('p_id',$aRequest['fields'])?$aRequest['fields']['p_id']:null;
             $oResultSet = $oDataFunctionGateway->getDataRecordSet(
                 'IPYME_FINAL'
                 , 'set_product'
-                , array(':p_p_id'                => array_key_exists('p_id',$aRequest)?$aRequest['p_id']:null
-                        ,':p_p_ref'              => $aRequest['p_ref']
-                        ,':p_p_description'      => $aRequest['p_description']
-                        ,':p_p_long_description' => $aRequest['p_long_description']
-                        ,':p_p_weight'           => $aRequest['p_weight']
-                        ,':p_p_size'             => $aRequest['p_size']
-                        ,':p_p_category'         => $aRequest['p_category']));
-
+                , array(':p_p_id'                => $nProductId
+                        ,':p_p_ref'              => $aRequest['fields']['p_ref']
+                        ,':p_p_description'      => array_key_exists('p_description',$aRequest['fields'])?$aRequest['fields']['p_description']:null
+                        ,':p_p_long_description' => array_key_exists('p_long_description',$aRequest['fields'])?$aRequest['fields']['p_long_description']:null
+                        ,':p_p_category'         => $aRequest['categoryselected']['id']));
+            
             $aResponse = $oResultSet->current();
             if ($oResultSet->count()==1){
-                $aResponse['success'] = ($oResultSet->count()==1)?1:0;
+                $aResponse['success'] = 1;
                 $aResponse['grid_id'] = $aResponse['p_id'];
+                
+                foreach($aRequest['category_attribute'] as $aAttributeValue){
+                    $oResultSet = $oDataFunctionGateway->getDataRecordSet(
+                    'IPYME_FINAL'
+                    , 'set_product_attribute_value'
+                    , array(':p_pav_product'                    => $aResponse['p_id']
+                           ,':p_pav_product_category_attribute' => $aAttributeValue['pca_id']
+                           ,':p_pav_value'                      => $aAttributeValue['attribute_value_selected']));
+                }
             }
             else {
                 $aResponse = array('success' => 0);
             }
-            
         }
         else {
             $aResponse = array('success' => 0);
@@ -80,15 +86,20 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
     }
     
     public function DeleteAction(){
+        
+//        $this->getRequest()->setContent('{"fields":{"p_id":42,"p_ref":"DDR51","p_description":null,"p_long_description":null,"p_category":16,"grid_id":42},"categoryselected":{"id":"15","category":"COMPONENTS"}}');
+//        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
+        
+        
         if ($this->getRequest()->isXmlHttpRequest()) {
             $sJSONDataRequest = $this->getRequest()->getContent();
-            $aRequest = (array)json_decode($sJSONDataRequest);
-            
+            $aRequest = (array)json_decode($sJSONDataRequest, true);
+//            var_dump($aRequest);
             $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
             $oResultSet = $oDataFunctionGateway->getDataRecordSet(
                 'IPYME_FINAL'
                 , 'delete_product'
-                , array(':p_p_id'                => array_key_exists('p_id',$aRequest)?$aRequest['p_id']:null));
+                , array(':p_p_id'                => array_key_exists('p_id',$aRequest['fields'])?$aRequest['fields']['p_id']:null));
             
             
             $aResponse = $oResultSet->current();

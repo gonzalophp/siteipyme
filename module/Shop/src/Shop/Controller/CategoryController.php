@@ -55,9 +55,11 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
     public function getAttributeValuesRelatedAction(){
         
         $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
-        $nProductCategoryId =  $this->getEvent()->getRouteMatch()->getParam('id');
+        $sParameters =  $this->getEvent()->getRouteMatch()->getParam('id');
+        $aParameters = explode(',',$sParameters);
+
         $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_attribute_value_related'
-            , array(':p_pc_id'            => $nProductCategoryId));
+            , array(':p_pc_id'            => $aParameters[0]));
         
         $aCategoryAttribute = array();
         foreach($oResultSet as $aRow) {
@@ -67,11 +69,12 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
                                                             ,'attribute_value_selected' => ''
                                                             ,'attribute_values' => array());
             }
-            
-            if (!is_null($aRow['pav_id'])){
-                $aCategoryAttribute[$aRow['pca_id']]['attribute_values'][] = array('pav_id'                         => $aRow['pav_id']
-                                                                                , 'pav_product_category_attribute'  => $aRow['pav_product_category_attribute']
-                                                                                , 'pav_value'                       => $aRow['pav_value']);
+            if (!is_null($aRow['pav_product'])){
+//                $aCategoryAttribute[$aRow['pca_id']]['attribute_values'][] = array('pav_id'                         => $aRow['pav_id']
+//                                                                                , 'pav_product_category_attribute'  => $aRow['pav_product_category_attribute']
+//                                                                                , 'pav_value'                       => $aRow['pav_value']);
+                if ($aRow['pav_product'] == $aParameters[1]) $aCategoryAttribute[$aRow['pca_id']]['attribute_value_selected'] = $aRow['pav_value'];
+                $aCategoryAttribute[$aRow['pca_id']]['attribute_values'][] = $aRow['pav_value'];
             }
         }
         

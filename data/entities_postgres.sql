@@ -24,6 +24,13 @@ CREATE TABLE "IPYME_AUX"."PRODUCT_CATEGORY" (
     PC_PATH TEXT UNIQUE
 );
 
+CREATE TABLE "IPYME_AUX"."PRODUCT_CATEGORY_ATTRIBUTE" (
+    PCA_ID BIGSERIAL PRIMARY KEY,
+    PCA_PRODUCT_CATEGORY BIGINT NOT NULL REFERENCES "IPYME_AUX"."PRODUCT_CATEGORY" ON DELETE CASCADE,
+    PCA_ATTRIBUTE TEXT NOT NULL,
+    CONSTRAINT unique_product_category_attribute UNIQUE(PCA_PRODUCT_CATEGORY, PCA_ATTRIBUTE)
+);
+
 CREATE TABLE "IPYME_AUX"."PRODUCT" (
     P_ID BIGSERIAL PRIMARY KEY
     , P_REF VARCHAR(45) UNIQUE NOT NULL
@@ -34,24 +41,11 @@ CREATE TABLE "IPYME_AUX"."PRODUCT" (
     , P_CATEGORY BIGINT REFERENCES "IPYME_AUX"."PRODUCT_CATEGORY"
 );
 
-CREATE TABLE "IPYME_AUX"."PRODUCT_CATEGORY_ATTRIBUTE" (
-    PCA_ID BIGSERIAL PRIMARY KEY,
-    PCA_PRODUCT_CATEGORY BIGINT NOT NULL REFERENCES "IPYME_AUX"."PRODUCT_CATEGORY" ON DELETE CASCADE,
-    PCA_ATTRIBUTE TEXT NOT NULL,
-    CONSTRAINT unique_product_category_attribute UNIQUE(PCA_PRODUCT_CATEGORY, PCA_ATTRIBUTE)
-);
-
 CREATE TABLE "IPYME_AUX"."PRODUCT_ATTRIBUTE_VALUE" (
-    PAV_ID BIGSERIAL PRIMARY KEY,
-    PAV_PRODUCT_CATEGORY_ATTRIBUTE BIGINT NOT NULL REFERENCES "IPYME_AUX"."PRODUCT_CATEGORY_ATTRIBUTE" ON DELETE CASCADE,
+    PAV_PRODUCT BIGINT REFERENCES "IPYME_AUX"."PRODUCT" ON DELETE CASCADE,
+    PAV_PRODUCT_CATEGORY_ATTRIBUTE BIGINT REFERENCES "IPYME_AUX"."PRODUCT_CATEGORY_ATTRIBUTE" ON DELETE CASCADE,
     PAV_VALUE TEXT NOT NULL,
-    CONSTRAINT unique_product_attribute_value UNIQUE(PAV_PRODUCT_CATEGORY_ATTRIBUTE, PAV_VALUE)
-);
-
-CREATE TABLE "IPYME_AUX"."PRODUCT_ATTRIBUTE_LINK" (
-    PAL_PRODUCT BIGINT REFERENCES "IPYME_AUX"."PRODUCT",
-    PAL_PRODUCT_ATTRIBUTE_VALUE BIGINT REFERENCES "IPYME_AUX"."PRODUCT_ATTRIBUTE_VALUE",
-    PRIMARY KEY (PAL_PRODUCT, PAL_PRODUCT_ATTRIBUTE_VALUE)
+    CONSTRAINT pk_product_attribute_value PRIMARY KEY(PAV_PRODUCT, PAV_PRODUCT_CATEGORY_ATTRIBUTE)
 );
 
 CREATE TABLE "IPYME_AUX"."STORE_TYPE" (
@@ -297,12 +291,28 @@ CREATE TABLE "IPYME_AUX"."CUSTOMER_CATEGORY_LINK" (
 
 
 
-
-
 CREATE OR REPLACE VIEW "IPYME_AUX".attribute_value_related AS 
- SELECT get_product_attribute_related.pca_id, get_product_attribute_related.pca_product_category, get_product_attribute_related.pca_attribute, "PRODUCT_ATTRIBUTE_VALUE".pav_id, "PRODUCT_ATTRIBUTE_VALUE".pav_product_category_attribute, "PRODUCT_ATTRIBUTE_VALUE".pav_value
-   FROM "IPYME_AUX".get_product_attribute_related(17::bigint) get_product_attribute_related(pca_id, pca_product_category, pca_attribute)
-   LEFT JOIN "IPYME_AUX"."PRODUCT_ATTRIBUTE_VALUE" ON "PRODUCT_ATTRIBUTE_VALUE".pav_product_category_attribute = get_product_attribute_related.pca_id;
+SELECT "PRODUCT_CATEGORY_ATTRIBUTE".pca_id
+    , "PRODUCT_CATEGORY_ATTRIBUTE".pca_product_category
+    , "PRODUCT_CATEGORY_ATTRIBUTE".pca_attribute
+    , "PRODUCT_ATTRIBUTE_VALUE".pav_product
+    , "PRODUCT_ATTRIBUTE_VALUE".pav_product_category_attribute
+    , "PRODUCT_ATTRIBUTE_VALUE".pav_value
+FROM "IPYME_AUX"."PRODUCT_CATEGORY_ATTRIBUTE"
+LEFT JOIN "IPYME_AUX"."PRODUCT_ATTRIBUTE_VALUE" 
+ON "PRODUCT_ATTRIBUTE_VALUE".pav_product_category_attribute = "PRODUCT_CATEGORY_ATTRIBUTE".pca_id;
+
+
+
+
+
+CREATE OR REPLACE VIEW "IPYME_AUX".product_by_category AS 
+ SELECT DISTINCT p.p_id, p.p_ref, p.p_description, p.p_long_description, p.p_category, substr(pc4.pc_path, length(pc4.pc_path) - strpos(reverse(pc4.pc_path), ' > '::text) + 2) AS p_category_name
+   FROM "IPYME_AUX"."PRODUCT" p
+   JOIN ( SELECT pc2.pc_id, pc2.pc_path
+           FROM "IPYME_AUX"."PRODUCT_CATEGORY" pc2, ( SELECT pc1.pc_path
+                   FROM "IPYME_AUX"."PRODUCT_CATEGORY" pc1) pc3
+          WHERE substr(pc2.pc_path, 0, length(pc3.pc_path) + 1) = pc3.pc_path) pc4 ON p.p_category = pc4.pc_id;
 
 
 
@@ -780,7 +790,7 @@ ALTER FUNCTION "IPYME_FINAL".set_customer(bigint, character varying, bigint, cha
 
 -- DROP FUNCTION "IPYME_FINAL".set_product(bigint, character varying, character varying, character varying, numeric, character varying);
 
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_product(p_p_id bigint, p_p_ref character varying, p_p_description character varying, p_p_long_description character varying, p_p_weight numeric, p_p_size character varying)
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_product(p_p_id bigint, p_p_ref character varying, p_p_description character varying, p_p_long_description character varying, p_p_category bigint)
   RETURNS SETOF "IPYME_FINAL"."PRODUCT" AS
 $BODY$
 DECLARE
@@ -795,15 +805,11 @@ BEGIN
 																				,p_ref 
 																				,p_description 
 																				,p_long_description 
-																				,p_weight 
-																				,p_size
 																				,p_category)
 																	VALUES(v_p_id
 																			, p_p_ref 
 																			, p_p_description
 																			, p_p_long_description
-																			, p_p_weight
-																			, p_p_size
 																			, p_p_category);
 		--
 	ELSE
@@ -814,9 +820,6 @@ BEGIN
 		SET  p_ref 							= p_p_ref
 				,p_description 			= p_p_description
 				,p_long_description = p_p_long_description
-				,p_weight 					= p_p_weight
-				,p_size 						= p_p_size
-				,p_category 				= p_p_category
 		WHERE p_id = v_p_id;
 		--
 	END IF;
@@ -1119,11 +1122,11 @@ ALTER FUNCTION "IPYME_FINAL".set_category_tree(bigint, character varying, charac
 -- DROP FUNCTION "IPYME_FINAL".get_category_tree(bigint);
 
 CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_category_tree(p_c_id bigint)
-  RETURNS SETOF t_category AS
+  RETURNS SETOF "IPYME_FINAL".t_category AS
 $BODY$
 DECLARE
 
---CREATE TYPE t_category as (
+--CREATE TYPE "IPYME_FINAL".t_category as (
 --c_id bigint
 --,c_reference character varying(50)
 --,c_description character varying(255)
@@ -1132,9 +1135,9 @@ DECLARE
 --,c_depth int
 --);
 
-v_category t_category;
+v_category "IPYME_FINAL".t_category;
 v_c_id BIGINT;
-a_category t_category[];
+a_category "IPYME_FINAL".t_category[];
 v_i integer;
 BEGIN
 	--
@@ -1471,7 +1474,7 @@ $BODY$
 DECLARE
 BEGIN
 	--
-	RETURN QUERY SELECT P.p_id
+	RETURN QUERY SELECT distinct P.p_id
 											,P.p_ref
 											,P.p_description
 											,P.p_long_description
@@ -1479,8 +1482,15 @@ BEGIN
 											,P.p_size
 											,P.p_category
 								FROM "IPYME_FINAL"."PRODUCT" P
-								WHERE P.p_category = p_p_category
-								OR p_p_category IS NULL;
+								inner join (select PC1.pc_id from "IPYME_FINAL"."PRODUCT_CATEGORY" PC1
+								,(select length(pc_path) as pc_path_length 
+												,pc_path 
+												from "IPYME_FINAL"."PRODUCT_CATEGORY" 
+												where pc_id=p_p_category
+												OR p_p_category IS NULL
+												) PC2
+								WHERE SUBSTR(PC1.pc_path,0,PC2.pc_path_length+1) = PC2.pc_path) PC3
+								ON P.p_category = PC3.pc_id;
 	--
 END;
 $BODY$
@@ -1504,6 +1514,68 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
+
+
+
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_product_attribute_value(p_p_id bigint, p_pav_product_category_attribute bigint, p_pav_value text)
+  RETURNS SETOF "IPYME_FINAL"."PRODUCT_ATTRIBUTE_VALUE" AS
+$BODY$
+DECLARE
+v_product_attribute_value "IPYME_FINAL"."PRODUCT_ATTRIBUTE_VALUE";
+v_p_category BIGINT;
+v_pav_product_category_attribute BIGINT;
+BEGIN
+	--
+	IF p_pav_value IS NULL OR LENGTH(p_pav_value)=0 THEN
+		RETURN;
+	END IF;
+	--
+	SELECT P_CATEGORY 
+	INTO v_p_category
+	FROM "IPYME_FINAL"."PRODUCT" 
+	WHERE P_ID = p_p_id;
+	--
+	IF NOT FOUND THEN
+		RETURN;
+	END IF;
+	--
+	SELECT pca_id
+	INTO v_product_attribute_value.pav_product_category_attribute 
+	FROM "IPYME_FINAL".get_product_attribute_related(v_p_category) 
+	WHERE pca_id = p_pav_product_category_attribute;
+	--
+	IF NOT FOUND THEN
+		RETURN;
+	END IF;
+	--
+	SELECT pav_product, pav_value
+	INTO v_product_attribute_value.pav_product, v_product_attribute_value.pav_value
+	FROM "IPYME_FINAL"."PRODUCT_ATTRIBUTE_VALUE"
+	WHERE pav_product_category_attribute = v_product_attribute_value.pav_product_category_attribute 
+		AND pav_value = UPPER(p_pav_value);
+	--
+	IF NOT FOUND THEN
+		SELECT NEXTVAL('"IPYME_FINAL"."PRODUCT_ATTRIBUTE_VALUE_pav_id_seq"') INTO v_product_attribute_value.pav_product;
+		v_product_attribute_value.pav_value := UPPER(p_pav_value);
+		--
+		INSERT INTO "IPYME_FINAL"."PRODUCT_ATTRIBUTE_VALUE"(pav_product
+																											, pav_product_category_attribute
+																											, pav_value)
+																								VALUES( v_product_attribute_value.pav_id
+																											, v_product_attribute_value.pav_product_category_attribute
+																											,	v_product_attribute_value.pav_value);
+	END IF;
+	--
+	RETURN QUERY SELECT v_product_attribute_value.*;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
 
 
 \dn
