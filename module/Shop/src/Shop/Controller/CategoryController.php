@@ -78,6 +78,12 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
             }
         }
         
+        foreach($aCategoryAttribute as $nProductCategoryAttributeId => $aProductAttributeValuesDetails){
+            $aCategoryAttribute[$nProductCategoryAttributeId]['attribute_values']=array_unique($aCategoryAttribute[$nProductCategoryAttributeId]['attribute_values']);
+//            $aCategoryAttribute[$nProductCategoryAttributeId]['attribute_values']=array_values($aCategoryAttribute[$nProductCategoryAttributeId]['attribute_values']);
+            sort($aCategoryAttribute[$nProductCategoryAttributeId]['attribute_values']);
+        }
+        
         $aResponse = array('success' => 1, 'category_attribute' => $aCategoryAttribute);
                 
         return new \Zend\View\Model\JsonModel($aResponse);

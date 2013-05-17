@@ -24,6 +24,32 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
 
         return new \Zend\View\Model\JsonModel($aResponse);
     }
+    public function getDisplayedProductsByCategoryAction() {
+        $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+        $nProductCategoryId =  $this->getEvent()->getRouteMatch()->getParam('id');
+        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_product_by_category', array(':pc_id' => $nProductCategoryId));
+        
+        $aResponse = array('success' =>1, 'displayedProducts' => array());
+        foreach($oResultSet as $aProduct) {
+            $aResponse['displayedProducts'][] = array('id'              => $aProduct['p_id']
+                                                    , 'image_path'      => $aProduct['p_image_path']
+                                                    , 'description'     => $aProduct['p_description']
+                                                    , 'longDescription' => $aProduct['p_long_description']
+                                                    , 'price'           => $aProduct['p_price']
+                                                    , 'currency'        => $aProduct['c_name']
+                                                    , 'category'        => $aProduct['p_category']
+                                                    , 'category_name'   => $aProduct['p_category_name']
+                                                    , 'quantity'        => 1);
+        }
+
+        
+        
+                                    
+                                    
+                                    
+                                    
+        return new \Zend\View\Model\JsonModel($aResponse);
+    }
     
     public function getProductsByCategoryAction() {
         $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');

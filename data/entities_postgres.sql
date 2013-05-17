@@ -36,8 +36,7 @@ CREATE TABLE "IPYME_AUX"."PRODUCT" (
     , P_REF VARCHAR(45) UNIQUE NOT NULL
     , P_DESCRIPTION VARCHAR(255)
     , P_LONG_DESCRIPTION VARCHAR(255)
-    , P_WEIGHT NUMERIC(8,3)
-    , P_SIZE VARCHAR(50)
+    , P_IMAGE_PATH TEXT
     , P_CATEGORY BIGINT REFERENCES "IPYME_AUX"."PRODUCT_CATEGORY"
 );
 
@@ -82,6 +81,7 @@ CREATE TABLE "IPYME_AUX"."CURRENCY" (
 
 CREATE TABLE "IPYME_AUX"."PRICES" (
     P_ID BIGINT PRIMARY KEY
+    , P_PRICE NUMERIC(8,3)
     , P_DATE TIMESTAMP WITH TIME ZONE
     , P_PRODUCT BIGINT REFERENCES "IPYME_AUX"."PRODUCT"
     , P_STATUS INT
@@ -326,11 +326,11 @@ COPY "USER" (u_session, u_last_login, u_email, u_status, u_basket, u_customer, u
 bqlup9j5bllktbfqiv2u1k6fa5	\N	ddddd	1	\N	\N	ddd	8e43bec6c9a4aba7dc358247a21ab52d301a2840	177
 \.
 
-COPY "PRODUCT" (p_ref, p_description, p_long_description, p_weight, p_size) FROM stdin;
-P5Ka	Asus P5K Intel P45	Asus P5K Intel P45, AC97 audio, 2 lan 100Gb	240.000	0.4,0.3,0.15
-p6ba	Asus Xeon prepared motherboard	audio 5.1, 2 lang gigabit	500.000	1,2,3
-P8Ba	Asus P8Btt	Asus P8B Intel i3, i5, i7	265.000	0.4,0.3,0.13
-p2baa	oooo77788	bbbbbbbbbb	4534.000	433
+COPY "PRODUCT" (p_ref, p_description, p_long_description) FROM stdin;
+P5Ka	Asus P5K Intel P45	Asus P5K Intel P45, AC97 audio, 2 lan 100Gb	
+p6ba	Asus Xeon prepared motherboard	audio 5.1, 2 lang gigabit	
+P8Ba	Asus P8Btt	Asus P8B Intel i3, i5, i7	
+p2baa	oooo77788	bbbbbbbbbb	
 \.
 
 COPY "CURRENCY" (C_NAME) FROM stdin;
@@ -488,8 +488,6 @@ BEGIN
 				,P.p_ref
 				,P.p_description
 				,P.p_long_description
-				,P.p_weight
-				,P.p_size
 				INTO v_row_product
 	FROM "IPYME_FINAL"."PRODUCT" P
 	WHERE P.p_id = p_p_id;
@@ -506,9 +504,7 @@ BEGIN
 		RETURN QUERY SELECT v_row_product.p_id 
 											,v_row_product.p_ref
 											,v_row_product.p_description
-											,v_row_product.p_long_description
-											,v_row_product.p_weight
-											,v_row_product.p_size;
+											,v_row_product.p_long_description;
 		--
 	END IF;
 	--
@@ -622,12 +618,18 @@ ALTER FUNCTION "IPYME_FINAL".get_customer(bigint)
   OWNER TO postgres;
 
 
--- Function: "IPYME_FINAL".get_product(bigint)
 
--- DROP FUNCTION "IPYME_FINAL".get_product(bigint);
+create type "IPYME_FINAL"."get_product" as ( p_id bigint
+                                            ,p_ref character varying(45)
+                                            ,p_description character varying(255)
+                                            ,p_long_description character varying(255)
+                                            ,p_category bigint
+                                            ,p_category_name text);
+
+  
 
 CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_product(p_p_id bigint)
-  RETURNS SETOF "IPYME_FINAL"."PRODUCT" AS
+  RETURNS SETOF "IPYME_FINAL"."get_product" AS
 $BODY$
 DECLARE
 BEGIN
@@ -636,11 +638,12 @@ BEGIN
 											,P.p_ref
 											,P.p_description
 											,P.p_long_description
-											,P.p_weight
-											,P.p_size
 											,P.p_category
+											,substr(PC.pc_path,length(PC.pc_path)-strpos(reverse(PC.pc_path),' > ')+2) AS p_category_name
 								FROM "IPYME_FINAL"."PRODUCT" P
-								WHERE P.p_id = p_p_id 
+								JOIN "IPYME_FINAL"."PRODUCT_CATEGORY" PC
+								ON P.p_category = PC.pc_id
+								WHERE P.p_id = p_p_id
 									OR p_p_id IS NULL;
 	--
 END;
@@ -1278,8 +1281,6 @@ BEGIN
 				,P.p_ref
 				,P.p_description
 				,P.p_long_description
-				,P.p_weight
-				,P.p_size
 				,P.p_category
 				INTO v_row_product
 	FROM "IPYME_FINAL"."PRODUCT" P
@@ -1298,8 +1299,6 @@ BEGIN
 											,v_row_product.p_ref
 											,v_row_product.p_description
 											,v_row_product.p_long_description
-											,v_row_product.p_weight
-											,v_row_product.p_size
 											,v_row_product.p_category;
 		--
 	END IF;
@@ -1469,7 +1468,7 @@ $BODY$
 
 
 CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_product_by_category(p_p_category bigint)
-  RETURNS SETOF "IPYME_FINAL"."PRODUCT" AS
+  RETURNS SETOF "IPYME_FINAL".get_product AS
 $BODY$
 DECLARE
 BEGIN
@@ -1478,16 +1477,17 @@ BEGIN
 											,P.p_ref
 											,P.p_description
 											,P.p_long_description
-											,P.p_weight
-											,P.p_size
 											,P.p_category
+											,PC3.p_category_name
 								FROM "IPYME_FINAL"."PRODUCT" P
-								inner join (select PC1.pc_id from "IPYME_FINAL"."PRODUCT_CATEGORY" PC1
+								inner join (select PC1.pc_id 
+														,substr(PC1.pc_path,length(PC1.pc_path)-strpos(reverse(PC1.pc_path),' > ')+2) as p_category_name
+														from "IPYME_FINAL"."PRODUCT_CATEGORY" PC1
 								,(select length(pc_path) as pc_path_length 
 												,pc_path 
 												from "IPYME_FINAL"."PRODUCT_CATEGORY" 
 												where pc_id=p_p_category
-												OR p_p_category IS NULL
+												OR p_p_category = -1
 												) PC2
 								WHERE SUBSTR(PC1.pc_path,0,PC2.pc_path_length+1) = PC2.pc_path) PC3
 								ON P.p_category = PC3.pc_id;
@@ -1578,4 +1578,48 @@ $BODY$
 
 
 
+
+-- 
+-- SELECT distinct P.p_id
+-- 											,P.p_ref
+-- 											,P.p_description
+-- 											,P.p_long_description
+-- 											,P.p_category
+-- 											,PC3.p_category_name
+-- 											,PR.p_price
+-- 											,C.c_name
+-- 								FROM "IPYME_FINAL"."PRODUCT" P
+-- 								INNER JOIN (select PC1.pc_id 
+-- 														,substr(PC1.pc_path,length(PC1.pc_path)-strpos(reverse(PC1.pc_path),' > ')+2) as p_category_name
+-- 														from "IPYME_FINAL"."PRODUCT_CATEGORY" PC1
+-- 													,(select length(pc_path) as pc_path_length 
+-- 																	,pc_path 
+-- 																	from "IPYME_FINAL"."PRODUCT_CATEGORY" 
+-- 																	where pc_id=20
+-- 																	--OR p_p_category = -1
+-- 																	) PC2
+-- 													WHERE SUBSTR(PC1.pc_path,0,PC2.pc_path_length+1) = PC2.pc_path) PC3
+-- 								ON P.p_category = PC3.pc_id
+-- 								LEFT JOIN "IPYME_FINAL"."PRICES" PR
+-- 								ON PR.p_product = P.p_id and PR.p_status = 1
+-- 								LEFT JOIN "IPYME_FINAL"."CURRENCY" C
+-- 								ON PR.p_currency = C.c_id;
+
+
+
+
 \dn
+
+
+
+
+CREATE TYPE "IPYME_FINAL".get_product2 AS
+   (p_id bigint,
+    p_ref character varying(45),
+    p_description character varying(255),
+    p_long_description character varying(255),
+    p_category bigint,
+    p_image_path text,
+    p_category_name text,
+    p_price numeric(8,3),
+		c_name character varying(100));
