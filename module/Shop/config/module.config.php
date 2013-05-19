@@ -69,6 +69,7 @@ return array(
             'Shop\Controller\User' => 'Shop\Controller\UserController',
             'Shop\Controller\Provider' => 'Shop\Controller\ProviderController',
             'Shop\Controller\Category' => 'Shop\Controller\CategoryController',
+            'Shop\Controller\ImageUpload' => 'Shop\Controller\ImageUploadController',
         ),
     ),
     'view_manager' => array(

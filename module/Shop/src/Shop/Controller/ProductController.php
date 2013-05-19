@@ -8,9 +8,11 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
             'datagrid' => array(),
             'columnDefs' => array(
                 array('field' => "p_id", 'displayName' => "ID", 'width' => 30, 'pinned' => true),
+                array('field' => "p_category_name", 'displayName' => "Category", 'width' => 100),
                 array('field' => "p_ref", 'displayName' => "Reference", 'width' => 100),
                 array('field' => "p_description", 'displayName' => "Description", 'width' => 150),
                 array('field' => "p_long_description", 'displayName' => "Long Description", 'width' => 200),
+                array('field' => "p_price", 'displayName' => "Price", 'width' => 50),
             )
         );
         
@@ -73,8 +75,6 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
         if ($this->getRequest()->isXmlHttpRequest()) {
             $sJSONDataRequest = $this->getRequest()->getContent();
             $aRequest = (array)json_decode($sJSONDataRequest, true);
-//            var_dump($aRequest);
-//            exit;
             $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
             $nProductId = array_key_exists('p_id',$aRequest['fields'])?$aRequest['fields']['p_id']:null;
             $oResultSet = $oDataFunctionGateway->getDataRecordSet(
@@ -84,7 +84,9 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
                         ,':p_p_ref'              => $aRequest['fields']['p_ref']
                         ,':p_p_description'      => array_key_exists('p_description',$aRequest['fields'])?$aRequest['fields']['p_description']:null
                         ,':p_p_long_description' => array_key_exists('p_long_description',$aRequest['fields'])?$aRequest['fields']['p_long_description']:null
-                        ,':p_p_category'         => $aRequest['categoryselected']['id']));
+                        ,':p_p_category'         => $aRequest['categoryselected']['id']
+                        ,':p_p_price'            => array_key_exists('p_price',$aRequest['fields'])?$aRequest['fields']['p_price']:null
+                        ,':p_p_image_path'       => array_key_exists('p_image_path',$aRequest['fields'])?$aRequest['fields']['p_image_path']:null));
             
             $aResponse = $oResultSet->current();
             if ($oResultSet->count()==1){

@@ -24,7 +24,7 @@ class Module
     
     public function  onDispatch(MvcEvent $e){
         $aConfig = $e->getApplication()->getServiceManager()->get('config');
-        $e->getResponse()->getHeaders()->addHeaders(array('Access-Control-Allow-Headers' => 'X-Requested-With'
+        $e->getResponse()->getHeaders()->addHeaders(array('Access-Control-Allow-Headers' => 'Content-Type,X-Requested-With'
                                                         ,'Access-Control-Allow-Credentials' => 'true'
                                                         ,'Access-Control-Allow-Origin'  => $aConfig['front_end']));
         if ($e->getTarget()->getRequest()->isOptions()) {
