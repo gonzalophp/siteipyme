@@ -27,6 +27,8 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
 
         return new \Zend\View\Model\JsonModel($aResponse);
     }
+    
+    
     public function getDisplayedProductsByCategoryAction() {
         $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
         $nProductCategoryId =  $this->getEvent()->getRouteMatch()->getParam('id');
@@ -47,6 +49,42 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
                                     
         return new \Zend\View\Model\JsonModel($aResponse);
     }
+    
+    public function getDisplayedProductsByAttributeValueAction() {
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            $sJSONDataRequest = $this->getRequest()->getContent();
+            $aRequest = (array)json_decode($sJSONDataRequest, true);
+            
+            $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+            $oResultSet = $oDataFunctionGateway->getDataRecordSet(
+                    'IPYME_FINAL'
+                    , 'get_product_by_attribute_value'
+                    , array(':p_pav_product_category_attribute' => $aRequest['category_attribute_id']
+                           ,':p_pav_value' => $aRequest['category_attribute_value']));
+            
+            
+
+            $aResponse = array('success' =>1, 'displayedProducts' => array());
+            foreach($oResultSet as $aProduct) {
+                $aResponse['displayedProducts'][] = array('id'              => $aProduct['p_id']
+                                                        , 'image_path'      => $aProduct['p_image_path']
+                                                        , 'description'     => $aProduct['p_description']
+                                                        , 'longDescription' => $aProduct['p_long_description']
+                                                        , 'price'           => number_format($aProduct['p_price'],2)
+                                                        , 'currency'        => $aProduct['c_name']
+                                                        , 'category'        => $aProduct['p_category']
+                                                        , 'category_name'   => $aProduct['p_category_name']
+                                                        , 'quantity'        => 1);
+            }
+        }
+        else {
+            $aResponse = array('success' => 0);
+        }
+                                    
+        return new \Zend\View\Model\JsonModel($aResponse);
+    }
+    
+    
     
     public function getProductsByCategoryAction() {
         $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
