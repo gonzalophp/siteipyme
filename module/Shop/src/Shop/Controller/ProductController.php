@@ -21,6 +21,7 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
             
         foreach($oResultSet as $aProduct) {
             $aProduct['grid_id'] = $aProduct['p_id'];
+            $aProduct['p_price'] = number_format($aProduct['p_price'],2);
             $aResponse['datagrid'][] = $aProduct;
         }
 
@@ -37,18 +38,12 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
                                                     , 'image_path'      => $aProduct['p_image_path']
                                                     , 'description'     => $aProduct['p_description']
                                                     , 'longDescription' => $aProduct['p_long_description']
-                                                    , 'price'           => $aProduct['p_price']
+                                                    , 'price'           => number_format($aProduct['p_price'],2)
                                                     , 'currency'        => $aProduct['c_name']
                                                     , 'category'        => $aProduct['p_category']
                                                     , 'category_name'   => $aProduct['p_category_name']
                                                     , 'quantity'        => 1);
         }
-
-        
-        
-                                    
-                                    
-                                    
                                     
         return new \Zend\View\Model\JsonModel($aResponse);
     }
@@ -61,6 +56,7 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
         $aResponse = array('success' =>1);
         foreach($oResultSet as $aProduct) {
             $aProduct['grid_id'] = $aProduct['p_id'];
+            $aProduct['p_price'] = number_format($aProduct['p_price'],2);
             $aResponse['datagrid'][] = $aProduct;
         }
 

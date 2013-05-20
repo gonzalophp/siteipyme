@@ -306,17 +306,6 @@ ON "PRODUCT_ATTRIBUTE_VALUE".pav_product_category_attribute = "PRODUCT_CATEGORY_
 
 
 
-CREATE OR REPLACE VIEW "IPYME_AUX".product_by_category AS 
- SELECT DISTINCT p.p_id, p.p_ref, p.p_description, p.p_long_description, p.p_category, substr(pc4.pc_path, length(pc4.pc_path) - strpos(reverse(pc4.pc_path), ' > '::text) + 2) AS p_category_name
-   FROM "IPYME_AUX"."PRODUCT" p
-   JOIN ( SELECT pc2.pc_id, pc2.pc_path
-           FROM "IPYME_AUX"."PRODUCT_CATEGORY" pc2, ( SELECT pc1.pc_path
-                   FROM "IPYME_AUX"."PRODUCT_CATEGORY" pc1) pc3
-          WHERE substr(pc2.pc_path, 0, length(pc3.pc_path) + 1) = pc3.pc_path) pc4 ON p.p_category = pc4.pc_id;
-
-
-
-
 
 SET search_path = "IPYME_AUX", pg_catalog;
 

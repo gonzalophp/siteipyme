@@ -67,12 +67,13 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
                 $aCategoryAttribute[$aRow['pca_id']] = array('pca_id'           => $aRow['pca_id'] 
                                                             ,'pca_attribute'    => $aRow['pca_attribute']
                                                             ,'attribute_value_selected' => ''
-                                                            ,'attribute_values' => array());
+                                                            ,'attribute_values' => array()
+                                                            ,'attributes' => array());
             }
             if (!is_null($aRow['pav_product'])){
-//                $aCategoryAttribute[$aRow['pca_id']]['attribute_values'][] = array('pav_id'                         => $aRow['pav_id']
-//                                                                                , 'pav_product_category_attribute'  => $aRow['pav_product_category_attribute']
-//                                                                                , 'pav_value'                       => $aRow['pav_value']);
+                $aCategoryAttribute[$aRow['pca_id']]['attributes'][$aRow['pav_value']] = array('id'     => $aRow['pav_product_category_attribute']
+                                                                                             , 'value'  => $aRow['pav_value']);    
+                
                 if ($aRow['pav_product'] == $aParameters[1]) $aCategoryAttribute[$aRow['pca_id']]['attribute_value_selected'] = $aRow['pav_value'];
                 $aCategoryAttribute[$aRow['pca_id']]['attribute_values'][] = $aRow['pav_value'];
             }
@@ -80,8 +81,8 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
         
         foreach($aCategoryAttribute as $nProductCategoryAttributeId => $aProductAttributeValuesDetails){
             $aCategoryAttribute[$nProductCategoryAttributeId]['attribute_values']=array_unique($aCategoryAttribute[$nProductCategoryAttributeId]['attribute_values']);
-//            $aCategoryAttribute[$nProductCategoryAttributeId]['attribute_values']=array_values($aCategoryAttribute[$nProductCategoryAttributeId]['attribute_values']);
             sort($aCategoryAttribute[$nProductCategoryAttributeId]['attribute_values']);
+            sort($aCategoryAttribute[$nProductCategoryAttributeId]['attributes']);
         }
         
         $aResponse = array('success' => 1, 'category_attribute' => $aCategoryAttribute);
