@@ -1612,3 +1612,57 @@ CREATE TYPE "IPYME_FINAL".get_product2 AS
     p_category_name text,
     p_price numeric(8,3),
 		c_name character varying(100));
+
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_product_by_attribute_value2(p_category_attribute_id_and_value text)
+  RETURNS SETOF "IPYME_FINAL".get_product AS
+$BODY$
+DECLARE
+v_a_attribute_id_and_attribute_value TEXT[];
+BEGIN
+	--
+	-- p_category_attribute_id_and_value FORMAT: ATTR_ID1%^%ATTR_VALUE1~^~ATTR_ID2%^%ATTR_VALUE2~^~ATTR_ID3%^%ATTR_VALUE3...    
+	-- EXAMPLE: 20%^%I7~^~15%^%4
+	--
+	--v_a_attribute_id_and_attribute_value := string_to_array('20%^%I7~^~15%^%4', '~^~')::TEXT[];
+	v_a_attribute_id_and_attribute_value := string_to_array(p_category_attribute_id_and_value, '~^~')::TEXT[];
+	--
+	/*
+	SELECT PAV.pav_product
+	(SELECT PAV2.pav_product, count(*) AS times_found
+	FROM "IPYME_FINAL"."PRODUCT_ATTRIBUTE_VALUE"	PAV2
+	WHERE PAV2.pav_product_category_attribute::TEXT||'%^%'||PAV2.pav_value = ANY (v_a_attribute_id_and_attribute_value)
+	group by PAV.pav_product) PAV
+	WHERE PAV.times_found = array_length(v_a_attribute_id_and_attribute_value);
+	*/
+	raise info '%',array_length(v_a_attribute_id_and_attribute_value,1);
+	--
+	RETURN QUERY 	SELECT P.p_id
+											,P.p_ref
+											,P.p_description
+											,P.p_long_description
+											,P.p_category
+											,P.p_image_path
+											,substr(PC.pc_path,length(PC.pc_path)-strpos(reverse(PC.pc_path),' > ')+2) AS p_category_name
+											,PR.p_price
+											,C.c_name 
+								FROM "IPYME_FINAL"."PRODUCT" P
+								INNER JOIN "IPYME_FINAL"."PRODUCT_CATEGORY" PC
+								ON P.p_category = PC.pc_id
+								INNER JOIN (SELECT PAV2.pav_product, count(*) AS times_found
+														FROM "IPYME_FINAL"."PRODUCT_ATTRIBUTE_VALUE"	PAV2
+														WHERE PAV2.pav_product_category_attribute::TEXT||'%^%'||PAV2.pav_value = ANY (v_a_attribute_id_and_attribute_value)
+														group by PAV2.pav_product) PAV
+								ON PAV.pav_product = P.p_id
+								LEFT JOIN "IPYME_FINAL"."PRICES" PR
+								ON PR.p_product = P.p_id and PR.p_status = 1
+								LEFT JOIN "IPYME_FINAL"."CURRENCY" C
+								ON PR.p_currency = C.c_id
+								WHERE PAV.times_found = array_length(v_a_attribute_id_and_attribute_value,1);								
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
