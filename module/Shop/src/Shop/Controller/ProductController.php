@@ -51,16 +51,34 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
     }
     
     public function getDisplayedProductsByAttributeValueAction() {
+//        $this->getRequest()->setContent('{"15":{"pca_id":15,"pca_attribute":"CORES","attribute_value_selected":"","attribute_values":["2","4"],"attributes":[{"id":15,"value":"2","selected":0},{"id":15,"value":"4","selected":1}]},"20":{"pca_id":20,"pca_attribute":"FAMILY","attribute_value_selected":"","attribute_values":["CORE 2","I5","I7"],"attributes":[{"id":20,"value":"CORE 2","selected":0},{"id":20,"value":"I5","selected":0},{"id":20,"value":"I7","selected":1}]},"21":{"pca_id":21,"pca_attribute":"SPEED","attribute_value_selected":"","attribute_values":["3.4G"],"attributes":[{"id":21,"value":"3.4G","selected":0}]}}');
+//        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
+        
+        
         if ($this->getRequest()->isXmlHttpRequest()) {
             $sJSONDataRequest = $this->getRequest()->getContent();
             $aRequest = (array)json_decode($sJSONDataRequest, true);
             
+//            var_dump($aRequest);
+            $aAttributeValuesSelected = array();
+            foreach($aRequest as $nCategoryAttributeId => $aAttributeDetails){
+                foreach($aAttributeDetails['attributes'] as $aAttributeValueDetails) {
+                    if ($aAttributeValueDetails['selected'] == 1){
+                        $aAttributeValuesSelected[] = $nCategoryAttributeId.'%^%'.$aAttributeValueDetails['value'];
+                    }
+                } 
+            }
+            $sAttributeValuesSelected = implode('~^~',$aAttributeValuesSelected);
+                    
+//            var_dump(implode('~^~',$aAttributeValuesSelected['category_attribute'])
+//                    ,implode('~^~',$aAttributeValuesSelected['value']));
+//            
+            
             $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
             $oResultSet = $oDataFunctionGateway->getDataRecordSet(
                     'IPYME_FINAL'
-                    , 'get_product_by_attribute_value'
-                    , array(':p_pav_product_category_attribute' => $aRequest['category_attribute_id']
-                           ,':p_pav_value' => $aRequest['category_attribute_value']));
+                    , 'get_product_by_attribute_value2'
+                    , array(':p_category_attribute_id_and_value' => $sAttributeValuesSelected));
             
             
 

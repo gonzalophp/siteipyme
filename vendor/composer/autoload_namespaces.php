@@ -6,7 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Zend\\' => $vendorDir . '/zendframework/zendframework/library',
-    'ZendTest\\' => $vendorDir . '/zendframework/zendframework/tests',
-    'Symfony\\Component\\Yaml\\' => $vendorDir . '/symfony/yaml',
+    'Zend\\' => array($vendorDir . '/zendframework/zendframework/library'),
+    'ZendTest\\' => array($vendorDir . '/zendframework/zendframework/tests'),
+    'Symfony\\Component\\Yaml\\' => array($vendorDir . '/symfony/yaml'),
 );

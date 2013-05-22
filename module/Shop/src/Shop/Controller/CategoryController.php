@@ -91,6 +91,46 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
     }
     
     
+    public function getAllAvailableAttributeValuesRelatedAction(){
+        
+        $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+        $sParameters =  $this->getEvent()->getRouteMatch()->getParam('id');
+        $aParameters = explode(',',$sParameters);
+
+        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_all_available_attribute_value_related'
+            , array(':p_pc_id'            => $aParameters[0]));
+        
+        $aCategoryAttribute = array();
+        foreach($oResultSet as $aRow) {
+            if (!array_key_exists($aRow['pca_id'], $aCategoryAttribute)){
+                $aCategoryAttribute[$aRow['pca_id']] = array('pca_id'           => $aRow['pca_id'] 
+                                                            ,'pca_attribute'    => $aRow['pca_attribute']
+                                                            ,'attribute_value_selected' => ''
+                                                            ,'attribute_values' => array()
+                                                            ,'attributes' => array());
+            }
+            if (!is_null($aRow['pav_product'])){
+                $aCategoryAttribute[$aRow['pca_id']]['attributes'][$aRow['pav_value']] = array('id'     => $aRow['pav_product_category_attribute']
+                                                                                             , 'value'  => $aRow['pav_value']
+                                                                                             , 'selected' => 0);    
+                
+                if ($aRow['pav_product'] == $aParameters[1]) $aCategoryAttribute[$aRow['pca_id']]['attribute_value_selected'] = $aRow['pav_value'];
+                $aCategoryAttribute[$aRow['pca_id']]['attribute_values'][] = $aRow['pav_value'];
+            }
+        }
+        
+        foreach($aCategoryAttribute as $nProductCategoryAttributeId => $aProductAttributeValuesDetails){
+            $aCategoryAttribute[$nProductCategoryAttributeId]['attribute_values']=array_unique($aCategoryAttribute[$nProductCategoryAttributeId]['attribute_values']);
+            sort($aCategoryAttribute[$nProductCategoryAttributeId]['attribute_values']);
+            sort($aCategoryAttribute[$nProductCategoryAttributeId]['attributes']);
+        }
+        
+        $aResponse = array('success' => 1, 'category_attribute' => $aCategoryAttribute);
+                
+        return new \Zend\View\Model\JsonModel($aResponse);
+    }
+    
+    
     
     public function getAction(){
         $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
