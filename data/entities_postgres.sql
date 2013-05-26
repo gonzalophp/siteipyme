@@ -303,6 +303,17 @@ create type "IPYME_AUX"."get_product" AS (
 	c_name character varying(100)
 );
 
+CREATE TYPE "IPYME_AUX".basket_list_extended AS(bl_id bigint
+                                                ,bl_basket bigint
+                                                ,bl_product bigint
+                                                ,bl_quantity numeric(5,3)
+                                                ,p_ref character varying(45)
+                                                ,p_description character varying(255)
+                                                ,p_long_description character varying(255)
+                                                ,p_image_path text
+                                                ,p_category bigint
+                                                ,p_price numeric(8,3)
+                                                ,c_name character varying(100));
 
 SET search_path = "IPYME_AUX", pg_catalog;
 
@@ -1526,8 +1537,48 @@ $BODY$
   ROWS 1000;
 
 
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_basket_product_list(p_user_id bigint)
+  RETURNS SETOF "IPYME_FINAL".basket_list_extended AS
+$BODY$
+DECLARE
+BEGIN
+	--
+	IF p_user_id IS NOT NULL THEN
+		RETURN QUERY 	SELECT BL.bl_id
+												,BL.bl_basket 
+												,BL.bl_product
+												,BL.bl_quantity
+												,P.p_ref 
+												,P.p_description 
+												,P.p_long_description
+												,P.p_image_path 
+												,P.p_category
+												,PR.p_price
+												,C.c_name
+									FROM "IPYME_FINAL"."BASKET_LIST" BL
+									INNER JOIN "IPYME_FINAL"."USER" U
+									ON BL.bl_basket = U.u_basket
+									INNER JOIN "IPYME_FINAL"."PRODUCT" P
+									ON P.p_id = BL.bl_product
+									LEFT JOIN "IPYME_FINAL"."PRICES" PR
+									ON PR.p_product = P.p_id
+									LEFT JOIN "IPYME_FINAL"."CURRENCY" C
+									ON PR.p_currency = C.c_id
+									WHERE U.u_id = p_user_id
+										AND PR.p_status = 1;
+	END IF;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
 
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".save_basket_product_list(p_user_id BIGINT, p_basket_products text) RETURNS SETOF "IPYME_FINAL"."BASKET_LIST" AS $BODY$
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".save_basket_product_list(p_user_id bigint, p_basket_products text)
+  RETURNS SETOF "IPYME_FINAL".basket_list_extended AS
+$BODY$
 DECLARE
 v_a_basket_product_list TEXT[];
 v_a_basket_and_product 	TEXT[];
@@ -1563,7 +1614,15 @@ BEGIN
 	--
 	v_a_basket_product_list := string_to_array(p_basket_products,'%^%');
 	--
-	FOR i IN 1..ARRAY_LENGTH(v_a_basket_product_list,1) LOOP
+	IF ARRAY_LENGTH(v_a_basket_product_list,1) IS NULL THEN
+		--
+		DELETE FROM "IPYME_FINAL"."BASKET_LIST"
+		WHERE bl_basket = v_basket_list.bl_basket;
+		RETURN;
+		--
+	END IF;
+	--
+	FOR i IN 1..coalesce(ARRAY_LENGTH(v_a_basket_product_list,1),0) LOOP
 		--
 		v_a_basket_and_product := string_to_array(v_a_basket_product_list[i],'~^~');
 		--
@@ -1594,17 +1653,19 @@ BEGIN
 		--
 	END LOOP;
 	--
-	FOR i IN 1..ARRAY_LENGTH(v_a_basket_list,1) LOOP
+	RETURN QUERY SELECT * FROM "IPYME_FINAL".get_basket_product_list(v_user.u_id);
+	--
+	/*
+	FOR i IN 1..coalesce(ARRAY_LENGTH(v_a_basket_list,1),0) LOOP
 		RETURN QUERY SELECT v_a_basket_list[i].*;
 	END LOOP;
+	*/
 	--
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
-
-
 
 
 \dn
