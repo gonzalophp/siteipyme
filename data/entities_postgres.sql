@@ -1583,8 +1583,8 @@ DECLARE
 v_a_basket_product_list TEXT[];
 v_a_basket_and_product 	TEXT[];
 v_basket_list 					"IPYME_FINAL"."BASKET_LIST";
-v_a_basket_list 				"IPYME_FINAL"."BASKET_LIST"[];
 v_user 									"IPYME_FINAL"."USER";
+v_a_updated_lines				BIGINT[];
 i INT;
 BEGIN
 	--
@@ -1632,7 +1632,8 @@ BEGIN
 		UPDATE "IPYME_FINAL"."BASKET_LIST"
 		SET bl_quantity = v_basket_list.bl_quantity
 		WHERE bl_basket = v_basket_list.bl_basket
-			AND bl_product = v_basket_list.bl_product;
+			AND bl_product = v_basket_list.bl_product
+		RETURNING bl_id INTO v_basket_list.bl_id;
 		--
 		IF NOT FOUND THEN
 			--
@@ -1649,17 +1650,16 @@ BEGIN
 			--
 		END IF;
 		--
-		v_a_basket_list := v_a_basket_list || v_basket_list;
+		v_a_updated_lines := v_a_updated_lines || v_basket_list.bl_id;
 		--
 	END LOOP;
 	--
+	DELETE FROM "IPYME_FINAL"."BASKET_LIST"
+	WHERE NOT ( BL_ID = ANY (v_a_updated_lines));
+	--
+	--
 	RETURN QUERY SELECT * FROM "IPYME_FINAL".get_basket_product_list(v_user.u_id);
 	--
-	/*
-	FOR i IN 1..coalesce(ARRAY_LENGTH(v_a_basket_list,1),0) LOOP
-		RETURN QUERY SELECT v_a_basket_list[i].*;
-	END LOOP;
-	*/
 	--
 END;
 $BODY$
