@@ -3,8 +3,9 @@ namespace Shop\Controller;
 
 class MenuController extends \Zend\Mvc\Controller\AbstractActionController {
     public function mainAction() {
+        $oUser = $this->getServiceLocator()->get('User\Model\UserCredentials')->getUserDetails();
         $oMenuList = new \Datainterface\Model\MainMenu;
-        $aMenuList= $oMenuList->aMenuList;
+        $aMenuList= $oMenuList->getMenu(array('username' => $oUser->u_name));
         return new \Zend\View\Model\JsonModel($aMenuList);
     }
     

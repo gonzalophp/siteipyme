@@ -63,13 +63,14 @@ return array(
 //    ),
     'controllers' => array(
         'invokables' => array(
-            'Shop\Controller\Menu' => 'Shop\Controller\MenuController',
-            'Shop\Controller\Product' => 'Shop\Controller\ProductController',
-            'Shop\Controller\Customer' => 'Shop\Controller\CustomerController',
-            'Shop\Controller\User' => 'Shop\Controller\UserController',
-            'Shop\Controller\Provider' => 'Shop\Controller\ProviderController',
-            'Shop\Controller\Category' => 'Shop\Controller\CategoryController',
-            'Shop\Controller\ImageUpload' => 'Shop\Controller\ImageUploadController',
+            'Shop\Controller\Menu'          => 'Shop\Controller\MenuController',
+            'Shop\Controller\Product'       => 'Shop\Controller\ProductController',
+            'Shop\Controller\Customer'      => 'Shop\Controller\CustomerController',
+            'Shop\Controller\User'          => 'Shop\Controller\UserController',
+            'Shop\Controller\Provider'      => 'Shop\Controller\ProviderController',
+            'Shop\Controller\Category'      => 'Shop\Controller\CategoryController',
+            'Shop\Controller\ImageUpload'   => 'Shop\Controller\ImageUploadController',
+            'Shop\Controller\Basket'        => 'Shop\Controller\BasketController',
         ),
     ),
     'view_manager' => array(

@@ -1,13 +1,25 @@
 <?php
-
 namespace Datainterface\Model;
 
 class MainMenu {
-
-    public $aMenuList;
-
     function __construct() {
-        $this->aMenuList = array(
+        
+    }
+    
+    public function getMenu($aOptions){
+        
+        $oUserMenu = (object) (array_key_exists('username', $aOptions)) ? 
+             array(
+                'label' => $aOptions['username']
+                , 'url' => '#/user/account/'.$aOptions['username']
+                , 'nodes' => array())
+            :array(
+                'label' => 'Sign In'
+                , 'url' => '#/user/signin'
+                , 'nodes' => array());
+                
+                
+        $aMenuList = array(
             (object) array(
                 'label' => 'iPyME'
                 , 'url' => ''
@@ -72,36 +84,12 @@ class MainMenu {
                                 'label' => 'Users'
                                 , 'url' => '#/admin/list/user'
                                 , 'nodes' => array())))))
-            , (object) array(
-                'label' => 'Sign In'
-                , 'url' => '#/user/signin'
-                , 'nodes' => array())
+            , $oUserMenu
             , (object) array(
                 'label' => 'Basket'
                 , 'url' => '#/user/basket'
-                , 'nodes' => array())
-            , (object) array(
-                'label' => 'Resources'
-                , 'url' => 'http://www.elmundo.es'
-                , 'nodes' => array(
-                    (object) array(
-                        'label' => 'Resources A'
-                        , 'url' => 'http://www.elmundo.es'
-                        , 'nodes' => array())
-                    , (object) array(
-                        'label' => 'Resources B'
-                        , 'url' => '#/admin/product'
-                        , 'nodes' => array(
-                            (object) array(
-                                'label' => 'Resources B A'
-                                , 'url' => 'http://www.elmundo.es'
-                                , 'nodes' => array())
-                            , (object) array(
-                                'label' => 'Product'
-                                , 'url' => '#/admin/product'
-                                , 'nodes' => array()))))));
+                , 'nodes' => array()));
+        return $aMenuList;
     }
-
 }
-
 ?>

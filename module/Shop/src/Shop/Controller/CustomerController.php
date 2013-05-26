@@ -74,15 +74,5 @@ class CustomerController extends \Zend\Mvc\Controller\AbstractActionController {
         
         return new \Zend\View\Model\JsonModel($aResponse);
     }
-    
-    public function testAction() {
-        $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
-        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_customer', array(':id' => null));
-        
-        foreach($oResultSet as $aRow) {
-            var_dump($aRow);
-        }
-        exit;
-    }
 }
 ?>

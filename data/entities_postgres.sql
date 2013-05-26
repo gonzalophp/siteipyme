@@ -8,12 +8,12 @@ GRANT ALL ON SCHEMA "IPYME_AUX" TO postgres;
 \set ON_ERROR_STOP true;
 
 CREATE TABLE "IPYME_AUX"."LANGUAGE" (
-    "L_ID" NUMERIC PRIMARY KEY
+    "L_ID" BIGSERIAL PRIMARY KEY
     , "L_1" VARCHAR(255)
     , "L_2" VARCHAR(255));
 
 CREATE TABLE "IPYME_AUX"."COMPANY" (
-    "C_ID" NUMERIC PRIMARY KEY
+    "C_ID" BIGSERIAL PRIMARY KEY
     , "C_NAME" VARCHAR(255)
     , "C_DATE" TIMESTAMP WITH TIME ZONE);
 
@@ -48,13 +48,13 @@ CREATE TABLE "IPYME_AUX"."PRODUCT_ATTRIBUTE_VALUE" (
 );
 
 CREATE TABLE "IPYME_AUX"."STORE_TYPE" (
-    ST_ID INT PRIMARY KEY
+    ST_ID SERIAL PRIMARY KEY
     , ST_DESCRIPTION VARCHAR(255)
     , ST_IN_OUT BOOLEAN
 );
 
 CREATE TABLE "IPYME_AUX"."STORE" (
-    S_ID INT PRIMARY KEY
+    S_ID SERIAL PRIMARY KEY
     , S_STORE_TYPE INT REFERENCES "IPYME_AUX"."STORE_TYPE"
     , S_STORE_NAME VARCHAR(100)
 );
@@ -62,14 +62,14 @@ CREATE TABLE "IPYME_AUX"."STORE" (
 
 
 CREATE TABLE "IPYME_AUX"."STOCK" (
-    S_ID BIGINT PRIMARY KEY
+    S_ID BIGSERIAL PRIMARY KEY
     , S_PRODUCT_ID BIGINT REFERENCES "IPYME_AUX"."PRODUCT"
     , S_STORE INT REFERENCES "IPYME_AUX"."STORE"
     , S_QUANTITY NUMERIC
 );
 
 CREATE TABLE "IPYME_AUX"."ITEM" (
-    I_ID BIGINT PRIMARY KEY
+    I_ID BIGSERIAL PRIMARY KEY
     ,I_PRODUCT BIGINT REFERENCES "IPYME_AUX"."PRODUCT"
     , I_COMMERCIAL_ID VARCHAR(50)
 );
@@ -89,18 +89,18 @@ CREATE TABLE "IPYME_AUX"."PRICES" (
 );
 
 CREATE TABLE "IPYME_AUX"."BASKET" (
-    B_ID BIGINT PRIMARY KEY
+    B_ID BIGSERIAL PRIMARY KEY
 );
 
 CREATE TABLE "IPYME_AUX"."BASKET_LIST" (
-    BL_ID BIGINT PRIMARY KEY
+    BL_ID BIGSERIAL PRIMARY KEY
     , BL_BASKET BIGINT REFERENCES "IPYME_AUX"."BASKET"
     , BL_PRODUCT BIGINT REFERENCES "IPYME_AUX"."PRODUCT"
-    , BL_QUANTITY INT
+    , BL_QUANTITY NUMERIC(5,3)
 );
 
 CREATE TABLE "IPYME_AUX"."COUNTRY" (
-    C_ID INT PRIMARY KEY
+    C_ID SERIAL PRIMARY KEY
     , C_NAME VARCHAR(100)
 );
 
@@ -280,47 +280,37 @@ CREATE TABLE "IPYME_AUX"."CUSTOMER_CATEGORY_LINK" (
 
 
 
+create type "IPYME_AUX".attribute_value_related AS (
+	pca_id bigint,
+	pca_product_category bigint,
+	pca_attribute text,
+	pav_product bigint,
+	pav_product_category_attribute bigint,
+	pav_value text
+);
 
 
 
-
-
-
-
-
-
-
-
-CREATE OR REPLACE VIEW "IPYME_AUX".attribute_value_related AS 
-SELECT "PRODUCT_CATEGORY_ATTRIBUTE".pca_id
-    , "PRODUCT_CATEGORY_ATTRIBUTE".pca_product_category
-    , "PRODUCT_CATEGORY_ATTRIBUTE".pca_attribute
-    , "PRODUCT_ATTRIBUTE_VALUE".pav_product
-    , "PRODUCT_ATTRIBUTE_VALUE".pav_product_category_attribute
-    , "PRODUCT_ATTRIBUTE_VALUE".pav_value
-FROM "IPYME_AUX"."PRODUCT_CATEGORY_ATTRIBUTE"
-LEFT JOIN "IPYME_AUX"."PRODUCT_ATTRIBUTE_VALUE" 
-ON "PRODUCT_ATTRIBUTE_VALUE".pav_product_category_attribute = "PRODUCT_CATEGORY_ATTRIBUTE".pca_id;
-
-
-
-
+create type "IPYME_AUX"."get_product" AS (
+	p_id bigint,
+	p_ref character varying(45),
+	p_description character varying(255),
+	p_long_description character varying(255),
+	p_category bigint,
+	p_image_path text,
+	p_category_name text,
+	p_price numeric(8,3),
+	c_name character varying(100)
+);
 
 
 SET search_path = "IPYME_AUX", pg_catalog;
 
 COPY "USER" (u_session, u_last_login, u_email, u_status, u_basket, u_customer, u_name, u_password_hash, u_id) FROM stdin;
-33	2011-12-31 00:00:00+00	123	456	\N	\N	BBB	4ed61e15c9f84e9fc98ae553ff46010035aac24d	222
 9od4p5ehecs9ne451ea0fgnv60	\N	gonzalophp@gmail.com	1	\N	\N	gonzalo	8e43bec6c9a4aba7dc358247a21ab52d301a2840	223
-bqlup9j5bllktbfqiv2u1k6fa5	\N	ddddd	1	\N	\N	ddd	8e43bec6c9a4aba7dc358247a21ab52d301a2840	177
 \.
 
-COPY "PRODUCT" (p_ref, p_description, p_long_description) FROM stdin;
-P5Ka	Asus P5K Intel P45	Asus P5K Intel P45, AC97 audio, 2 lan 100Gb	
-p6ba	Asus Xeon prepared motherboard	audio 5.1, 2 lang gigabit	
-P8Ba	Asus P8Btt	Asus P8B Intel i3, i5, i7	
-p2baa	oooo77788	bbbbbbbbbb	
-\.
+
 
 COPY "CURRENCY" (C_NAME) FROM stdin;
 GBP
@@ -457,8 +447,6 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
-ALTER FUNCTION "IPYME_FINAL".delete_customer(bigint)
-  OWNER TO postgres;
 
 
 
@@ -502,8 +490,6 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
-ALTER FUNCTION "IPYME_FINAL".delete_product(bigint)
-  OWNER TO postgres;
 
 
 
@@ -573,8 +559,30 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
-ALTER FUNCTION "IPYME_FINAL".delete_provider(bigint)
-  OWNER TO postgres;
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_all_available_attribute_value_related(p_pc_id bigint)
+  RETURNS SETOF "IPYME_FINAL".attribute_value_related AS
+$BODY$
+DECLARE
+BEGIN
+	--
+	RETURN QUERY 	SELECT * 
+								FROM "IPYME_FINAL"."PRODUCT_CATEGORY_ATTRIBUTE" PCA
+								INNER JOIN "IPYME_FINAL"."PRODUCT_ATTRIBUTE_VALUE" PAV
+								ON PAV.pav_product_category_attribute = PCA.pca_id
+								WHERE PCA.pca_product_category in (select PC1.pc_id 
+																									from "IPYME_FINAL"."PRODUCT_CATEGORY" PC1
+																									,(select pc_path
+																									from "IPYME_FINAL"."PRODUCT_CATEGORY" 
+																									where pc_id = p_pc_id) PC2
+																									where substr(PC1.pc_path,0,length(PC2.pc_path)+1) = PC2.pc_path);
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
 
 
 -- Function: "IPYME_FINAL".get_customer(bigint)
@@ -603,19 +611,32 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
-ALTER FUNCTION "IPYME_FINAL".get_customer(bigint)
-  OWNER TO postgres;
 
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_price_by_product(p_p_id bigint)
+  RETURNS SETOF "IPYME_FINAL"."PRICES" AS
+$BODY$
+DECLARE
+BEGIN
+	--
+	IF p_p_id IS NULL THEN
+		--
+		RETURN;
+		--
+	ELSE
+		--
+		RETURN QUERY SELECT * 
+		FROM "IPYME_FINAL"."PRICES" PR
+		WHERE PR.p_product = p_p_id
+		AND PR.p_status = 1;
+		--
+	END IF;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
 
-
-create type "IPYME_FINAL"."get_product" as ( p_id bigint
-                                            ,p_ref character varying(45)
-                                            ,p_description character varying(255)
-                                            ,p_long_description character varying(255)
-                                            ,p_category bigint
-                                            ,p_category_name text);
-
-  
 
 CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_product(p_p_id bigint)
   RETURNS SETOF "IPYME_FINAL"."get_product" AS
@@ -628,12 +649,20 @@ BEGIN
 											,P.p_description
 											,P.p_long_description
 											,P.p_category
+											,P.p_image_path
 											,substr(PC.pc_path,length(PC.pc_path)-strpos(reverse(PC.pc_path),' > ')+2) AS p_category_name
+											,PR.p_price
+											,C.c_name
 								FROM "IPYME_FINAL"."PRODUCT" P
 								JOIN "IPYME_FINAL"."PRODUCT_CATEGORY" PC
 								ON P.p_category = PC.pc_id
+								LEFT JOIN "IPYME_FINAL"."PRICES" PR
+								ON PR.p_product = P.p_id and PR.p_status = 1
+								LEFT JOIN "IPYME_FINAL"."CURRENCY" C
+								ON PR.p_currency = C.c_id
 								WHERE P.p_id = p_p_id
-									OR p_p_id IS NULL;
+									OR p_p_id IS NULL
+								;
 	--
 END;
 $BODY$
@@ -668,8 +697,6 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
-ALTER FUNCTION "IPYME_FINAL".get_provider(bigint)
-  OWNER TO postgres;
 
 
 -- Function: "IPYME_FINAL".set_customer(bigint, character varying, bigint, character varying, character varying)
@@ -774,19 +801,18 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
-ALTER FUNCTION "IPYME_FINAL".set_customer(bigint, character varying, bigint, character varying, character varying)
-  OWNER TO postgres;
 
 
 -- Function: "IPYME_FINAL".set_product(bigint, character varying, character varying, character varying, numeric, character varying)
 
 -- DROP FUNCTION "IPYME_FINAL".set_product(bigint, character varying, character varying, character varying, numeric, character varying);
 
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_product(p_p_id bigint, p_p_ref character varying, p_p_description character varying, p_p_long_description character varying, p_p_category bigint)
-  RETURNS SETOF "IPYME_FINAL"."PRODUCT" AS
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_product(p_p_id bigint, p_p_ref character varying, p_p_description character varying, p_p_long_description character varying, p_p_category bigint, p_p_price numeric, p_p_image_path text)
+  RETURNS SETOF "IPYME_FINAL".get_product AS
 $BODY$
 DECLARE
 v_p_id "IPYME_FINAL"."PRODUCT"."p_id"%TYPE;
+v_prices "IPYME_FINAL"."PRICES"%ROWTYPE;
 BEGIN
 	--
 	IF p_p_id IS NULL THEN
@@ -797,12 +823,14 @@ BEGIN
 																				,p_ref 
 																				,p_description 
 																				,p_long_description 
-																				,p_category)
+																				,p_category
+																				,p_image_path)
 																	VALUES(v_p_id
 																			, p_p_ref 
 																			, p_p_description
 																			, p_p_long_description
-																			, p_p_category);
+																			, p_p_category
+																			, p_p_image_path);
 		--
 	ELSE
 		--
@@ -812,13 +840,14 @@ BEGIN
 		SET  p_ref 							= p_p_ref
 				,p_description 			= p_p_description
 				,p_long_description = p_p_long_description
+				,p_image_path				= p_p_image_path
 		WHERE p_id = v_p_id;
 		--
 	END IF;
 	--
-	RETURN  QUERY SELECT * 
-	FROM "IPYME_FINAL"."PRODUCT" 
-	WHERE p_id = v_p_id;
+	PERFORM "IPYME_FINAL".set_price_to_product(v_p_id, p_p_price);
+	--
+	RETURN  QUERY SELECT * FROM "IPYME_FINAL".get_product(v_p_id); 
 	--
 	EXCEPTION
 		WHEN OTHERS THEN
@@ -931,8 +960,6 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
-ALTER FUNCTION "IPYME_FINAL".set_provider(bigint, character varying, bigint, character varying, character varying)
-  OWNER TO postgres;
 
 
 -- Function: "IPYME_FINAL".set_invoice_entity(bigint, character varying, character varying)
@@ -993,182 +1020,75 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION "IPYME_FINAL".set_invoice_entity(bigint, character varying, character varying)
-  OWNER TO postgres;
 
 
-/*
--- Function: "IPYME_FINAL".set_category_tree(bigint, character varying, character varying, numeric, bigint)
-
--- DROP FUNCTION "IPYME_FINAL".set_category_tree(bigint, character varying, character varying, numeric, bigint);
-
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_category_tree(p_c_id bigint, p_c_reference character varying, p_c_description character varying, p_c_tax numeric, p_c_parent bigint)
-  RETURNS SETOF "IPYME_FINAL"."CATEGORY" AS
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_price_to_product(p_p_product bigint, p_p_price numeric)
+  RETURNS SETOF "IPYME_FINAL"."PRICES" AS
 $BODY$
 DECLARE
-v_category "IPYME_FINAL"."CATEGORY"%ROWTYPE;
-v_dummy INT;
+v_p_id BIGINT;
 BEGIN
 	--
-	IF (p_c_reference IS NULL) OR (LENGTH(p_c_reference) = 0) THEN
+	IF (p_p_product IS NULL) OR (p_p_price IS NULL) THEN
+		--
 		RETURN;
-	END IF;
-	--
-	v_category.c_reference 		:= p_c_reference;
-	v_category.c_description 	:= p_c_description;
-	v_category.c_tax 					:= p_c_tax;
-	--
-	IF p_c_parent IS NULL THEN -- IT IS A ROOT NODE 
-		--
-		v_category.c_parent 			:= NULL;
-		--
-		IF p_c_id IS NULL THEN
-			--
-			SELECT NEXTVAL('"IPYME_FINAL"."CATEGORY_c_id_seq"') INTO v_category.c_id;			
-			--
-			INSERT INTO "IPYME_FINAL"."CATEGORY" (c_id
-																					, c_reference
-																					, c_description
-																					, c_tax
-																					, c_parent)		
-																		VALUES (v_category.c_id
-																					, v_category.c_reference
-																					, v_category.c_description
-																					, v_category.c_tax
-																					, v_category.c_parent);
-			--
-		ELSE
-			--
-			v_category.c_id := p_c_id;
-			--
-			UPDATE "IPYME_FINAL"."CATEGORY" 
-			SET c_reference = v_category.c_reference
-				, c_description = v_category.c_description
-				, c_tax = v_category.c_tax
-				, c_parent = v_category.c_parent
-			WHERE c_id = v_category.c_id;
-			--
-		END IF;
 		--
 	ELSE
 		--
-		v_category.c_parent 			:= p_c_parent;
+		UPDATE "IPYME_FINAL"."PRICES" 
+		SET p_status = 0
+		WHERE p_product = p_p_product;
 		--
-		SELECT c_id
-		INTO v_category.c_id
-		FROM "IPYME_FINAL"."CATEGORY" 
-		WHERE c_reference = v_category.c_reference
-		AND c_parent = v_category.c_parent;
+		SELECT NEXTVAL('"IPYME_FINAL"."PRICES_p_id_seq"') INTO v_p_id;
 		--
-		IF FOUND THEN
-			--
-			IF ((p_c_id IS NULL) OR (p_c_id <> v_category.c_id)) THEN
-				RETURN;
-			END IF;
-			--
-			UPDATE "IPYME_FINAL"."CATEGORY" 
-				SET c_description = v_category.c_description
-					, c_tax = v_category.c_tax
-				WHERE c_id = v_category.c_id;
-			--
-		ELSE
-			--
-			SELECT NEXTVAL('"IPYME_FINAL"."CATEGORY_c_id_seq"') INTO v_category.c_id;
-			--
-			INSERT INTO "IPYME_FINAL"."CATEGORY" (c_id
-																					, c_reference
-																					, c_description
-																					, c_tax
-																					, c_parent)		
-																		VALUES (v_category.c_id
-																					, v_category.c_reference
-																					, v_category.c_description
-																					, v_category.c_tax
-																					, v_category.c_parent);
-			--
-		END IF;
+		INSERT INTO "IPYME_FINAL"."PRICES" (p_id
+																			, p_date 
+																			, p_product
+																			, p_status
+																			, p_currency
+																			, p_price)
+																VALUES (v_p_id
+																			, CURRENT_TIMESTAMP
+																			, p_p_product
+																			, 1
+																			, NULL	
+																			, p_p_price);
+		RETURN QUERY SELECT * 
+		FROM "IPYME_FINAL"."PRICES" PR
+		WHERE PR.p_product = p_p_product
+		AND PR.p_status = 1;
 		--
 	END IF;
 	--
-	RETURN QUERY SELECT v_category.c_id
-										, v_category.c_reference
-										, v_category.c_description
-										, v_category.c_tax
-										, v_category.c_parent;
-	--
-	EXCEPTION
-		WHEN OTHERS THEN
-			RETURN;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
-ALTER FUNCTION "IPYME_FINAL".set_category_tree(bigint, character varying, character varying, numeric, bigint)
-  OWNER TO postgres;
 
 
-
--- Function: "IPYME_FINAL".get_category_tree(bigint)
-
--- DROP FUNCTION "IPYME_FINAL".get_category_tree(bigint);
-
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_category_tree(p_c_id bigint)
-  RETURNS SETOF "IPYME_FINAL".t_category AS
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".delete_product_category(p_pc_id bigint)
+  RETURNS SETOF "IPYME_FINAL"."PRODUCT_CATEGORY" AS
 $BODY$
 DECLARE
-
---CREATE TYPE "IPYME_FINAL".t_category as (
---c_id bigint
---,c_reference character varying(50)
---,c_description character varying(255)
---,c_tax numeric(8,3)
---,c_parent bigint
---,c_depth int
---);
-
-v_category "IPYME_FINAL".t_category;
-v_c_id BIGINT;
-a_category "IPYME_FINAL".t_category[];
-v_i integer;
+v_row_product_category "IPYME_FINAL"."PRODUCT_CATEGORY"%ROWTYPE;
 BEGIN
 	--
-	v_c_id := p_c_id;
+	SELECT *
+	INTO v_row_product_category
+	FROM "IPYME_FINAL"."PRODUCT_CATEGORY" PC
+	WHERE PC.pc_id = p_pc_id;
 	--
-	LOOP
+	IF NOT FOUND THEN
 		--
-		SELECT *
-		INTO v_category
-		FROM "IPYME_FINAL"."CATEGORY" C
-		WHERE C.c_id = v_c_id;
-		--
-		IF NOT FOUND THEN
-			EXIT;
-		ELSE
-			--
-			IF a_category @> ARRAY[v_category] THEN
-				RETURN; -- CIRCULAR REFERENCES ARE NOT ALLOWED
-			ELSE
-				--
-				a_category := a_category || v_category;
-				v_c_id := v_category.c_parent;
-				--
-			END IF;
-			--
-		END IF;
-		--
-	END LOOP;
-	--
-	IF a_category IS NOT NULL THEN
-		--
-		FOR v_i IN array_lower(a_category,1)..array_upper(a_category,1) LOOP
-			--
-			v_category := a_category[v_i];
-			v_category.c_depth := array_upper(a_category,1)+1-v_i;
-			RETURN NEXT v_category;
-			--
-		END LOOP;
 		RETURN;
+		--
+	ELSE
+		--
+		DELETE FROM "IPYME_FINAL"."PRODUCT_CATEGORY" PC
+		WHERE PC.pc_id = p_pc_id;
+		--
+		RETURN QUERY SELECT v_row_product_category.*;
 		--
 	END IF;
 	--
@@ -1177,11 +1097,6 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
-ALTER FUNCTION "IPYME_FINAL".get_category_tree(bigint)
-  OWNER TO postgres;
-
-
-*/
 
 
 CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_product_category(p_pc_id bigint)
@@ -1218,7 +1133,7 @@ BEGIN
 	--
 	v_product_category.pc_tax_rate := p_pc_tax_rate;
 	v_product_category.pc_description = p_pc_description;
-	v_product_category.pc_path := p_pc_path;
+	v_product_category.pc_path := UPPER(p_pc_path);
 	--																						
 	IF p_pc_id IS NULL THEN
 		--
@@ -1325,7 +1240,7 @@ v_product_category_attribute "IPYME_FINAL"."PRODUCT_CATEGORY_ATTRIBUTE";
 BEGIN
 	--
 	v_product_category_attribute.pca_product_category := p_pca_product_category;
-	v_product_category_attribute.pca_attribute := p_pca_attribute;
+	v_product_category_attribute.pca_attribute := UPPER(p_pca_attribute);
 	--
 	IF p_pca_id IS NULL THEN
 		--
@@ -1435,7 +1350,8 @@ BEGIN
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100;
+  COST 100
+  ROWS 1000;
 
 
 CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_product_attribute_related(p_pc_id bigint)
@@ -1467,19 +1383,26 @@ BEGIN
 											,P.p_description
 											,P.p_long_description
 											,P.p_category
+											,P.p_image_path
 											,PC3.p_category_name
+											,PR.p_price
+											,C.c_name
 								FROM "IPYME_FINAL"."PRODUCT" P
-								inner join (select PC1.pc_id 
+								INNER JOIN (select PC1.pc_id 
 														,substr(PC1.pc_path,length(PC1.pc_path)-strpos(reverse(PC1.pc_path),' > ')+2) as p_category_name
 														from "IPYME_FINAL"."PRODUCT_CATEGORY" PC1
-								,(select length(pc_path) as pc_path_length 
-												,pc_path 
-												from "IPYME_FINAL"."PRODUCT_CATEGORY" 
-												where pc_id=p_p_category
-												OR p_p_category = -1
-												) PC2
-								WHERE SUBSTR(PC1.pc_path,0,PC2.pc_path_length+1) = PC2.pc_path) PC3
-								ON P.p_category = PC3.pc_id;
+													,(select length(pc_path) as pc_path_length 
+																	,pc_path 
+																	from "IPYME_FINAL"."PRODUCT_CATEGORY" 
+																	where pc_id=p_p_category
+																	OR p_p_category = -1
+																	) PC2
+													WHERE SUBSTR(PC1.pc_path,0,PC2.pc_path_length+1) = PC2.pc_path) PC3
+								ON P.p_category = PC3.pc_id
+								LEFT JOIN "IPYME_FINAL"."PRICES" PR
+								ON PR.p_product = P.p_id and PR.p_status = 1
+								LEFT JOIN "IPYME_FINAL"."CURRENCY" C
+								ON PR.p_currency = C.c_id;								
 	--
 END;
 $BODY$
@@ -1508,56 +1431,42 @@ $BODY$
 
 
 
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_product_attribute_value(p_p_id bigint, p_pav_product_category_attribute bigint, p_pav_value text)
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_product_attribute_value(p_pav_product bigint, p_pav_product_category_attribute bigint, p_pav_value text)
   RETURNS SETOF "IPYME_FINAL"."PRODUCT_ATTRIBUTE_VALUE" AS
 $BODY$
 DECLARE
-v_product_attribute_value "IPYME_FINAL"."PRODUCT_ATTRIBUTE_VALUE";
-v_p_category BIGINT;
-v_pav_product_category_attribute BIGINT;
+v_pav_value TEXT;
 BEGIN
 	--
 	IF p_pav_value IS NULL OR LENGTH(p_pav_value)=0 THEN
 		RETURN;
 	END IF;
 	--
-	SELECT P_CATEGORY 
-	INTO v_p_category
-	FROM "IPYME_FINAL"."PRODUCT" 
-	WHERE P_ID = p_p_id;
+	v_pav_value := UPPER(p_pav_value);
+	--
+	UPDATE "IPYME_FINAL"."PRODUCT_ATTRIBUTE_VALUE"
+		SET pav_value = v_pav_value
+	WHERE pav_product = p_pav_product
+	AND pav_product_category_attribute = p_pav_product_category_attribute;
 	--
 	IF NOT FOUND THEN
-		RETURN;
-	END IF;
-	--
-	SELECT pca_id
-	INTO v_product_attribute_value.pav_product_category_attribute 
-	FROM "IPYME_FINAL".get_product_attribute_related(v_p_category) 
-	WHERE pca_id = p_pav_product_category_attribute;
-	--
-	IF NOT FOUND THEN
-		RETURN;
-	END IF;
-	--
-	SELECT pav_product, pav_value
-	INTO v_product_attribute_value.pav_product, v_product_attribute_value.pav_value
-	FROM "IPYME_FINAL"."PRODUCT_ATTRIBUTE_VALUE"
-	WHERE pav_product_category_attribute = v_product_attribute_value.pav_product_category_attribute 
-		AND pav_value = UPPER(p_pav_value);
-	--
-	IF NOT FOUND THEN
-		SELECT NEXTVAL('"IPYME_FINAL"."PRODUCT_ATTRIBUTE_VALUE_pav_id_seq"') INTO v_product_attribute_value.pav_product;
-		v_product_attribute_value.pav_value := UPPER(p_pav_value);
 		--
-		INSERT INTO "IPYME_FINAL"."PRODUCT_ATTRIBUTE_VALUE"(pav_product
-																											, pav_product_category_attribute
-																											, pav_value)
-																								VALUES( v_product_attribute_value.pav_id
-																											, v_product_attribute_value.pav_product_category_attribute
-																											,	v_product_attribute_value.pav_value);
+		INSERT INTO "IPYME_FINAL"."PRODUCT_ATTRIBUTE_VALUE" (pav_product
+																												,pav_product_category_attribute 
+																												,pav_value)
+																									VALUES(p_pav_product
+																												,p_pav_product_category_attribute
+																												,v_pav_value);
+		--
 	END IF;
 	--
-	RETURN QUERY SELECT v_product_attribute_value.*;
+	RETURN QUERY SELECT p_pav_product
+											,p_pav_product_category_attribute
+											,v_pav_value;
+	--
+	EXCEPTION
+		WHEN OTHERS THEN
+			NULL;
 	--
 END;
 $BODY$
@@ -1566,77 +1475,25 @@ $BODY$
   ROWS 1000;
 
 
-
-
--- 
--- SELECT distinct P.p_id
--- 											,P.p_ref
--- 											,P.p_description
--- 											,P.p_long_description
--- 											,P.p_category
--- 											,PC3.p_category_name
--- 											,PR.p_price
--- 											,C.c_name
--- 								FROM "IPYME_FINAL"."PRODUCT" P
--- 								INNER JOIN (select PC1.pc_id 
--- 														,substr(PC1.pc_path,length(PC1.pc_path)-strpos(reverse(PC1.pc_path),' > ')+2) as p_category_name
--- 														from "IPYME_FINAL"."PRODUCT_CATEGORY" PC1
--- 													,(select length(pc_path) as pc_path_length 
--- 																	,pc_path 
--- 																	from "IPYME_FINAL"."PRODUCT_CATEGORY" 
--- 																	where pc_id=20
--- 																	--OR p_p_category = -1
--- 																	) PC2
--- 													WHERE SUBSTR(PC1.pc_path,0,PC2.pc_path_length+1) = PC2.pc_path) PC3
--- 								ON P.p_category = PC3.pc_id
--- 								LEFT JOIN "IPYME_FINAL"."PRICES" PR
--- 								ON PR.p_product = P.p_id and PR.p_status = 1
--- 								LEFT JOIN "IPYME_FINAL"."CURRENCY" C
--- 								ON PR.p_currency = C.c_id;
-
-
-
-
-\dn
-
-
-
-
-CREATE TYPE "IPYME_FINAL".get_product2 AS
-   (p_id bigint,
-    p_ref character varying(45),
-    p_description character varying(255),
-    p_long_description character varying(255),
-    p_category bigint,
-    p_image_path text,
-    p_category_name text,
-    p_price numeric(8,3),
-		c_name character varying(100));
-
-
-
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_product_by_attribute_value2(p_category_attribute_id_and_value text)
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_product_by_attribute_value(p_category_attribute_id_and_value text)
   RETURNS SETOF "IPYME_FINAL".get_product AS
 $BODY$
 DECLARE
 v_a_attribute_id_and_attribute_value TEXT[];
+v_attributes_count BIGINT;
 BEGIN
+	--
+	SELECT COUNT(*) AS attribute_count
+	INTO v_attributes_count
+	FROM (SELECT PAV.pav_product_category_attribute
+				FROM "IPYME_FINAL"."PRODUCT_ATTRIBUTE_VALUE"	PAV
+				WHERE PAV.pav_product_category_attribute::TEXT||'%^%'||PAV.pav_value = ANY (string_to_array(p_category_attribute_id_and_value, '~^~')::TEXT[])
+				GROUP BY PAV.pav_product_category_attribute) AC;
 	--
 	-- p_category_attribute_id_and_value FORMAT: ATTR_ID1%^%ATTR_VALUE1~^~ATTR_ID2%^%ATTR_VALUE2~^~ATTR_ID3%^%ATTR_VALUE3...    
 	-- EXAMPLE: 20%^%I7~^~15%^%4
 	--
-	--v_a_attribute_id_and_attribute_value := string_to_array('20%^%I7~^~15%^%4', '~^~')::TEXT[];
 	v_a_attribute_id_and_attribute_value := string_to_array(p_category_attribute_id_and_value, '~^~')::TEXT[];
-	--
-	/*
-	SELECT PAV.pav_product
-	(SELECT PAV2.pav_product, count(*) AS times_found
-	FROM "IPYME_FINAL"."PRODUCT_ATTRIBUTE_VALUE"	PAV2
-	WHERE PAV2.pav_product_category_attribute::TEXT||'%^%'||PAV2.pav_value = ANY (v_a_attribute_id_and_attribute_value)
-	group by PAV.pav_product) PAV
-	WHERE PAV.times_found = array_length(v_a_attribute_id_and_attribute_value);
-	*/
-	raise info '%',array_length(v_a_attribute_id_and_attribute_value,1);
 	--
 	RETURN QUERY 	SELECT P.p_id
 											,P.p_ref
@@ -1659,10 +1516,97 @@ BEGIN
 								ON PR.p_product = P.p_id and PR.p_status = 1
 								LEFT JOIN "IPYME_FINAL"."CURRENCY" C
 								ON PR.p_currency = C.c_id
-								WHERE PAV.times_found = array_length(v_a_attribute_id_and_attribute_value,1);								
+								WHERE PAV.times_found = v_attributes_count
+								;								
 	--
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
+
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".save_basket_product_list(p_user_id BIGINT, p_basket_products text) RETURNS SETOF "IPYME_FINAL"."BASKET_LIST" AS $BODY$
+DECLARE
+v_a_basket_product_list TEXT[];
+v_a_basket_and_product 	TEXT[];
+v_basket_list 					"IPYME_FINAL"."BASKET_LIST";
+v_a_basket_list 				"IPYME_FINAL"."BASKET_LIST"[];
+v_user 									"IPYME_FINAL"."USER";
+i INT;
+BEGIN
+	--
+	SELECT *
+	INTO v_user
+	FROM "IPYME_FINAL"."USER" U
+	WHERE U.u_id = p_user_id;
+	--
+	IF NOT FOUND THEN
+		RETURN;
+	END IF;
+	--
+	IF v_user.u_basket IS NULL THEN
+		--
+		SELECT NEXTVAL('"IPYME_FINAL"."BASKET_b_id_seq"') INTO v_user.u_basket;
+		--
+		INSERT INTO "IPYME_FINAL"."BASKET" (b_id)
+																 VALUES(v_user.u_basket);
+		--
+		UPDATE "IPYME_FINAL"."USER"
+		SET u_basket = v_user.u_basket
+		WHERE u_id = v_user.u_id;
+		--
+	END IF;
+	--
+	v_basket_list.bl_basket := v_user.u_basket;
+	--
+	v_a_basket_product_list := string_to_array(p_basket_products,'%^%');
+	--
+	FOR i IN 1..ARRAY_LENGTH(v_a_basket_product_list,1) LOOP
+		--
+		v_a_basket_and_product := string_to_array(v_a_basket_product_list[i],'~^~');
+		--
+		v_basket_list.bl_product	:= v_a_basket_and_product[2];
+		v_basket_list.bl_quantity	:= v_a_basket_and_product[1];
+		--
+		UPDATE "IPYME_FINAL"."BASKET_LIST"
+		SET bl_quantity = v_basket_list.bl_quantity
+		WHERE bl_basket = v_basket_list.bl_basket
+			AND bl_product = v_basket_list.bl_product;
+		--
+		IF NOT FOUND THEN
+			--
+			SELECT NEXTVAL('"IPYME_FINAL"."BASKET_LIST_bl_id_seq"') INTO v_basket_list.bl_id;
+			--
+			INSERT INTO "IPYME_FINAL"."BASKET_LIST" (bl_id
+																							,bl_basket
+																							,bl_product
+																							,bl_quantity)
+																			VALUES (v_basket_list.bl_id
+																							,v_basket_list.bl_basket
+																							,v_basket_list.bl_product
+																							,v_basket_list.bl_quantity);
+			--
+		END IF;
+		--
+		v_a_basket_list := v_a_basket_list || v_basket_list;
+		--
+	END LOOP;
+	--
+	FOR i IN 1..ARRAY_LENGTH(v_a_basket_list,1) LOOP
+		RETURN QUERY SELECT v_a_basket_list[i].*;
+	END LOOP;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
+
+
+
+\dn
+
+
