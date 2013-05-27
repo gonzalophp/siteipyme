@@ -10,7 +10,6 @@ return array(
         ),
         'invokables' => array(
             'Datainterface\Model\User' => 'Datainterface\Model\User',
-            'Datainterface\Model\Product' => 'Datainterface\Model\Product',
             'Datainterface\Model\Customer' => 'Datainterface\Model\Customer',
         )
     ),

@@ -84,11 +84,7 @@ class MainMenu {
                                 'label' => 'Users'
                                 , 'url' => '#/admin/list/user'
                                 , 'nodes' => array())))))
-            , $oUserMenu
-            , (object) array(
-                'label' => 'Basket'
-                , 'url' => '#/user/basket'
-                , 'nodes' => array()));
+            , $oUserMenu);
         return $aMenuList;
     }
 }
