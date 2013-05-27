@@ -185,5 +185,21 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
         
         return new \Zend\View\Model\JsonModel($aResponse);
     }
+    
+    public function getAction() {
+        $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+        $nProductId =  $this->getEvent()->getRouteMatch()->getParam('id');
+        $oResultSet = $oDataFunctionGateway->getDataRecordSet(
+                'IPYME_FINAL'
+                , 'get_product'
+                , array(':pc_id' => $nProductId));
+        
+        $aProduct = $oResultSet->current();
+        $aProduct['p_price'] = number_format($aProduct['p_price'],2);
+        
+        $aResponse = array('success' =>1, 'product' => $aProduct);
+        
+        return new \Zend\View\Model\JsonModel($aResponse);
+    }
 }
 ?>

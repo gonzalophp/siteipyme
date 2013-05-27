@@ -13,6 +13,8 @@ class UserController extends \Zend\Mvc\Controller\AbstractActionController {
                 array('field' => "u_email", 'displayName' => "EMail", 'width' => 150),
                 array('field' => "u_status", 'displayName' => "Status", 'width' => 50),
                 array('field' => "u_basket", 'displayName' => "Basket", 'width' => 70),
+                array('field' => "u_customer", 'displayName' => "Customer", 'width' => 100),
+                
             )
         );
                 

@@ -120,7 +120,6 @@ class MenuController extends \Zend\Mvc\Controller\AbstractActionController {
     
     public function userAction(){
         $oMenuList = new \Datainterface\Model\MainMenu;
-        $aMenuList= $oMenuList->aMenuList;
         
         $aResponse = array('menuitems' => array(array('form'        => 'admin.user'
                                                      ,'displayName' => 'New'

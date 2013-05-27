@@ -21,6 +21,7 @@ class BasketController extends \Zend\Mvc\Controller\AbstractActionController {
                     , array(':p_user_id'          => $oUser->u_id));
             
             foreach($oResultSet as $aRow) {
+                $aRow['bl_quantity'] = number_format($aRow['bl_quantity'], 0);
                 $aBasketProductList[] = $aRow;
             }
         }
