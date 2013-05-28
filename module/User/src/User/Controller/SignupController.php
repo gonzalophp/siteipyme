@@ -64,29 +64,28 @@ class SignupController extends \Zend\Mvc\Controller\AbstractActionController {
     public function confirmAction() {
         if ($this->getRequest()->isOptions()) return;
         $sSessionId =  $this->getEvent()->getRouteMatch()->getParam('id');
-        $oUserTable = $this->getServiceLocator()->get('Datainterface\Model\UserTable');
-        $aResult = $oUserTable->update(
-            array('u_status' => 1)
-            ,array( 'u_session' => $sSessionId
-                   ,'u_status' => 0));
-        $bConfirmationSuccess = ($aResult['resultset']==1) && $aResult['success'] && ($aResult['error_code']==0);
-        if ($bConfirmationSuccess){
-//            if(array_key_exists('PHPSESSID',$_COOKIE)) unset($_COOKIE['PHPSESSID']);
-//            session_id($sSessionId);
-//            session_start();
-        }
+        
+        
+        $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+        $oResultSet = $oDataFunctionGateway->getDataRecordSet(
+                'IPYME_FINAL'
+                , 'set_user_confirm'
+                , array(':p_u_session' => $sSessionId));
+        
+        $bConfirmationSuccess = ($oResultSet->count() == 1);
         $aResponse = array('signup_confirmation' => ($bConfirmationSuccess?1:0));
-
         
         return new \Zend\View\Model\JsonModel($aResponse);
     }
     
        
     private function _emailConfirmation($sUser_name,$sUser_password,$sUser_email) {
-        $from = "gonzalophp@gmail.com";
+        $aConfig = $this->getEvent()->getApplication()->getServiceManager()->get('config');
+        
+        
+        $from = "ipymesoft@gmail.com";
         $to = $sUser_email;
         
-        $to = $from;
         $subject = "iPyME Registration";
         $text = "";
         
@@ -112,7 +111,7 @@ class SignupController extends \Zend\Mvc\Controller\AbstractActionController {
     <p>Please, confirm your new registry data at iPyME making click on the link below:
         <br/>
         <br/>
-        <a href='http://ipyme/#/user/signup/confirm/".session_id()."'>Click here to confirm and complete your registration</a>
+        <a href='{$aConfig['front_end']}/#/user/signup/confirm/".session_id()."'>Click here to confirm and complete your registration</a>
     </p>
     <hr/>
     <footer>2013 - Gonzalo Grado</footer>
@@ -129,8 +128,8 @@ class SignupController extends \Zend\Mvc\Controller\AbstractActionController {
     
         $host = "smtp.gmail.com";
         $port = "465";
-        $username = "gonzalophp@gmail.com";  //<> give errors
-        $password = "G4d1t4n010";
+        $username = "ipymesoft@gmail.com";  //<> give errors
+        $password = "openshift";
         $ssl = 'ssl';
         
         $oMailMessage = new \Zend\Mail\Message();
