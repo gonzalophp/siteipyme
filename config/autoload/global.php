@@ -22,4 +22,6 @@ return array(
             'Zend\Db\Adapter\Adapter' => 'Zend\Db\Adapter\AdapterServiceFactory',
         ),
     ),
+    'front_end' => "http://".$_SERVER['SERVER_NAME'],
+    'image_path' => "http://".$_SERVER['SERVER_NAME'].'/img/',
 );
