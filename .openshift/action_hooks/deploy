@@ -1,0 +1,3 @@
+cd $OPENSHIFT_REPO_DIR
+mkdir -p php/img
+chmod a+w php/img
