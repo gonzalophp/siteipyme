@@ -1,0 +1,51 @@
+@import 'shop.css';
+
+div.basket {
+    /*width:80%;*/
+    margin:0em 1em 0em 1em;
+}
+
+div > table {
+    border-collapse: separate;
+    width:80%;
+    margin:0% 10% 0% 10%;
+    border:solid 1px red;
+}
+table.basket th {
+    font-weight: bold;
+    border:solid 1px blue;
+}
+
+table.basket td {
+    border:solid 1px green;
+}
+
+table.basket > tbody> tr > td:nth-child(1) {
+    width:5%;
+}
+table.basket > tbody> tr > td:nth-child(2) {
+    width:27em;
+}
+
+table.basket > tbody > tr > td:nth-child(2)  > img {
+    width:7em;
+    height:7em;
+}
+table.basket > tbody> tr > td:nth-child(3) {
+    width:5em;
+}
+table.basket > tbody> tr > td:nth-child(4) {
+    width:5em;
+}
+table.basket > tbody> tr > td:nth-child(5) {
+    width:5em;
+}
+
+div.ipymeButtonsGroup {
+    text-align: right;
+    padding:0em 1em 0em 1em;
+}
+
+div.ipymeButtonsGroup button {
+    margin-left: 1em;
+}

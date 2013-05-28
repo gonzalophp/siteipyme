@@ -1,0 +1,202 @@
+@import "menu.css";
+
+* {
+    font-size: 13px;
+}
+
+.ipymeButton {
+    margin-top:1em;
+    border-radius: 5px;
+    cursor:pointer;
+    padding: 0.4em 1em 0.4em 1em;
+    border:1px solid #999;
+}
+
+.ipymeButton:hover {
+    background-color:#c7c7c7;
+}
+
+.ipymeTitle{
+    width:99%;
+    margin:auto;
+    margin-top:0.3em;
+    text-align: center;
+    border:1px solid #eee ;
+    border-radius: 6px;
+    color:#444;
+    background-color:#ccc;
+    padding:0.3em 0 0.3em 0;
+    font: 700 1.05em sans-serif;
+}
+
+.ipymedialog {
+}
+
+td {
+    text-align: left;
+}
+
+p  {
+    text-align: center;
+}
+
+label input {
+    position:relative;
+    top:2px;
+    margin:0.5em 0.5em 0.5em 0.5em;
+}
+
+p.ipymeErrorMessage {
+    background-color: #FFC276;
+    border-radius: 4px;
+}
+
+
+
+
+
+td.attributevaluelistinput {
+    vertical-align: top;
+    top:0px;
+}
+
+td.attributevaluelistinput div {
+    height:20em;
+    background-color: rgb(220,230,250);
+    margin:0em 0em 0em 1.5em;
+    padding: 0.5em 1em 0.5em 1em;
+    overflow: auto;
+    border:solid 1px rgb(170,180,200);
+}
+
+
+td.attributevaluelistinput > div > table{
+}
+
+td.attributevaluelistinput > div > table > tbody > tr > td {
+    padding:2px 1em 2px 1em;
+    font-weight: bolder;
+}
+
+td.attributevaluelistinput div input{
+    vertical-align: middle;
+    width: 9em;
+    padding:0;
+    margin:0;
+    background-color:  rgb(230,230,235);
+    font-weight: bolder;
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+div.modal {
+    width:auto;
+}
+
+div.ipymeButtonGroup {
+    padding:0px 0px 0px 1em;
+    
+}
+div.ipymeButtonGroup button{
+    margin:0px 0.6em 0px 0px;
+    padding:3px 1em 3px 1em;
+    border-radius: 3px;
+    
+}
+
+
+div.basketquantity > button.more 
+,div.basketquantity > button.minus 
+,button.ipymebuttonclose 
+{
+    position:relative;
+    font-weight: bold;
+    color: #aaaaaa;
+    font-size: larger;
+    background-color:transparent;
+    border: solid #aaaaaa 1px;
+    vertical-align: middle;
+    line-height: 0px;
+    height:1.1em;
+    border-radius: 4px;
+    display: table-cell;      
+}
+
+button.ipymebuttonclose {
+    /*float:right;*/
+    right:4px;
+    padding:0px 2px 1px 2px;
+}
+
+button.ipymebuttonclose:hover{
+    right:4px;
+    background-color: #aaa;
+    color:white;
+    border: solid #aaaaaa 2px;
+}
+
+div.basketquantity > button.minus {
+    padding:0px 3px 0px 3px;
+    margin-left:0.3em;
+    margin-right: 0.3em;
+    background-color: #f5dadf;
+    color: #555;
+}
+
+div.basketquantity > button.minus:hover{
+    background-color: #eb4972;
+    color:white;
+    -webkit-box-shadow: 1px 1px 3px 1px rgba(255, 0, 0, 0.5);
+box-shadow: 1px 1px 3px 1px rgba(255, 0, 0, 0.5);
+}
+
+div.basketquantity > button.more {
+    padding:0px 2px 0px 2px;
+    margin-left:0.3em;
+    margin-right: 0.3em;
+    background-color: #bce9c4;
+    color: #555;
+}
+
+div.basketquantity > button.more:hover {
+    background-color: #15ab10;
+    color:white;
+    -webkit-box-shadow: 1px 1px 3px 1px rgba(0, 255, 0, 0.5);
+    box-shadow: 1px 1px 3px 1px rgba(81, 255, 0, 0.8);
+}
+
+div.basketquantity > input   {
+    width:2.0em;
+    height:1.5em;
+    line-height: 1em;
+    top:0.4em;
+    position:relative;
+    font-size: 9pt;
+    padding: 0;
+}
+
+
+button.shop {
+    margin:0.2em 0em 0em 0em;
+    padding: 0em 1em 0em 1em;
+    border-radius: 4px;
+    background-color: rgb(50, 97, 197);
+    color:white;
+    border:1px solid rgb(131, 165, 173);
+    font-weight: bolder;
+}
+
+button.shop:hover {
+    background-color: rgb(62, 111, 165);
+    -webkit-box-shadow: 1px 1px 3px 1px rgba(50, 100, 200, 0.5);
+    box-shadow: 1px 1px 3px 1px rgba(50, 100, 200, 0.5);
+}

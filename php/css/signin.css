@@ -1,0 +1,40 @@
+div.ipymeSignin {
+    margin-left:15%;
+    margin-right:15%;
+    margin-top:2%;
+    width:70%; 
+}
+
+div.ipymeSignin > table {
+    width:100%;
+    border-collapse:separate;
+    border-spacing: 2px;
+}
+
+div.ipymeSignin > table > tbody > tr > td   {
+    border:solid 1px #bbb;
+    border-radius: 7px;
+    width:50%;
+    padding:1em 1em 1em 1em;
+}
+
+div.ipymeSignin > table > tbody > tr > td > table > tbody > tr > td  {
+    padding: 0.6em;
+    border-radius: 8px;
+    margin-left:auto;
+    margin-right:auto;
+    width:80%;
+}
+
+div.ipymeSignin td > p {    
+    width:100%;
+}   
+
+div.ipymeSignin > table > tbody > tr > td > div.ipymeButtonsGroup {
+    text-align: center;
+}
+
+div.ipymeSignin > table > tbody > tr > td > div.ipymeButtonsGroup button {
+    width:30%;
+    margin:1em 1em 1em 1em;
+}

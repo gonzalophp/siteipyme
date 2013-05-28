@@ -1,0 +1,110 @@
+div.container > div.ipymeCategory > table{
+    border-spacing: 2px;
+    width:49em;
+    margin-left:20%;
+    margin-right:20%;
+    width:60%;
+}
+
+div.container > div.ipymeCategory > table > tbody > tr > td {
+    border-radius: 5px;
+    border:1px solid #ccc;
+    padding: 1em 0.3em 1em 0.2em;
+    vertical-align: top;
+}
+
+div.container > div.ipymeCategory > table > tbody > tr > td:first-child {
+    width:24em;
+    max-width: 24em;
+}
+
+div.container > div.ipymeCategory > table > tbody > tr > td:nth-child(2) {
+    width:18em;
+}
+
+div.container > div.ipymeCategory > table > tbody > tr > td div {
+    display:table;
+}
+
+div.container > div.ipymeCategory > table > tbody > tr > td > div.ipymeTreeCategories {
+    width:99%;
+}
+
+div.container > div.ipymeCategory > table > tbody > tr > td > div.ipymeTreeCategories > div#categorytree {
+    height:30em;
+    max-height: 30em;
+    border:solid 1px #bbb;
+    width:100%;
+}
+
+div.container > div.ipymeCategory > table > tbody > tr > td > div.ipymeTreeCategories > div#categorytree > ul{
+    max-width: 97%;
+    /*width:25em;*/
+    border: 0;
+}
+
+div.container > div.ipymeCategory > table > tbody > tr > td > div.ipymeAttributes {
+    width:98%;
+    margin-left:1%;
+    margin-right:1%;
+}
+
+div.container > div.ipymeCategory > table > tbody > tr > td > div.ipymeAttributes > div.attributelist{
+    width:100%;
+    height:30em;
+    max-height: 30em;
+    display:block;
+    overflow: auto;
+    border:solid 1px #bbb;
+}
+
+div.container > div.ipymeCategory > table > tbody > tr > td > div.ipymeAttributes > div.attributelist > div.attribute{
+    background-color:#cad7db;
+    border:solid 1px #bac7db;
+    width:97%;
+    border-radius: 5px;
+    margin-top: 2px;
+    margin-left: 1%;
+    margin-right: 1%;
+}
+
+div.container > div.ipymeCategory > table > tbody > tr > td > div.ipymeAttributes > div.attributelist > div.attribute > input {
+    padding:0;
+    margin:0;
+}
+    
+div.container > div.ipymeCategory > table > tbody > tr > td > div.ipymeAttributes > div.attributelist > div.attribute > p{
+    padding:0;
+    margin:0 25px 0 0;
+    color: #224422;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor:pointer;
+}
+
+div.container > div.ipymeCategory > table > tbody > tr > td > div.ipymeAttributes > div.attributelist > div.attribute > button{
+    float:right;
+    position:relative;
+    top:2px;
+    right:8px;
+    font-weight: bold;
+    color: #aaaaaa;
+    font-size: larger;
+    background-color:transparent;
+    border: solid #aaaaaa 1px;
+    vertical-align: middle;
+    line-height: 0px;
+    padding:0px 2px 0px 2px;
+    height:1.1em;
+    border-radius: 4px;
+    display: table-cell;
+}
+
+div.container > div.ipymeCategory > table > tbody > tr > td > div.ipymeAttributes > div.attributelist > div.attribute > button:hover{
+    border: solid #aaaaaa 2px;
+    right:7px;
+}
