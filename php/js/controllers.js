@@ -160,7 +160,6 @@ angular.module('iPymeApp')
     $scope.click = function() {
         ipymeajax('/user/signin', $scope.user_data)
         .success(function(responseData){
-            console.log(responseData);
             if (responseData.u_authenticated == 1){
                 $scope.user_data.user_sessionid = responseData.u_sessionid;
                 if ($scope.user_data.user_remember) {

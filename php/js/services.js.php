@@ -3,7 +3,7 @@
 /* Services */
 
 angular.module('iPymeApp.services')
-        .value('backendSourceHost','http://siteipyme');
+        .value('backendSourceHost','<?php echo "http://".$_SERVER['SERVER_NAME'] ?>');
 
 angular.module('iPymeApp')
     .factory('getParentByTagName',function() { 

@@ -182,7 +182,7 @@ div.ipymeshop div.carousel-content > table > tbody > tr > td+td {
     width:100%;
 }
 
-div.carousel-details > p {
+div.carousel-details > a > p {
     padding-left: 2em;
     text-align: left;
     font-size: initial;

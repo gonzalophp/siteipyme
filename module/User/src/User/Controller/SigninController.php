@@ -21,7 +21,7 @@ class SigninController extends \Zend\Mvc\Controller\AbstractActionController {
                                                , 'u_password_hash'=>$sUser_password_hash
                                                 ,'u_status' => 1));
             
-            $bAuthenticated = ($aResult['resultset']->count()==1) && $aResult['success'] && ($aResult['error_code']==0);
+            $bAuthenticated = (!is_null($aResult['resultset'])) && ($aResult['resultset']->count()==1) && $aResult['success'] && ($aResult['error_code']==0);
             if ($bAuthenticated) {
                 
                 if(array_key_exists('PHPSESSID',$_COOKIE)) unset($_COOKIE['PHPSESSID']);

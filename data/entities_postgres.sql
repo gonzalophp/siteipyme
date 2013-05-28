@@ -1,11 +1,12 @@
 --\o /dev/null
+CREATE LANGUAGE plpgsql;
 
 DROP SCHEMA "IPYME_AUX" CASCADE;
 CREATE SCHEMA "IPYME_AUX";
 
 GRANT ALL ON SCHEMA "IPYME_AUX" TO postgres;
 
-\set ON_ERROR_STOP true;
+\set ON_ERROR_STOP on
 
 CREATE TABLE "IPYME_AUX"."LANGUAGE" (
     "L_ID" BIGSERIAL PRIMARY KEY
@@ -386,10 +387,26 @@ COPY "PRODUCT_CATEGORY_ATTRIBUTE" (pca_product_category, pca_attribute) FROM std
 
 
 
+\set ON_ERROR_STOP off
 DROP SCHEMA "IPYME_FINAL" CASCADE;
-
+\set ON_ERROR_STOP on
 ALTER SCHEMA "IPYME_AUX" RENAME TO "IPYME_FINAL";
 
+
+
+
+create or replace function "IPYME_FINAL".rev(varchar) returns varchar as $$
+declare
+        _temp varchar;
+        _count int;
+begin
+        _temp := '';
+        for _count in reverse length($1)..1 loop
+                _temp := _temp || substring($1 from _count for 1);
+        end loop;
+        return _temp;
+end;
+$$ language plpgsql immutable;
 
 
 -- Function: "IPYME_FINAL".delete_customer(bigint)
@@ -661,7 +678,7 @@ BEGIN
 											,P.p_long_description
 											,P.p_category
 											,P.p_image_path
-											,substr(PC.pc_path,length(PC.pc_path)-strpos(reverse(PC.pc_path),' > ')+2) AS p_category_name
+											,substr(PC.pc_path,length(PC.pc_path)-strpos("IPYME_FINAL".rev(PC.pc_path),' > ')+2) AS p_category_name
 											,PR.p_price
 											,C.c_name
 								FROM "IPYME_FINAL"."PRODUCT" P
@@ -713,7 +730,7 @@ $BODY$
 -- Function: "IPYME_FINAL".set_customer(bigint, character varying, bigint, character varying, character varying)
 
 -- DROP FUNCTION "IPYME_FINAL".set_customer(bigint, character varying, bigint, character varying, character varying);
-
+/*
 CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_customer(IN p_c_id bigint, IN p_c_customer_name character varying, IN p_ie_id bigint, IN p_ie_legal_id character varying, IN p_ie_invoice_name character varying)
   RETURNS TABLE(c_id bigint, c_customer_name character varying, c_invoice_entity bigint, ie_id bigint, ie_legal_id character varying, ie_invoice_name character varying) AS
 $BODY$
@@ -812,6 +829,7 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
+*/
 
 
 -- Function: "IPYME_FINAL".set_product(bigint, character varying, character varying, character varying, numeric, character varying)
@@ -872,7 +890,7 @@ $BODY$
 -- Function: "IPYME_FINAL".set_provider(bigint, character varying, bigint, character varying, character varying)
 
 -- DROP FUNCTION "IPYME_FINAL".set_provider(bigint, character varying, bigint, character varying, character varying);
-
+/*
 CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_provider(IN p_p_id bigint, IN p_p_provider_name character varying, IN p_ie_id bigint, IN p_ie_legal_id character varying, IN p_ie_invoice_name character varying)
   RETURNS TABLE(p_id bigint, p_provider_name character varying, p_invoice_entity bigint, ie_id bigint, ie_legal_id character varying, ie_invoice_name character varying) AS
 $BODY$
@@ -971,6 +989,7 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
+*/
 
 
 -- Function: "IPYME_FINAL".set_invoice_entity(bigint, character varying, character varying)
@@ -1341,7 +1360,7 @@ BEGIN
 			EXIT;
 		END IF;
 		--
-		v_pc_path := substr(v_pc_path, 0,length(v_pc_path)-strpos(reverse(v_pc_path),' > ')-1);
+		v_pc_path := substr(v_pc_path, 0,length(v_pc_path)-strpos("IPYME_FINAL".rev(v_pc_path),' > ')-1);
 		--
 		IF LENGTH(v_pc_path) < 4 THEN
 				EXIT;
@@ -1400,7 +1419,7 @@ BEGIN
 											,C.c_name
 								FROM "IPYME_FINAL"."PRODUCT" P
 								INNER JOIN (select PC1.pc_id 
-														,substr(PC1.pc_path,length(PC1.pc_path)-strpos(reverse(PC1.pc_path),' > ')+2) as p_category_name
+														,substr(PC1.pc_path,length(PC1.pc_path)-strpos("IPYME_FINAL".rev(PC1.pc_path),' > ')+2) as p_category_name
 														from "IPYME_FINAL"."PRODUCT_CATEGORY" PC1
 													,(select length(pc_path) as pc_path_length 
 																	,pc_path 
@@ -1512,7 +1531,7 @@ BEGIN
 											,P.p_long_description
 											,P.p_category
 											,P.p_image_path
-											,substr(PC.pc_path,length(PC.pc_path)-strpos(reverse(PC.pc_path),' > ')+2) AS p_category_name
+											,substr(PC.pc_path,length(PC.pc_path)-strpos("IPYME_FINAL".rev(PC.pc_path),' > ')+2) AS p_category_name
 											,PR.p_price
 											,C.c_name 
 								FROM "IPYME_FINAL"."PRODUCT" P

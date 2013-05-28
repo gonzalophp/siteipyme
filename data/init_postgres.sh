@@ -1,6 +1,6 @@
 export PGHOST=localhost             
 export PGPORT=5432
-export PGDATABASE=postgres
+export PGDATABASE=siteipyme
 export PGPASSWORD=postgres
 export PGUSER=postgres
 

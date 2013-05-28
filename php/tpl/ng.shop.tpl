@@ -14,9 +14,11 @@
                                     </td>
                                     <td>
                                         <div class="carousel-details">
-                                            <p>{{slide.description}}</p>
-                                            <p>{{slide.longdescription}}</p>
-                                            <p>{{slide.price}}</p>
+                                            <a href="#/shop/product/{{slide.id}}">
+                                                <p>{{slide.description}}</p>
+                                                <p>{{slide.longdescription}}</p>
+                                                <p>{{slide.price}}</p>
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
