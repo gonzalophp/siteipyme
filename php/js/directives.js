@@ -141,7 +141,7 @@ angular.module('iPymeApp')
 .directive('imageupload', function(){
     return {
         restrict:'E',
-        template:'<form enctype="multipart/form-data"><input style="position:absolute;top:-999em;" name="file" type="file"/><div style="border:solid 1px red;width:100px; height:100px;"><img ng-show="imagepath" src="{{imagepath}}"/></div></form>',
+        template:'<form enctype="multipart/form-data"><input style="position:absolute;top:-999em;" name="file" type="file"/><div style="border:solid 1px red;width:100px; height:100px;"><img ng-show="imagepath" ng-src="{{imagepath}}"/></div></form>',
         scope:{imagepath:'=ngModel',imagechange:'='},
         link:function(scope, element, attr){
             element.find('input').bind('change', function(e){
@@ -175,7 +175,7 @@ angular.module('iPymeApp')
         restrict:'E',
         scope:{product:'=ngModel', addbutton:'=ngAddbutton'},
         replace:true,
-        template:'<table><tbody><tr><td rowspan="3"><a href="#/shop/product/{{product.id}}"><img src="{{product.image_path}}" alt="{{product.longDescription}}"/></a></td><td><a href="#/shop/product/{{product.id}}"><span>{{product.description}}</span></a></td></tr><tr><td><span>{{product.currency}}</span>&nbsp;<span>{{product.price}}</span></td></tr><tr><td><button class="shop addtobasket" ng-click="addbutton(product)">Add</button><quantity class="basketquantity" ng-model="product.quantity"></quantity></td></tr></tbody></table>',
+        template:'<table><tbody><tr><td rowspan="3"><a href="#/shop/product/{{product.id}}"><img ng-src="{{product.image_path}}" alt="{{product.longDescription}}"/></a></td><td><a href="#/shop/product/{{product.id}}"><span>{{product.description}}</span></a></td></tr><tr><td><span>{{product.currency}}</span>&nbsp;<span>{{product.price}}</span></td></tr><tr><td><button class="shop addtobasket" ng-click="addbutton(product)">Add</button><quantity class="basketquantity" ng-model="product.quantity"></quantity></td></tr></tbody></table>',
         link:function(scope, element, attr) {
         }
     }
@@ -294,22 +294,7 @@ angular.module('iPymeApp')
             
             var windowNode = angular.element($window)
                 ,innerHeight = 0
-                ,resize = function() {
-                    innerHeight = 0;
-                    var p = element.children('p');
-                    for(var i=0;i<p.length;i++) innerHeight += p[i].offsetHeight;
-                    element.children('div.productlist').css('maxHeight', (windowNode.height()-40-innerHeight)+'px');
-                    element.css('maxHeight', (windowNode.height())+'px');
-                }
-                ,scroll = function() {
-                    var windowTop = windowNode.scrollTop()
-                    , tdBasketTop = $('td.basket').offset().top
-                    , floatingTop = (windowTop > tdBasketTop) ? windowTop - tdBasketTop : 0;
-
-                    if (floatingTop+(parseInt(element.css('height')))+20 < parseInt(element.parents('div.ipymeshopcolumns').css('height'))){
-                        element.stop().animate({"marginTop": floatingTop + "px"}, "slow" );	
-                    }
-                }
+                
                 ,basketchange = function(){
                     var total=0, p = scope.basket.products;
                     for(var i in p) total += p[i].total;
@@ -320,12 +305,9 @@ angular.module('iPymeApp')
                     scope.persist(true);
                 }
                 
-            windowNode.bind('resize', resize);
-            windowNode.bind('scroll', scroll);
             scope.$on("$destroy", function() {windowNode.unbind('scroll');windowNode.unbind('resize');});
             scope.$watch('basket.products', basketchange, true);
             
-            resize();
             initialize();
         }
     }

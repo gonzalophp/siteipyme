@@ -1686,6 +1686,36 @@ $BODY$
   COST 100
   ROWS 1000;
 
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_user_confirm(
+p_u_session character varying(100))
+  RETURNS SETOF "IPYME_FINAL"."USER" AS
+$BODY$
+DECLARE
+v_user "IPYME_FINAL"."USER";
+BEGIN
+	--
+	IF (p_u_session IS NULL) THEN
+		RETURN;
+	END IF;
+	--
+	UPDATE "IPYME_FINAL"."USER"
+	SET u_status = 1
+	WHERE u_status = 0
+		AND u_session = p_u_session;
+	--
+	IF FOUND THEN
+		--
+		RETURN QUERY SELECT * 
+		FROM "IPYME_FINAL"."USER" U 
+		WHERE U.u_session = p_u_session;
+		--
+	END IF;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
 
 \dn
 

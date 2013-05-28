@@ -7,8 +7,6 @@ class ImageUploadController extends \Zend\Mvc\Controller\AbstractActionControlle
         $aConfig = $this->getEvent()->getApplication()->getServiceManager()->get('config');
         $target_path = $_SERVER['DOCUMENT_ROOT'].'/img/'.basename( $_FILES['file']['name']);
 
-        $sTempName = $_FILES['file']['tmp_name'];
-                
         move_uploaded_file($_FILES['file']['tmp_name'], $target_path);
         $imagepath = $aConfig['image_path'].basename( $_FILES['file']['name']);
         $aResponse = array('imagepath' => $imagepath);

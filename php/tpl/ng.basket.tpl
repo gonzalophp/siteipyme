@@ -2,7 +2,7 @@
 <div class="ipymeshop">
     <div class="ipymeshopbody" ng-controller="basketCtrl">
         <div class="basket">
-            <basketsummary class="ipymeshopright" persist="basketpersist" ng-model="model.basket"></basketsummary> 
+            <basketsummary class="basketsummary" persist="basketpersist" ng-model="model.basket"></basketsummary> 
         </div>
     </div>
 </div>

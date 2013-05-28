@@ -360,7 +360,7 @@ div.ipymeshopright {
     padding-bottom: 0.5em;
 }
 
-div.ipymeshopright p.baskettotal {
+div p.baskettotal {
     font-size: 1.5em;
     font-weight: bold;
     text-align: right;
@@ -368,7 +368,7 @@ div.ipymeshopright p.baskettotal {
     background-color: rgb(183, 226, 214);
 }
 
-div.productlist {
+div.ipymeshopright div.productlist {
     overflow-y: auto;
     overflow-x: hidden;
     max-height: 1px;
