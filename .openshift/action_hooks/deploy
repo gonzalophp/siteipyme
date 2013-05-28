@@ -1,3 +1,6 @@
 cd $OPENSHIFT_REPO_DIR
+
+echo Veamos
+
 mkdir -p php/img
-chmod a+w php/img
+chmod a+w php/img 
