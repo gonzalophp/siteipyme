@@ -515,11 +515,12 @@ angular.module('iPymeApp')
         oTree.getRoot().addChild(responseData.tree);
     });
 }])
-.controller('ShopController',['$scope','$element',"ipymeajax", function($scope,$element,ipymeajax) {
+.controller('ShopController',['$scope','$element','$location',"ipymeajax", function($scope,$element,$location,ipymeajax) {
     $scope.model = {}
     
     ipymeajax('/shop/category/menu/3', {})
     .success(function(responseData){
+        if (responseData.valid_session == 0) $location.path('/user/signin');
         $scope.menutree = responseData;
     });
     
@@ -564,6 +565,8 @@ angular.module('iPymeApp')
         if (initialize){
             ipymeajax('/shop/basket/get', {})
             .success(function(responseData){
+                if (responseData.valid_session == 0) $location.path('/user/signin');
+        
                 $scope.model.basket.id          = responseData.basket.id;
                 $scope.model.basket.products    = responseData.basket.products;
                 $scope.model.basket.initialized = true;
@@ -621,7 +624,7 @@ angular.module('iPymeApp')
             name:'name',
             surname:'surname',
             company:'company',
-            dob:'05/28/2012',
+            dob:new Date('05/28/2012'),
             add1:'aadd1',
             add2:'add2',
             town:'town',
@@ -640,15 +643,17 @@ angular.module('iPymeApp')
         if (initialize){
             ipymeajax('/shop/basket/get', {})
             .success(function(responseData){
-                $scope.model.basket.id          = responseData.basket.id;
-                $scope.model.basket.products    = responseData.basket.products;
-                $scope.model.basket.initialized = true;
+                if (responseData.valid_session != 0) {
+                    $scope.model.basket.id          = responseData.basket.id;
+                    $scope.model.basket.products    = responseData.basket.products;
+                    $scope.model.basket.initialized = true;
+                }
             });
         }
         else {
             ipymeajax('/shop/basket/save', $scope.model.basket)
             .success(function(responseData){
-                $scope.model.basket.id          = responseData.basket.id;
+                if (responseData.valid_session != 0) $scope.model.basket.id = responseData.basket.id;
             });
         }
     }
