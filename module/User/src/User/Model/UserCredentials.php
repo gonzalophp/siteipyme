@@ -16,7 +16,8 @@ class UserCredentials implements \Zend\ServiceManager\FactoryInterface{
             , array(':p_u_session' => $sSessionId));
         
         $this->oUser = $oResultSet->current();
-        return !is_null($this->oUser);
+        
+        return ($this->oUser!==FALSE);
     }
     
     public function getUserDetails() {

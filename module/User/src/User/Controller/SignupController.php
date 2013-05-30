@@ -30,28 +30,28 @@ class SignupController extends \Zend\Mvc\Controller\AbstractActionController {
                 $sFail = 'error_password_does_not_match';
             }
             else {
-                if(array_key_exists('PHPSESSID',$_COOKIE)) unset($_COOKIE['PHPSESSID']);
-                session_start();
                 $sUser_password_hash = sha1($oDataRequest->user_password);
-                $oUserTable = $this->getServiceLocator()->get('Datainterface\Model\DataTableGateway')->getTableGateway('IPYME_FINAL','USER');
-                $aResult = $oUserTable->insert(array('u_id' => new \Zend\Db\Sql\Predicate\Expression("DEFAULT")
-                                                    ,'u_name'           => new \Zend\Db\Sql\Predicate\Expression("LOWER('".$oDataRequest->user_name."')") 
-                                                    ,'u_password_hash'  => $sUser_password_hash
-                                                    ,'u_email'          => $oDataRequest->user_email
-                                                    ,'u_status'         => 0
-                                                    ,'u_session'        => session_id()));
-                if ($aResult['success']){
-                    $nSignUpSuccess = 1;
-                    $sFail = '';
+                
+                $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+                
+                session_start();
+                
+                $aFunctionParams = array( ':p_u_session'         => session_id()
+                                        ,':p_u_name'            => $oDataRequest->user_name
+                                        ,':p_u_password_hash'   => $sUser_password_hash
+                                        ,':p_u_email'           => $oDataRequest->user_email);
+                        
+                $oResultSet = $oDataFunctionGateway->getDataRecordSet(
+                    'IPYME_FINAL'
+                    , 'user_signup'
+                    , $aFunctionParams);
+                $nSignUpSuccess = ($oResultSet->count() == 1) ? 1:0;
+                
+                if ($nSignUpSuccess){
                     $this->_emailConfirmation($oDataRequest->user_name, $oDataRequest->user_password, $oDataRequest->user_email);
                 }
-                else {
-                    if ($aResult['error_code']==23505){
-                        $aMatches=array();
-                        preg_match('/Key \((.*)\)=\((.*)\) already exists/', $aResult['error_message'], $aMatches);
-                        if (count($aMatches)==3) $sFail = "error_constraint_".$aMatches[1];
-                    }
-                }
+                
+                $sFail = '';
             }
         }
         

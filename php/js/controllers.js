@@ -481,10 +481,13 @@ angular.module('iPymeApp')
     
 }])
 
-.controller('CarouselDemoCtrl', ['$scope','$element','ipymeajax', function($scope,$element,ipymeajax){    
+.controller('CarouselDemoCtrl', ['$scope','$element','$location','ipymeajax', function($scope,$element,$location,ipymeajax){    
     $scope.slides = [];
-    ipymeajax('/shop/product/getDisplayedProductsByCategory/'+20, {})
+    ipymeajax('/shop/product/getDisplayedProductsByCategory/-1', {})
     .success(function(responseData){
+        if (responseData.valid_session == 0) {
+            $location.path('/user/signin');
+        }
         if (responseData.displayedProducts){
             for(var i=0; i<responseData.displayedProducts.length; i++) {
                 $scope.slides.push({image:responseData.displayedProducts[i].image_path

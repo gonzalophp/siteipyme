@@ -1734,7 +1734,8 @@ BEGIN
 	SELECT *
 	INTO v_user
 	FROM "IPYME_FINAL"."USER"
-	WHERE u_session = p_u_session;
+	WHERE u_session = p_u_session 
+		AND ((u_status = 1) OR ((u_status=0) AND (u_name IS NULL)));
 	--
 	IF NOT FOUND THEN
 		--
@@ -1771,6 +1772,9 @@ BEGIN
 	--
 	RETURN QUERY SELECT v_user.*;
 	--
+	EXCEPTION
+		WHEN OTHERS THEN
+			RETURN;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
@@ -1778,9 +1782,7 @@ $BODY$
   ROWS 1000;
 
 
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".user_login(p_u_session character varying, p_u_name character varying, p_u_password_hash character varying)
-  RETURNS SETOF "IPYME_FINAL"."USER" AS
-$BODY$
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".user_login(p_u_session character varying, p_u_name character varying, p_u_password_hash character varying) RETURNS SETOF "IPYME_FINAL"."USER" AS $BODY$
 DECLARE
 v_anonymous_user "IPYME_FINAL"."USER";
 v_user "IPYME_FINAL"."USER";
@@ -1802,7 +1804,7 @@ BEGIN
 	SELECT *
 	INTO v_user
 	FROM "IPYME_FINAL"."USER"
-	WHERE u_name = p_u_name 
+	WHERE u_name = lower(p_u_name)
 		AND u_password_hash = p_u_password_hash 
 		AND u_status = 1;
 	--
@@ -1819,7 +1821,7 @@ BEGIN
 			--
 			UPDATE "IPYME_FINAL"."USER"
 			SET u_basket = NULL
-				, u_session = ''
+				, u_session = 'MOVING TO REAL USER' -- KEEPING BASKET REFERENCE
 			WHERE u_id = v_anonymous_user.u_id;
 			--
 			UPDATE "IPYME_FINAL"."USER"
@@ -1828,11 +1830,78 @@ BEGIN
 				, u_last_login = now()
 			WHERE u_id = v_user.u_id;
 			--
+			DELETE FROM "IPYME_FINAL"."USER"
+			WHERE u_id = v_anonymous_user.u_id;
+			--
 		END IF;
 		--
 	END IF;
 	--
 	RETURN QUERY SELECT v_user.*;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".user_signup(
+	p_u_session character varying
+, p_u_name character varying
+, p_u_password_hash character varying
+, p_u_email character varying)
+  RETURNS SETOF "IPYME_FINAL"."USER" AS
+$BODY$
+DECLARE
+v_user "IPYME_FINAL"."USER";
+BEGIN
+	--
+	IF 	p_u_name IS NULL OR 
+			p_u_password_hash IS NULL OR 
+			p_u_email IS NULL OR 
+			p_u_session IS NULL THEN
+		--
+		RETURN;
+		--
+	END IF;
+	--
+	SELECT NEXTVAL('"IPYME_FINAL"."USER_u_id_seq"') INTO v_user.u_id;
+	--
+  v_user.u_session 				:= p_u_session;
+  v_user.u_last_login			:= now();
+  v_user.u_email 					:= LOWER(p_u_email);
+  v_user.u_status 				:= 0;
+  v_user.u_basket 				:= NULL;
+  v_user.u_customer 			:= NULL;
+  v_user.u_name 					:= LOWER(p_u_name);
+  v_user.u_password_hash 	:= p_u_password_hash;
+	--
+	INSERT INTO "IPYME_FINAL"."USER" ( u_id 
+																		,u_session 
+																		,u_last_login
+																		,u_email 
+																		,u_status
+																		,u_basket
+																		,u_customer
+																		,u_name 
+																		,u_password_hash)
+														VALUES ( v_user.u_id 
+																		,v_user.u_session 
+																		,v_user.u_last_login
+																		,v_user.u_email 
+																		,v_user.u_status
+																		,v_user.u_basket
+																		,v_user.u_customer
+																		,v_user.u_name 
+																		,v_user.u_password_hash);
+	--
+	RETURN QUERY SELECT v_user.*;
+	--
+	EXCEPTION
+		WHEN OTHERS THEN
+			NULL;
 	--
 END;
 $BODY$
