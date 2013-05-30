@@ -18,7 +18,6 @@ angular.module('iPymeApp')
 .controller('AdminListController',['$scope','$element','$dialog','$routeParams','ipymeajax', function($scope,$element,$dialog,$routeParams,ipymeajax){
     $scope.selectedItems = [];
     $scope.adminList = $routeParams.list;
-    $scope.categoryselected = {id:-1,category:'ALL'};
     $scope.gridOptions = {
         enableColumnResize:true,
 //        enablePaging:true,
@@ -39,6 +38,7 @@ angular.module('iPymeApp')
     }
     
     if ($scope.adminList == 'product'){
+        $scope.categoryselected = {id:-1,category:'ALL'};
         $scope.refreshProductByCategory = function() {
             ipymeajax('/shop/product/getProductsByCategory/'+$scope.categoryselected.id,{}) 
             .success(function(responseData){
@@ -129,15 +129,19 @@ angular.module('iPymeApp')
         });
     }
     
-    $scope.product = {attributes: []
-                      ,categoryselected: dialog.data.categoryselected};
-    
-    ipymeajax('/shop/category/getAttributeValuesRelated/'+dialog.data.categoryselected.id+','+dialog.data.fields.p_id, {})
-    .success(function(responseData){
-        if (responseData.success == 1){
-            dialog.data.category_attribute = responseData.category_attribute;
-        }
-    });
+    if ($scope.adminList == 'product'){
+        console.log($scope);
+        $scope.product = {attributes: []
+                          ,categoryselected: dialog.data.categoryselected};
+
+        ipymeajax('/shop/category/getAttributeValuesRelated/'+dialog.data.categoryselected.id+','+dialog.data.fields.p_id, {})
+        .success(function(responseData){
+            if (responseData.success == 1){
+                dialog.data.category_attribute = responseData.category_attribute;
+            }
+        });
+    }
+        
     
     $scope.do = function(e,task){
         e.preventDefault();
@@ -511,7 +515,7 @@ angular.module('iPymeApp')
         oTree.getRoot().addChild(responseData.tree);
     });
 }])
-.controller('ShopController',['$scope',"ipymeajax", function($scope,ipymeajax) {
+.controller('ShopController',['$scope','$element',"ipymeajax", function($scope,$element,ipymeajax) {
     $scope.model = {}
     
     ipymeajax('/shop/category/menu/3', {})
@@ -555,24 +559,29 @@ angular.module('iPymeApp')
                                                         , c_name:product.currency});
     }
     
-    $scope.basketpersist = function(initialize){
+    $scope.basketpersist = function(initialize,element){
+        element.prepend(element.divwaiting = angular.element('<div class="ajax-waiting"></div>'));
         if (initialize){
             ipymeajax('/shop/basket/get', {})
             .success(function(responseData){
                 $scope.model.basket.id          = responseData.basket.id;
                 $scope.model.basket.products    = responseData.basket.products;
                 $scope.model.basket.initialized = true;
+                element.divwaiting.remove();
             });
         }
         else {
             ipymeajax('/shop/basket/save', $scope.model.basket)
             .success(function(responseData){
                 $scope.model.basket.id          = responseData.basket.id;
+                element.divwaiting.remove();
             });
         }
     }
     
     $scope.$watch('model.selected_category', function(selected_category){
+        
+       $element.find('div.ipymeshopcenter').prepend($element.divwaiting = angular.element('<div class="ajax-waiting"></div>'));
        ipymeajax('/shop/product/getDisplayedProductsByCategory/'+selected_category.key, {})
        .success(function(responseData){
             $scope.model.displayedProducts = responseData.displayedProducts;
@@ -580,6 +589,7 @@ angular.module('iPymeApp')
             ipymeajax('/shop/category/getAllAvailableAttributeValuesRelated/'+selected_category.key+',', {})
             .success(function(responseData){
                 $scope.model.relativeAttributes = responseData.category_attribute;
+                $element.divwaiting.remove();
             });
         });
     });
@@ -605,7 +615,27 @@ angular.module('iPymeApp')
     }
 }])
 .controller('basketCtrl', ['$scope','$element','$location','ipymeajax', function ($scope, $element, $location,ipymeajax) {
-    $scope.model = {}
+    $scope.model = {
+        iscollapsed:false,
+        customer:{
+            name:'name',
+            surname:'surname',
+            company:'company',
+            dob:'05/28/2012',
+            add1:'aadd1',
+            add2:'add2',
+            town:'town',
+            postcode:'postcode',
+            country:'country',
+            phone:'045444556',
+            card:{name:'cardname', number:'cardnumber', expire:'expire',issue:'issue'}
+        },
+        dateoptions:{
+            changeYear: true,
+            changeMonth: true,
+            yearRange: '1900:-0'
+        }
+    }
     $scope.basketpersist = function(initialize){
         if (initialize){
             ipymeajax('/shop/basket/get', {})

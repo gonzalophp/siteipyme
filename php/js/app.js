@@ -6,7 +6,7 @@ angular.module('iPymeApp.filters', []);
 angular.module('iPymeApp.directives',[]);
 
 // Declare app level module which depends on filters, and services
-angular.module('iPymeApp', ['iPymeApp.filters', 'iPymeApp.services', 'iPymeApp.directives','iPymeApp.Menu', 'ngGrid', 'ngCookies','ui.bootstrap']).
+angular.module('iPymeApp', ['iPymeApp.filters', 'iPymeApp.services', 'iPymeApp.directives','iPymeApp.Menu', 'ngGrid', 'ngCookies','ui.bootstrap','ui.date']).
   config(['$routeProvider', function($routeProvider) {
 
     $routeProvider

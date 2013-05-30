@@ -49,3 +49,27 @@ div.ipymeButtonsGroup {
 div.ipymeButtonsGroup button {
     margin-left: 1em;
 }
+
+div.paymentcheckout{
+    background-color:red;
+}
+
+div.paymentcheckout p{
+    clear:both;
+}
+
+div.paymentcheckout fieldset {
+    padding: 1em 1em 1em 1em;
+}
+
+div.paymentcheckout input {
+    height: 1em;
+    float:left;
+}
+
+div.paymentcheckout label {
+    float:left;
+    width:30%;
+    text-align: right;
+    margin-right:1em;
+}

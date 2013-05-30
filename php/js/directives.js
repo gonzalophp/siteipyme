@@ -211,11 +211,15 @@ angular.module('iPymeApp')
                             
             scope.countDownToPersist = function() {
                 clearTimeout(scope.timeOutToPersist);
-                scope.timeOutToPersist = setTimeout(scope.persist, 2000);
+                scope.timeOutToPersist = setTimeout(scope.persistTimeOut, 2000);
+            }
+            
+            scope.persistTimeOut = function(){
+                scope.persist(false,element);
             }
             
             scope.checkout = function() {
-                scope.persist(false);
+                scope.persist(false,element);
                 $location.path( "/basket" );
             }
             
@@ -244,7 +248,7 @@ angular.module('iPymeApp')
                     if (scope.basket.initialized) scope.countDownToPersist();
                 }
                 ,initialize = function() {
-                    scope.persist(true);
+                    scope.persist(true, element);
                 }
                 
             windowNode.bind('resize', resize);
@@ -261,23 +265,23 @@ angular.module('iPymeApp')
 .directive('basketsummary', function($window,$location){
     return {
         restrict:'E',
-        scope:{basket:'=ngModel', persist:'='},
+        scope:{model:'=ngModel', persist:'='},
         replace:true,
         template:'<div>\
                     <p class="ipymeTitle">Basket</p>\
                     <div class="productlist">\
                         <ul>\
-                            <li ng-repeat="basketproduct in basket.products"><basketproduct ng-model="basketproduct" ></basketproduct></li>\
+                            <li ng-repeat="basketproduct in model.basket.products"><basketproduct ng-model="basketproduct" ></basketproduct></li>\
                         </ul>\
                     </div>\
-                        <p class="baskettotal">Total: {{basket.total}}</p>\
+                        <p class="baskettotal">Total: {{model.basket.total}}</p>\
                         <div class="ipymeButtonsGroup">\n\
                             <button class="shop" ng-click="redirect(\'/shop\')">Continue Shopping</button>\
-                            <button class="shop" ng-click="redirect(\'/payment\')">Proceed to Payment</button>\
+                            <button class="shop" ng-click="model.iscollapsed = !model.iscollapsed">Proceed to Payment</button>\
                         </div>\
                 </div>',
         link:function(scope, element, attr) {
-            scope.basket = {id:0
+            scope.model.basket = {id:0
                             ,total:0
                             ,products:[]
                             ,initialized:false}
@@ -296,17 +300,17 @@ angular.module('iPymeApp')
                 ,innerHeight = 0
                 
                 ,basketchange = function(){
-                    var total=0, p = scope.basket.products;
+                    var total=0, p = scope.model.basket.products;
                     for(var i in p) total += p[i].total;
-                    scope.basket.total = total;
-                    if (scope.basket.initialized) scope.countDownToPersist();
+                    scope.model.basket.total = total;
+                    if (scope.model.basket.initialized) scope.countDownToPersist();
                 }
                 ,initialize = function() {
                     scope.persist(true);
                 }
                 
             scope.$on("$destroy", function() {windowNode.unbind('scroll');windowNode.unbind('resize');});
-            scope.$watch('basket.products', basketchange, true);
+            scope.$watch('model.basket.products', basketchange, true);
             
             initialize();
         }

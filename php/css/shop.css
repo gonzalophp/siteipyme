@@ -291,6 +291,7 @@ div.ipymeshopleft > ul li{
 
 div.ipymeshopcenter {
     width:100%;
+    position:relative;
 }
 
 div.ipymeshopcenter > ul {
