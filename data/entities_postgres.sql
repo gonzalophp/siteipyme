@@ -1777,6 +1777,70 @@ $BODY$
   COST 100
   ROWS 1000;
 
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".user_login(p_u_session character varying, p_u_name character varying, p_u_password_hash character varying)
+  RETURNS SETOF "IPYME_FINAL"."USER" AS
+$BODY$
+DECLARE
+v_anonymous_user "IPYME_FINAL"."USER";
+v_user "IPYME_FINAL"."USER";
+BEGIN
+	--
+	IF (p_u_session IS NULL) THEN
+		RETURN;
+	END IF;
+	--
+	SELECT *
+	INTO v_anonymous_user
+	FROM "IPYME_FINAL"."USER"
+	WHERE u_session = p_u_session;
+	--
+	IF NOT FOUND THEN
+		RETURN;
+	END IF;
+	--
+	SELECT *
+	INTO v_user
+	FROM "IPYME_FINAL"."USER"
+	WHERE u_name = p_u_name 
+		AND u_password_hash = p_u_password_hash 
+		AND u_status = 1;
+	--
+	IF NOT FOUND THEN
+		--
+		RETURN;
+		--
+	ELSE
+		--
+		IF NOT v_anonymous_user.u_id = v_user.u_id THEN
+			--
+			v_user.u_basket = v_anonymous_user.u_basket;
+			v_user.u_session = v_anonymous_user.u_session;
+			--
+			UPDATE "IPYME_FINAL"."USER"
+			SET u_basket = NULL
+				, u_session = ''
+			WHERE u_id = v_anonymous_user.u_id;
+			--
+			UPDATE "IPYME_FINAL"."USER"
+			SET u_basket = v_user.u_basket
+				, u_session = v_user.u_session
+				, u_last_login = now()
+			WHERE u_id = v_user.u_id;
+			--
+		END IF;
+		--
+	END IF;
+	--
+	RETURN QUERY SELECT v_user.*;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
+
 \dn
 
 

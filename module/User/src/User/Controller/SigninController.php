@@ -10,30 +10,23 @@ class SigninController extends \Zend\Mvc\Controller\AbstractActionController {
         $bAuthenticated = false;
         if ($this->getRequest()->isXmlHttpRequest() && ($sJSONDataRequest = $this->getRequest()->getContent())) {
             $oDataRequest = json_decode($sJSONDataRequest);
-            
-            $sUser_name = $oDataRequest->user_name;
-            $sUser_password = $oDataRequest->user_password;
+                    
+            $sUser_name     = isset($oDataRequest->user_name)?$oDataRequest->user_name:null;
+            $sUser_password = isset($oDataRequest->user_password)?$oDataRequest->user_password:null;
             $bUser_remember = $oDataRequest->user_remember;
             $sUser_password_hash = sha1($sUser_password);
+            session_start();
+            $sSessionId = session_id();
             
-            $oUserTable = $this->getServiceLocator()->get('Datainterface\Model\DataTableGateway')->getTableGateway('IPYME_FINAL','USER');
-            $aResult = $oUserTable->select(array(new \Zend\Db\Sql\Predicate\Literal("lower(u_name)='".strtolower($sUser_name)."'")
-                                               , 'u_password_hash'=>$sUser_password_hash
-                                                ,'u_status' => 1));
+            $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+            $oResultSet = $oDataFunctionGateway->getDataRecordSet(
+                'IPYME_FINAL'
+                , 'user_login'
+                , array( ':p_u_session'         => $sSessionId
+                        ,':p_u_name'            => $sUser_name
+                        ,':p_u_password_hash'   => $sUser_password_hash));
             
-            $bAuthenticated = (!is_null($aResult['resultset'])) && ($aResult['resultset']->count()==1) && $aResult['success'] && ($aResult['error_code']==0);
-            if ($bAuthenticated) {
-                
-                if(array_key_exists('PHPSESSID',$_COOKIE)) unset($_COOKIE['PHPSESSID']);
-                if ($bUser_remember) session_set_cookie_params(84600,'/');
-                session_start();
-                
-                $oUser = $aResult['resultset']->current();
-                $oUser->u_session = session_id();
-                
-                $resultSet = $oUserTable->update(array('u_session' => $oUser->u_session)
-                                               , array('u_id' => $oUser->u_id));
-            }
+            $bAuthenticated = ($oResultSet->count() == 1);
         }
         $aResponse =  array('u_authenticated'    => ($bAuthenticated ? 1 : 0));
         

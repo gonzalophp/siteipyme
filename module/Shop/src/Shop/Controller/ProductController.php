@@ -139,13 +139,15 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
                 $aResponse['success'] = 1;
                 $aResponse['grid_id'] = $aResponse['p_id'];
                 
-                foreach($aRequest['category_attribute'] as $aAttributeValue){
-                    $oResultSet = $oDataFunctionGateway->getDataRecordSet(
-                    'IPYME_FINAL'
-                    , 'set_product_attribute_value'
-                    , array(':p_pav_product'                    => $aResponse['p_id']
-                           ,':p_pav_product_category_attribute' => $aAttributeValue['pca_id']
-                           ,':p_pav_value'                      => $aAttributeValue['attribute_value_selected']));
+                if (array_key_exists('category_attribute',$aRequest)){
+                    foreach($aRequest['category_attribute'] as $aAttributeValue){
+                        $oResultSet = $oDataFunctionGateway->getDataRecordSet(
+                        'IPYME_FINAL'
+                        , 'set_product_attribute_value'
+                        , array(':p_pav_product'                    => $aResponse['p_id']
+                               ,':p_pav_product_category_attribute' => $aAttributeValue['pca_id']
+                               ,':p_pav_value'                      => $aAttributeValue['attribute_value_selected']));
+                    }
                 }
             }
             else {
