@@ -6,9 +6,6 @@ angular.module('iPymeApp')
     ipymeajax('/shop/menu/main', requestData)
     .success(function(responseData){
         $scope.menutree = responseData;
-        if (responseData.valid_session == 0){
-            $location.path( "/user/signin" );
-        }
     });
 
     $scope.getLiClass = function (menuitem){
@@ -177,6 +174,8 @@ angular.module('iPymeApp')
     $scope.clear = function() {
         $cookieStore.remove('ipyme_u_n');
         $cookieStore.remove('ipyme_u_p');
+        $cookieStore.remove('PHPSESSID');
+        
         $scope.user_data = { user_name:null
                             , user_password:null
                             , user_remember:null};
@@ -196,7 +195,7 @@ angular.module('iPymeApp')
             console.log(responseData);
             if (responseData.signup_success == 1){
                 $scope.error_message = 'Check your email inbox to complete the registration';
-                setTimeout($location.path("#/user/signin"), 5000);
+                setTimeout($location.path("#/user/signin"), 3000);
             }
             else {
                 if (responseData.signup_fail == 'error_password_does_not_match'){
@@ -520,7 +519,6 @@ angular.module('iPymeApp')
     
     ipymeajax('/shop/category/menu/3', {})
     .success(function(responseData){
-        if (responseData.valid_session == 0) $location.path('/user/signin');
         $scope.menutree = responseData;
     });
     
@@ -565,18 +563,22 @@ angular.module('iPymeApp')
         if (initialize){
             ipymeajax('/shop/basket/get', {})
             .success(function(responseData){
-                if (responseData.valid_session == 0) $location.path('/user/signin');
-        
-                $scope.model.basket.id          = responseData.basket.id;
-                $scope.model.basket.products    = responseData.basket.products;
-                $scope.model.basket.initialized = true;
+                if (responseData.valid_session != 0) {
+                    $scope.model.basket.id          = responseData.basket.id;
+                    $scope.model.basket.products    = responseData.basket.products;
+                    $scope.model.basket.initialized = true;
+                }
+                
                 element.divwaiting.remove();
             });
         }
         else {
             ipymeajax('/shop/basket/save', $scope.model.basket)
             .success(function(responseData){
-                $scope.model.basket.id          = responseData.basket.id;
+                if (responseData.valid_session != 0) {
+                    $scope.model.basket.id = responseData.basket.id;
+                }
+                
                 element.divwaiting.remove();
             });
         }

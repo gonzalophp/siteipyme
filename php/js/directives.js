@@ -25,7 +25,7 @@ angular.module('iPymeApp.Menu')
             link:function(scope,element,attr){
                 if (scope.$parent.menuitem && scope.$parent.menuitem.url == ""){
                     element.bind('click', function(e){
-                        scope.menuclick(scope.$parent.menuitem);
+                        scope.menuclick && scope.menuclick(scope.$parent.menuitem);
                         return false;
                     });
                 }

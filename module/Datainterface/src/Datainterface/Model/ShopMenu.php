@@ -4,8 +4,7 @@ namespace Datainterface\Model;
 class ShopMenu {
     
     public function getMenu($aOptions){
-        
-        $oUserMenu = (object) (array_key_exists('username', $aOptions)) ? 
+        $oUserMenu = (object) (array_key_exists('username', $aOptions) ? 
              array(
                 'label' => $aOptions['username']
                 , 'url' => '#/user/account/'.$aOptions['username']
@@ -13,7 +12,7 @@ class ShopMenu {
             :array(
                 'label' => 'Sign In'
                 , 'url' => '#/user/signin'
-                , 'nodes' => array());
+                , 'nodes' => array()));
                 
                 
         $aMenuList = array(

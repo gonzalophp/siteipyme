@@ -259,14 +259,14 @@ CREATE TABLE "IPYME_AUX"."ITEM_HISTORY" (
 
 CREATE TABLE "IPYME_AUX"."USER" (
     U_ID BIGSERIAL PRIMARY KEY
-    , U_SESSION VARCHAR(100) UNIQUE
+    , U_SESSION VARCHAR(100) UNIQUE NOT NULL
     , U_LAST_LOGIN TIMESTAMP WITH TIME ZONE
     , U_EMAIL VARCHAR(200) UNIQUE
     , U_STATUS INT
     , U_BASKET BIGINT REFERENCES "IPYME_AUX"."BASKET"
     , U_CUSTOMER BIGINT REFERENCES "IPYME_AUX"."CUSTOMER"
-    , U_NAME VARCHAR(30) UNIQUE NOT NULL
-    , U_PASSWORD_HASH VARCHAR(100) NOT NULL
+    , U_NAME VARCHAR(30) UNIQUE 
+    , U_PASSWORD_HASH VARCHAR(100) 
 );
 
 CREATE TABLE "IPYME_AUX"."CUSTOMER_CATEGORY_DETAILS" (
@@ -1712,6 +1712,64 @@ BEGIN
 		WHERE U.u_session = p_u_session;
 		--
 	END IF;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_user(p_u_session character varying)
+  RETURNS SETOF "IPYME_FINAL"."USER" AS
+$BODY$
+DECLARE
+v_user "IPYME_FINAL"."USER";
+BEGIN
+	--
+	IF (p_u_session IS NULL) THEN
+		RETURN;
+	END IF;
+	--
+	SELECT *
+	INTO v_user
+	FROM "IPYME_FINAL"."USER"
+	WHERE u_session = p_u_session;
+	--
+	IF NOT FOUND THEN
+		--
+		SELECT nextval('"IPYME_FINAL"."USER_u_id_seq"') INTO v_user.u_id;
+		v_user.u_session 			:= p_u_session;
+		v_user.u_last_login 	:= datetime();
+		v_user.u_email 				:= null;
+		v_user.u_status				:= 0;
+		v_user.u_basket				:= null;
+		v_user.u_customer			:= null;
+		v_user.u_name					:= null;
+		v_user.u_password_hash:= null;
+		--
+		INSERT INTO "IPYME_FINAL"."USER" (u_id 
+																			,u_session 
+																			,u_last_login 
+																			,u_email 
+																			,u_status
+																			,u_basket
+																			,u_customer
+																			,u_name
+																			,u_password_hash)
+															VALUES  (v_user.u_id 
+																			,v_user.u_session 
+																			,v_user.u_last_login 
+																			,v_user.u_email 
+																			,v_user.u_status
+																			,v_user.u_basket
+																			,v_user.u_customer
+																			,v_user.u_name
+																			,v_user.u_password_hash);
+		--
+	END IF;
+	--
+	RETURN QUERY SELECT v_user.*;
 	--
 END;
 $BODY$

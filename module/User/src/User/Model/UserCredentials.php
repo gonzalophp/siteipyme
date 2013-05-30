@@ -7,12 +7,16 @@ class UserCredentials implements \Zend\ServiceManager\FactoryInterface{
     
     public function isAuthenticated() {
         @session_start();
-        $oUserTable = $this->serviceLocator->get('Datainterface\Model\DataTableGateway')->getTableGateway('IPYME_FINAL','USER');
-        $aResult = $oUserTable->select(array('u_session'=>session_id()
-                                            ,'u_status' => 1));
-        $bAuthenticated = ($aResult['resultset']->count()==1) && $aResult['success'] && ($aResult['error_code']==0);
-        $this->oUser = $bAuthenticated ? $aResult['resultset']->current() : NULL;
-        return $bAuthenticated;
+        $sSessionId = session_id();
+        
+        $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+        $oResultSet = $oDataFunctionGateway->getDataRecordSet(
+            'IPYME_FINAL'
+            , 'get_user'
+            , array(':p_u_session' => $sSessionId));
+        
+        $this->oUser = $oResultSet->current();
+        return !is_null($this->oUser);
     }
     
     public function getUserDetails() {

@@ -18,7 +18,7 @@ class BasketController extends \Zend\Mvc\Controller\AbstractActionController {
             
             $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL'
                     , 'get_basket_product_list'
-                    , array(':p_user_id'          => $oUser->u_id));
+                    , array(':p_user_id'          => !is_null($oUser) ? $oUser['u_id']:null));
             
             foreach($oResultSet as $aRow) {
                 $aRow['bl_quantity'] = number_format($aRow['bl_quantity'], 0);
@@ -52,7 +52,7 @@ class BasketController extends \Zend\Mvc\Controller\AbstractActionController {
                 $aBasketProducts[] = $aProduct['bl_quantity'].'~^~'.$aProduct['bl_product'];
             }
             
-            $aFunctionParameters = array(':p_user_id'          => $oUser->u_id
+            $aFunctionParameters = array(':p_user_id'          => $oUser['u_id']
                                         , ':p_basket_products'  => implode('%^%', $aBasketProducts));
             $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'save_basket_product_list', $aFunctionParameters);
             
