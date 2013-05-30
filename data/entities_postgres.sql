@@ -1740,7 +1740,7 @@ BEGIN
 		--
 		SELECT nextval('"IPYME_FINAL"."USER_u_id_seq"') INTO v_user.u_id;
 		v_user.u_session 			:= p_u_session;
-		v_user.u_last_login 	:= datetime();
+		v_user.u_last_login 	:= now();
 		v_user.u_email 				:= null;
 		v_user.u_status				:= 0;
 		v_user.u_basket				:= null;
