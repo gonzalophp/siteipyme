@@ -10,7 +10,8 @@
  * in ZendSkeletonApplication. This is a good practice, as it prevents sensitive
  * credentials from accidentally being committed into version control.
  */
-
+error_reporting(E_ALL-E_USER_NOTICE);
+ini_set('display_errors', 'On'); 
 return array(
     // Whether or not to enable a configuration cache.
     // If enabled, the merged configuration will be cached and used in

@@ -563,6 +563,7 @@ angular.module('iPymeApp')
         if (initialize){
             ipymeajax('/shop/basket/get', {})
             .success(function(responseData){
+        console.log(responseData); 
                 if (responseData.valid_session != 0) {
                     $scope.model.basket.id          = responseData.basket.id;
                     $scope.model.basket.products    = responseData.basket.products;
