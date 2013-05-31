@@ -7,11 +7,10 @@ class DataFunctionGateway implements \Zend\ServiceManager\FactoryInterface{
     public $oAdapter;
     
     public function getDataRecordSet($sSchema, $sFunction, $aParameters=array()) {
-        $sSql = 'SELECT * FROM '.(!empty($sSchema)?'"'.$sSchema.'".':'').$sFunction.'('.implode(',',array_keys($aParameters)).');';
-        $oStatement = $this->oAdapter->query($sSql);
-        $oResultSet = $oStatement->execute($aParameters);
-        
-        return $oResultSet;
+        return $this->oAdapter->query(
+                str_replace(array('{SCHEMA}','{FUNCTION}','{PARAMETERS}')
+                            ,array($sSchema, $sFunction, implode(',',array_keys($aParameters)))
+                            ,'SELECT * FROM "{SCHEMA}".{FUNCTION}({PARAMETERS});'))->execute($aParameters);
     }
     
     public function createService(\Zend\ServiceManager\ServiceLocatorInterface $serviceLocator) {

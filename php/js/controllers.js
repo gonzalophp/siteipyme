@@ -566,7 +566,6 @@ angular.module('iPymeApp')
         if (initialize){
             ipymeajax('/shop/basket/get', {})
             .success(function(responseData){
-        console.log(responseData); 
                 if (responseData.valid_session != 0) {
                     $scope.model.basket.id          = responseData.basket.id;
                     $scope.model.basket.products    = responseData.basket.products;
@@ -716,6 +715,10 @@ angular.module('iPymeApp')
     $scope.getLiClass = function (menuitem){
         return (menuitem.nodes && menuitem.nodes.length > 0) ? 'submenu':'';
     }
+}])
+.controller('logoutctrl',['$location','$cookieStore', function ($location,$cookieStore) {
+    $cookieStore.remove('PHPSESSID');
+    $location.path('/shop');
 }])
 
 
