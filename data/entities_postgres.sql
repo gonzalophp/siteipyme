@@ -91,6 +91,7 @@ CREATE TABLE "IPYME_AUX"."PRICES" (
 
 CREATE TABLE "IPYME_AUX"."BASKET" (
     B_ID BIGSERIAL PRIMARY KEY
+    ,B_CONFIRMED INTEGER
 );
 
 CREATE TABLE "IPYME_AUX"."BASKET_LIST" (
@@ -1577,6 +1578,8 @@ BEGIN
 												,PR.p_price
 												,C.c_name
 									FROM "IPYME_FINAL"."BASKET_LIST" BL
+									INNER JOIN "IPYME_FINAL"."BASKET" B
+									ON BL.bl_basket = B.b_id
 									INNER JOIN "IPYME_FINAL"."USER" U
 									ON BL.bl_basket = U.u_basket
 									INNER JOIN "IPYME_FINAL"."PRODUCT" P
@@ -1586,6 +1589,7 @@ BEGIN
 									LEFT JOIN "IPYME_FINAL"."CURRENCY" C
 									ON PR.p_currency = C.c_id
 									WHERE U.u_id = p_user_id
+										AND B.b_confirmed = 0
 										AND PR.p_status = 1;
 	END IF;
 	--
@@ -1622,8 +1626,10 @@ BEGIN
 		--
 		SELECT NEXTVAL('"IPYME_FINAL"."BASKET_b_id_seq"') INTO v_user.u_basket;
 		--
-		INSERT INTO "IPYME_FINAL"."BASKET" (b_id)
-																 VALUES(v_user.u_basket);
+		INSERT INTO "IPYME_FINAL"."BASKET" (b_id
+																			, b_confirmed)
+																 VALUES(v_user.u_basket
+																			, 0);
 		--
 		UPDATE "IPYME_FINAL"."USER"
 		SET u_basket = v_user.u_basket
@@ -1676,7 +1682,8 @@ BEGIN
 	END LOOP;
 	--
 	DELETE FROM "IPYME_FINAL"."BASKET_LIST"
-	WHERE NOT ( BL_ID = ANY (v_a_updated_lines));
+	WHERE bl_basket = v_user.u_basket
+	AND NOT ( BL_ID = ANY (v_a_updated_lines));
 	--
 	--
 	RETURN QUERY SELECT * FROM "IPYME_FINAL".get_basket_product_list(v_user.u_id);
@@ -1914,7 +1921,9 @@ $BODY$
 
 
 
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".payment_confirm(p_u_session 				TEXT,p_b_id 						BIGINT,cust_name 					TEXT,cust_surname 			TEXT,cust_add1 					TEXT,cust_add2 					TEXT,cust_company 			TEXT,cust_country 			TEXT,cust_dob 					TEXT,cust_phone 				TEXT,cust_postcode 			TEXT,cust_town 					TEXT,cust_card_expire 	TEXT,cust_card_issue 		TEXT,cust_card_name 		TEXT,cust_card_number 	TEXT)RETURNS SETOF "IPYME_FINAL".payment_confirmation AS $BODY$
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".payment_confirm(p_u_session text, p_b_id bigint, cust_name text, cust_surname text, cust_add1 text, cust_add2 text, cust_company text, cust_country text, cust_dob text, cust_phone text, cust_postcode text, cust_town text, cust_card_expire text, cust_card_issue text, cust_card_name text, cust_card_number text)
+  RETURNS SETOF "IPYME_FINAL".payment_confirmation AS
+$BODY$
 DECLARE
 --
 basket_lines CURSOR(c_p_u_session text, c_p_b_id BIGINT) IS
@@ -1925,7 +1934,8 @@ basket_lines CURSOR(c_p_u_session text, c_p_b_id BIGINT) IS
 		INNER JOIN "IPYME_FINAL"."BASKET_LIST" BL
 		ON B.b_id = BL.bl_basket
 		WHERE U.u_session = c_p_u_session
-			AND B.b_id = c_p_b_id;
+			AND B.b_id = c_p_b_id
+			AND B.b_confirmed = 0;
 --
 v_cur_u_id BIGINT;
 v_cur_u_customer BIGINT;
@@ -1933,8 +1943,9 @@ v_cur_bl_id BIGINT;
 v_cur_bl_product BIGINT;
 v_cur_bl_quantity NUMERIC(5,3);
 --
-v_customer_created BOOLEAN := FALSE;
+v_customer_identified BOOLEAN := FALSE;
 v_customer_order_created BOOLEAN := FALSE;
+v_user_basket_reset BOOLEAN := FALSE;
 v_customer "IPYME_FINAL"."CUSTOMER";
 v_entity "IPYME_FINAL"."INVOICE_ENTITY";
 v_people "IPYME_FINAL"."PEOPLE";
@@ -1957,10 +1968,10 @@ BEGIN
 				,v_cur_bl_quantity;
 		--
 		IF NOT FOUND THEN
-			RETURN;
+			EXIT;
 		END IF;
 		--
-		IF NOT v_customer_created THEN
+		IF NOT v_customer_identified THEN
 			--
 			IF v_cur_u_customer IS NULL THEN
 				--
@@ -2071,7 +2082,17 @@ BEGIN
 				--
 			END IF;
 			--
-			v_customer_created := TRUE;
+			IF NOT v_user_basket_reset THEN
+				--
+				UPDATE "IPYME_FINAL"."USER"
+				SET u_basket = NULL
+				WHERE u_id = v_cur_u_id;
+				--
+				v_user_basket_reset := TRUE;
+				--
+			END IF;
+			--
+			v_customer_identified := TRUE;
 			--
 		END IF;
 		--
@@ -2130,6 +2151,10 @@ BEGIN
 		--
 		--	
 	END LOOP;
+	--
+	UPDATE "IPYME_FINAL"."BASKET"
+	SET b_confirmed = 1
+	WHERE b_id = p_b_id;
 	--
 	/*
 	EXCEPTION

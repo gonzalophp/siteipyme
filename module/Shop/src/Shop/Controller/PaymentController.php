@@ -37,7 +37,7 @@ class PaymentController extends \Zend\Mvc\Controller\AbstractActionController {
                 , $aFunctionParams);
         }
         
-        $aResponse = $aRequest;
+//        $aResponse = $aRequest;
         $aResponse = array('success' =>1);
         
         return new \Zend\View\Model\JsonModel($aResponse);

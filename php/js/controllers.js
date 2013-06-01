@@ -670,6 +670,7 @@ angular.module('iPymeApp')
         console.log($scope.model);
         ipymeajax('/shop/payment/pay', $scope.model)
         .success(function(responseData){
+            $scope.basketpersist = function(){}
             console.log(responseData);
         });
     }
