@@ -319,6 +319,10 @@ CREATE TYPE "IPYME_AUX".basket_list_extended AS(bl_id bigint
                                                 ,p_price numeric(8,3)
                                                 ,c_name character varying(100));
 
+
+CREATE TYPE "IPYME_AUX".payment_confirmation AS();
+
+
 SET search_path = "IPYME_AUX", pg_catalog;
 
 COPY "USER" (u_session, u_last_login, u_email, u_status, u_basket, u_customer, u_name, u_password_hash, u_id) FROM stdin;
