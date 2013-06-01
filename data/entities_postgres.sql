@@ -320,7 +320,11 @@ CREATE TYPE "IPYME_AUX".basket_list_extended AS(bl_id bigint
                                                 ,c_name character varying(100));
 
 
-CREATE TYPE "IPYME_AUX".payment_confirmation AS();
+CREATE TYPE "IPYME_AUX".payment_confirmation AS(u_id 	BIGINT
+                                                , u_customer 	BIGINT
+                                                , bl_id 	BIGINT
+                                                , bl_product 	BIGINT
+                                                , bl_quantity 	NUMERIC(5,3));
 
 
 SET search_path = "IPYME_AUX", pg_catalog;
