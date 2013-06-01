@@ -619,7 +619,7 @@ angular.module('iPymeApp')
 }])
 .controller('basketCtrl', ['$scope','$element','$location','ipymeajax', function ($scope, $element, $location,ipymeajax) {
     $scope.model = {
-        iscollapsed:false,
+        iscollapsed:true,
         customer:{
             name:'name',
             surname:'surname',

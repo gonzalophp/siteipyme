@@ -4,6 +4,10 @@ namespace Datainterface\Model;
 class ShopMenu {
     
     public function getMenu($aOptions){
+        $aMenuList = array('label' => 'iPyME'
+                        , 'url' => ''
+                        , 'nodes' => array());
+        
         if (array_key_exists('username', $aOptions)){
             $oUserMenu = array('label' => $aOptions['username']
                                 , 'url' => '#/user/account/'.$aOptions['username']
@@ -14,12 +18,17 @@ class ShopMenu {
                                 , 'url' => '#/user/signin'
                                 , 'nodes' => array());
         }
-        $aMenuList = array();
+        
         array_push($aMenuList,
                     array('label' => 'iPyME'
                         , 'url' => ''
                         , 'nodes' => array())
                     , $oUserMenu);
+        
+        array_push($aMenuList
+                 ,array('label' => '-admin panel-'
+                      , 'url' => '#/admin'
+                      , 'nodes' => array()));
         
         if (array_key_exists('username', $aOptions)){
             array_push($aMenuList
@@ -28,10 +37,6 @@ class ShopMenu {
                       , 'nodes' => array()));
         }
         
-        array_push($aMenuList
-                 ,array('label' => 'Basket'
-                      , 'url' => '#/basket'
-                      , 'nodes' => array()));
         return $aMenuList;
     }
 }

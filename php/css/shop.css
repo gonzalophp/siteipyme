@@ -471,3 +471,53 @@ div.ipymeproduct div.basketquantity{
 button.addtobasket {
     float:right;
 }
+
+div.ipymeshoptopmenu{
+    /*margin-top: 30px;*/
+    background-color:rgba(0,0,0,0.4);
+    color:#ccc;
+    text-align: right;
+    height: 30px;
+}
+
+div.ipymeshoptopmenu > ul > li{
+    padding: 8px 5px 9px 5px;
+    list-style: none;
+    display: inline;
+    position: relative;
+    top:4px;
+    border: solid 1px rgb(77, 77, 77);
+    border-radius: 2px;
+    margin-left: 5px;
+}
+
+div.ipymeshoptopmenu > ul > li span {
+    font-size: 14px;
+    font-weight: bold;
+    color: yellow;
+}
+
+div.ipymeshoptopmenu > ul > li:hover {
+    background-color: rgb(26, 43, 51);
+    cursor: pointer;
+}
+
+div.ipymeshoptopmenu > ul > li:hover span{
+    color:rgb(158, 230, 131);
+}
+
+div.ipymeshoptopmenu > ul > li.logout{
+    padding-right: 25px;
+    background: url('images/logout.png') 95% 45%  no-repeat;
+}
+
+div.ipymeshoptopmenu > ul > li.admin{
+    padding-right: 35px;
+    background: url('images/admin.png') 95% 45%  no-repeat;
+}
+
+div.ipymeshoptopmenu > ul > li.user{
+    padding-right: 25px;
+    background: url('images/user.png') 95% 45%  no-repeat;
+}
+

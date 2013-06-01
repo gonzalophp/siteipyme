@@ -1,6 +1,13 @@
 <link rel="stylesheet" href="css/shop.css"/>
 <div class="ipymeshop">
-    <main-menu ng-controller="ShopMenuController" class="shopmenu"></main-menu>
+    <div class="ipymeshoptopmenu">
+        <ul>
+            <li class="admin"><a href="/#/admin"><span>(admin panel)</span></a></li>
+            <li class="user"><span>gonzalo</span></li>
+            <li class="logout"><span>logout</span></li>
+        </ul>
+    </div>
+    <!-- <main-menu ng-controller="ShopMenuController" class="shopmenu"></main-menu> -->
     <div class="ipymeshopbody" ng-controller="ShopController">
         <div class="carousel" ng-controller="CarouselDemoCtrl">
             <carousel interval="100000">
