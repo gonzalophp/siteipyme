@@ -29,8 +29,8 @@ angular.module('iPymeApp', ['iPymeApp.filters', 'iPymeApp.services', 'iPymeApp.d
         templateUrl: 'tpl/ng.user.sign.tpl', 
     })
     .when('/user/logout', {
-        templateUrl: 'tpl/ng.shop.tpl', 
-        controller: 'logoutctrl', 
+        template: '<span></span>', 
+        controller:'logoutCtrl',    
     })
     .when('/user/signup/confirm/:sessionid', {
         templateUrl: 'tpl/ng.user.sign.confirmation.tpl', 

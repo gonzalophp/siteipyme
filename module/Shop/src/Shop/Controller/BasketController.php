@@ -26,7 +26,7 @@ class BasketController extends \Zend\Mvc\Controller\AbstractActionController {
             }
         }
         
-        $aBasket = array('id' => (count($aBasketProductList) ? $aBasketProductList[0]['bl_id']:0)
+        $aBasket = array('id' => (count($aBasketProductList) ? $aBasketProductList[0]['bl_basket']:0)
                         ,'products' => $aBasketProductList);
         
         $aResponse = array('success' => 1, 'basket' => $aBasket);
@@ -60,7 +60,7 @@ class BasketController extends \Zend\Mvc\Controller\AbstractActionController {
                 $aBasketProductList[] = $aRow;
             }
             
-            $nBasketId = (count($aBasketProductList) ? $aBasketProductList[0]['bl_id']:0);
+            $nBasketId = (count($aBasketProductList) ? $aBasketProductList[0]['bl_basket']:0);
         }
         
         $aBasket = array('id'       => $nBasketId

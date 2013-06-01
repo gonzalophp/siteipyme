@@ -185,7 +185,7 @@ angular.module('iPymeApp')
         restrict:'E',
         scope:{product:'=ngModel'},
         replace:true,
-        template:'<table><tbody><tr><td><quantity class="basketquantity" ng-model="product.bl_quantity"></quantity></td><td><span>{{product.p_description}}</span></td><td><span>{{product.c_name}}</span>&nbsp;<span>{{product.total}}</span></td><td><button class="ipymebuttonclose" ng-click="removebutton(product)">x</button></td></tr></tbody></table>',
+        template:'<table><tbody><tr><td><quantity class="basketquantity" ng-model="product.bl_quantity"></quantity></td><td><a href="#/shop/product/{{product.bl_product}}"><span>{{product.p_description}}</span></a></td><td><span>{{product.c_name}}</span>&nbsp;<span>{{product.total}}</span></td><td><button class="ipymebuttonclose" ng-click="removebutton(product)">x</button></td></tr></tbody></table>',
         link:function(scope, element, attr) {
             scope.removebutton = function() {
                  scope.$parent.$parent.basket.products.splice(scope.$parent.$index,1);
@@ -276,8 +276,8 @@ angular.module('iPymeApp')
                     </div>\
                         <p class="baskettotal">Total: {{model.basket.total}}</p>\
                         <div class="ipymeButtonsGroup">\n\
-                            <button class="shop" ng-click="redirect(\'/shop\')">Continue Shopping</button>\
-                            <button class="shop" ng-click="model.iscollapsed = !model.iscollapsed">Proceed to Payment</button>\
+                            <button class="shop backtoshop" ng-click="redirect(\'/shop\')">Continue Shopping</button>\
+                            <button class="shop proceedtopay" ng-click="model.iscollapsed = !model.iscollapsed">Proceed to Payment</button>\
                         </div>\
                 </div>',
         link:function(scope, element, attr) {

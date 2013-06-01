@@ -159,7 +159,7 @@ div.ipymeshop div.ipymeshopbody {
     margin-top:1em;
     margin-left:10%;
     margin-right:10%;
-    min-width: 50em;
+    min-width: 67em;
     padding:1em 0em 1em 0em;
 }
 
@@ -439,4 +439,35 @@ button.addtobasket {
 button.checkout{
     width:96%;
     margin:2%;
+}
+
+div.ipymeproduct  {
+    border:solid 1px black;
+    margin: 1em 1em 1em 1em;
+}
+
+div.ipymeproduct > table {
+    width:100%;
+}
+
+div.ipymeproduct > table > tbody > tr td {
+    vertical-align: top;
+    padding: 1em 1em 1em 1em;
+}
+
+div.ipymeproduct > table > tbody > tr > td:nth-child(1) {
+    width:65%;
+}
+
+div.ipymeButtonsGroup {
+    display: inline;
+}
+
+div.ipymeproduct div.basketquantity{
+    float:right;
+    margin-right: 1em;
+}
+
+button.addtobasket {
+    float:right;
 }

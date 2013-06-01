@@ -71,6 +71,8 @@ return array(
             'Shop\Controller\Category'      => 'Shop\Controller\CategoryController',
             'Shop\Controller\ImageUpload'   => 'Shop\Controller\ImageUploadController',
             'Shop\Controller\Basket'        => 'Shop\Controller\BasketController',
+            'Shop\Controller\Payment'        => 'Shop\Controller\PaymentController',
+            
         ),
     ),
     'view_manager' => array(

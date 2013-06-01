@@ -1,8 +1,7 @@
 @import 'shop.css';
 
 div.basket {
-    /*width:80%;*/
-    margin:0em 1em 0em 1em;
+    margin:0em 1em 2em 1em;
 }
 
 div > table {
@@ -11,51 +10,30 @@ div > table {
     margin:0% 10% 0% 10%;
     border:solid 1px red;
 }
-table.basket th {
-    font-weight: bold;
-    border:solid 1px blue;
-}
-
-table.basket td {
-    border:solid 1px green;
-}
-
-table.basket > tbody> tr > td:nth-child(1) {
-    width:5%;
-}
-table.basket > tbody> tr > td:nth-child(2) {
-    width:27em;
-}
-
-table.basket > tbody > tr > td:nth-child(2)  > img {
-    width:7em;
-    height:7em;
-}
-table.basket > tbody> tr > td:nth-child(3) {
-    width:5em;
-}
-table.basket > tbody> tr > td:nth-child(4) {
-    width:5em;
-}
-table.basket > tbody> tr > td:nth-child(5) {
-    width:5em;
-}
-
-div.ipymeButtonsGroup {
-    text-align: right;
-    padding:0em 1em 0em 1em;
-}
 
 div.ipymeButtonsGroup button {
     margin-left: 1em;
 }
 
+div.ipymeButtonsGroup button.proceedtopay{
+    float: right;
+    margin-right: 1em;
+}
+
 div.paymentcheckout{
-    background-color:red;
+    border: solid 1px;
+    border-radius: 5px;
+    margin: 1em 1em 1em 1em;
+}
+
+div.paymentcheckout h4{
+    clear:both;
+    font-weight: bold;
 }
 
 div.paymentcheckout p{
     clear:both;
+    text-align: initial;
 }
 
 div.paymentcheckout fieldset {
@@ -72,4 +50,8 @@ div.paymentcheckout label {
     width:30%;
     text-align: right;
     margin-right:1em;
+}
+
+div.paymentcheckout button.confirm{
+    float:right;
 }

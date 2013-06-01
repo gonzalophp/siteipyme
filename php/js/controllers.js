@@ -125,9 +125,7 @@ angular.module('iPymeApp')
             $scope.dialogForm.data.fields.p_image_path=responseData.imagepath;
         });
     }
-    
-    if ($scope.adminList == 'product'){
-        console.log($scope);
+    if ($routeParams.list == 'product'){
         $scope.product = {attributes: []
                           ,categoryselected: dialog.data.categoryselected};
 
@@ -586,7 +584,7 @@ angular.module('iPymeApp')
             });
         }
     }
-    
+    $scope.model.selected_category = {key:-1};
     $scope.$watch('model.selected_category', function(selected_category){
         
        $element.find('div.ipymeshopcenter').prepend($element.divwaiting = angular.element('<div class="ajax-waiting"></div>'));
@@ -610,9 +608,6 @@ angular.module('iPymeApp')
     $scope.getLiClass = function (menuitem){
         return (menuitem.nodes && menuitem.nodes.length > 0) ? 'submenu':'';
     }
-    
-    $scope.model.selected_category = {key:-1};
-    
 }])
 .controller('imageuploadCtrl', ['$scope','$element','ipymeajax', function ($scope, $element,ipymeajax) {
     $scope._imagechanged = function(oFormData) {
@@ -636,12 +631,20 @@ angular.module('iPymeApp')
             postcode:'postcode',
             country:'country',
             phone:'045444556',
-            card:{name:'cardname', number:'cardnumber', expire:'expire',issue:'issue'}
+            card:{name:'cardname'
+                , number:'cardnumber'
+                , expire:'expire'
+                ,issue:'issue'}
         },
         dateoptions:{
             changeYear: true,
             changeMonth: true,
-            yearRange: '1900:-0'
+            yearRange: '1900:-0',
+            showOn: "button",
+            buttonImage: "css/images/calendar.gif",
+            buttonImageOnly: true,
+            dateFormat:'dd/mm/yy',
+            showAnim:'clip'
         }
     }
     $scope.basketpersist = function(initialize){
@@ -662,6 +665,14 @@ angular.module('iPymeApp')
             });
         }
     }
+    
+    $scope.confirm = function() {
+        console.log($scope.model);
+        ipymeajax('/shop/payment/pay', $scope.model)
+        .success(function(responseData){
+            console.log(responseData);
+        });
+    }
 }])
 
 .controller('productController', ['$scope','$element','$location','ipymeajax','$routeParams', function ($scope, $element, $location,ipymeajax,$routeParams) {
@@ -669,41 +680,58 @@ angular.module('iPymeApp')
     ipymeajax('/shop/product/get/'+$routeParams.id, {})
     .success(function(responseData){
         $scope.model.product = responseData.product;
+        $scope.model.product.quantity = 1;
     });
     
     $scope.redirect = function(path) {
         $location.path(path);
     }
     
-    $scope.addbutton = function(product){
-        
-        ipymeajax('/shop/basket/get', {})
-        .success(function(responseData){
-            console.log(product);
-            $scope.model.basket.id          = responseData.basket.id;
-            $scope.model.basket.products    = responseData.basket.products;
-            
-            var bInBasket = false, p = $scope.model.basket.products;
-            for(var i in p){
-                if (p[i].bl_product == product.p_id) {
-                    p[i].bl_quantity = parseFloat(p[i].bl_quantity)+1;
-                    bInBasket = true;
-                    break;
-                }
+    $scope.addbutton = function(product) {
+        var bInBasket = false, p = $scope.model.basket.products;
+        console.log(p,product);
+        for(var i in p){
+            if (p[i].bl_product == product.p_id) {
+                p[i].bl_quantity = parseFloat(p[i].bl_quantity)+product.quantity;
+                bInBasket = true;
+                break;
             }
+        }
         
-            bInBasket || $scope.model.basket.products.push({bl_product:product.p_id
+        bInBasket || $scope.model.basket.products.push({bl_product:product.p_id
                                                         , p_description:product.p_description
-                                                        , bl_quantity:1
-                                                        , p_price:product.p_price
-                                                        , total:product.p_price
+                                                        , bl_quantity:product.quantity
+                                                        , p_price:product.quantity*product.p_price
+                                                        , total:product.price
                                                         , c_name:product.c_name});
+    }
+    
+    $scope.basketpersist = function(initialize,element){
+        element.prepend(element.divwaiting = angular.element('<div class="ajax-waiting"></div>'));
+        if (initialize){
+            ipymeajax('/shop/basket/get', {})
+            .success(function(responseData){
+                if (responseData.valid_session != 0) {
+                    $scope.model.basket.id          = responseData.basket.id;
+                    $scope.model.basket.products    = responseData.basket.products;
+                    $scope.model.basket.initialized = true;
+                }
+                
+                element.divwaiting.remove();
+            });
+        }
+        else {
             ipymeajax('/shop/basket/save', $scope.model.basket)
             .success(function(responseData){
-                $scope.redirect('/shop');
+                if (responseData.valid_session != 0) {
+                    $scope.model.basket.id = responseData.basket.id;
+                }
+                
+                element.divwaiting.remove();
             });
-        });
+        }
     }
+ 
 }])
 .controller('ShopMenuController',['$scope','$location',"ipymeajax", function ($scope,$location,ipymeajax) {
     var requestData = {};
@@ -716,9 +744,11 @@ angular.module('iPymeApp')
         return (menuitem.nodes && menuitem.nodes.length > 0) ? 'submenu':'';
     }
 }])
-.controller('logoutctrl',['$location','$cookieStore', function ($location,$cookieStore) {
-    $cookieStore.remove('PHPSESSID');
-    $location.path('/shop');
+.controller('logoutCtrl',['$location','ipymeajax', function ($location, ipymeajax) {
+    ipymeajax('/user/logout', {})
+    .success(function(responseData){
+        $location.path('/shop');
+    });
 }])
 
 

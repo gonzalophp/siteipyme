@@ -65,6 +65,7 @@ return array(
             'User\Controller\Authenticate' => 'User\Controller\AuthenticateController',
             'User\Controller\Signin' => 'User\Controller\SigninController',
             'User\Controller\Signup' => 'User\Controller\SignupController',
+            'User\Controller\Logout' => 'User\Controller\LogoutController',
         ),
     ),
     'view_manager' => array(

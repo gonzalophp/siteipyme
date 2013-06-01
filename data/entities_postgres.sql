@@ -1910,6 +1910,239 @@ $BODY$
   ROWS 1000;
 
 
+
+
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".payment_confirm(p_u_session 				TEXT,p_b_id 						BIGINT,cust_name 					TEXT,cust_surname 			TEXT,cust_add1 					TEXT,cust_add2 					TEXT,cust_company 			TEXT,cust_country 			TEXT,cust_dob 					TEXT,cust_phone 				TEXT,cust_postcode 			TEXT,cust_town 					TEXT,cust_card_expire 	TEXT,cust_card_issue 		TEXT,cust_card_name 		TEXT,cust_card_number 	TEXT)RETURNS SETOF "IPYME_FINAL".payment_confirmation AS $BODY$
+DECLARE
+--
+basket_lines CURSOR(c_p_u_session text, c_p_b_id BIGINT) IS
+		SELECT U.u_id, U.u_customer, BL.bl_id, BL.bl_product, BL.bl_quantity
+		FROM "IPYME_FINAL"."BASKET" B
+		INNER JOIN "IPYME_FINAL"."USER" U
+		ON U.u_basket = B.b_id
+		INNER JOIN "IPYME_FINAL"."BASKET_LIST" BL
+		ON B.b_id = BL.bl_basket
+		WHERE U.u_session = c_p_u_session
+			AND B.b_id = c_p_b_id;
+--
+v_cur_u_id BIGINT;
+v_cur_u_customer BIGINT;
+v_cur_bl_id BIGINT;
+v_cur_bl_product BIGINT;
+v_cur_bl_quantity NUMERIC(5,3);
+--
+v_customer_created BOOLEAN := FALSE;
+v_customer_order_created BOOLEAN := FALSE;
+v_customer "IPYME_FINAL"."CUSTOMER";
+v_entity "IPYME_FINAL"."INVOICE_ENTITY";
+v_people "IPYME_FINAL"."PEOPLE";
+v_address_detail "IPYME_FINAL"."ADDRESS_DETAIL";
+v_card "IPYME_FINAL"."CARD";
+v_order_customer "IPYME_FINAL"."ORDER_CUSTOMER";
+v_product_list "IPYME_FINAL"."PRODUCT_LIST";
+--
+BEGIN
+	--
+	OPEN basket_lines(p_u_session,p_b_id);
+	--
+	LOOP
+		--
+		FETCH basket_lines 
+		INTO v_cur_u_id 
+				,v_cur_u_customer
+				,v_cur_bl_id 
+				,v_cur_bl_product
+				,v_cur_bl_quantity;
+		--
+		IF NOT FOUND THEN
+			RETURN;
+		END IF;
+		--
+		IF NOT v_customer_created THEN
+			--
+			IF v_cur_u_customer IS NULL THEN
+				--
+				SELECT NEXTVAL('"IPYME_FINAL"."INVOICE_ENTITY_ie_id_seq"') INTO v_entity.ie_id;
+				--
+				v_entity.ie_legal_id := cust_company;
+				v_entity.ie_invoice_name := cust_company;
+				--
+				INSERT INTO "IPYME_FINAL"."INVOICE_ENTITY" (ie_id
+																									,ie_legal_id
+																									,ie_invoice_name)
+																						VALUES (v_entity.ie_id
+																									,v_entity.ie_legal_id
+																									,v_entity.ie_invoice_name);
+				--																						
+				SELECT NEXTVAL('"IPYME_FINAL"."CUSTOMER_c_id_seq"') INTO v_customer.c_id;
+				v_customer.c_customer_name := v_entity.ie_invoice_name;
+				v_customer.c_invoice_entity := v_entity.ie_id;
+				--
+				--
+				INSERT INTO "IPYME_FINAL"."CUSTOMER" (c_id
+																							,c_customer_name
+																							,c_invoice_entity)
+																			VALUES (v_customer.c_id
+																							,v_customer.c_customer_name
+																							,v_customer.c_invoice_entity);
+				--
+				--
+				SELECT NEXTVAL('"IPYME_FINAL"."PEOPLE_p_id_seq"') INTO v_people.p_id;
+				v_people.p_name			:= cust_name;
+				v_people.p_surname	:= cust_surname;
+				v_people.p_phone		:= cust_phone;
+				v_people.p_invoice_entity := v_entity.ie_id;
+				--
+				INSERT INTO "IPYME_FINAL"."PEOPLE"(p_id
+																					,p_name
+																					,p_surname
+																					,p_phone
+																					,p_invoice_entity)
+																	VALUES (v_people.p_id
+																					,v_people.p_name
+																					,v_people.p_surname
+																					,v_people.p_phone
+																					,v_people.p_invoice_entity);
+				--
+				--
+				SELECT NEXTVAL('"IPYME_FINAL"."ADDRESS_DETAIL_ad_id_seq"') INTO v_address_detail.ad_id;
+				v_address_detail.ad_line1						:= cust_add1;
+				v_address_detail.ad_line2						:= cust_add2;
+				v_address_detail.ad_town						:= cust_town;
+				v_address_detail.ad_post_code 			:= cust_postcode;
+				v_address_detail.ad_country 				:= NULL;
+				v_address_detail.ad_description 		:= 'PRIMARY';
+				v_address_detail.ad_invoice_entity 	:= v_entity.ie_id;
+				--
+				INSERT INTO "IPYME_FINAL"."ADDRESS_DETAIL"(ad_id
+																									,ad_line1
+																									,ad_line2
+																									,ad_town 
+																									,ad_post_code
+																									,ad_country 
+																									,ad_description 
+																									,ad_invoice_entity)
+																					VALUES ( v_address_detail.ad_id
+																									,v_address_detail.ad_line1
+																									,v_address_detail.ad_line2
+																									,v_address_detail.ad_town 
+																									,v_address_detail.ad_post_code
+																									,v_address_detail.ad_country 
+																									,v_address_detail.ad_description 
+																									,v_address_detail.ad_invoice_entity);
+				--
+				--
+				SELECT NEXTVAL('"IPYME_FINAL"."CARD_c_id_seq"') INTO v_card.c_id;
+				v_card.c_invoice_entity := v_entity.ie_id;
+				v_card.c_description := 'PRIMARY CARD';
+				v_card.c_card_number := cust_card_number;
+				v_card.c_name 				:= cust_card_name;
+				v_card.c_expire_date := cust_card_expire;
+				v_card.c_issue_numer := cust_card_issue;
+				v_card.c_vendor := NULL;
+				--
+				INSERT INTO "IPYME_FINAL"."CARD" (c_id 
+																				,c_invoice_entity 
+																				,c_description 
+																				,c_card_number 
+																				,c_name 
+																				,c_expire_date
+																				,c_issue_numer
+																				,c_vendor )
+																	VALUES (v_card.c_id
+																			,v_card.c_invoice_entity
+																			,v_card.c_description
+																			,v_card.c_card_number
+																			,v_card.c_name 			
+																			,v_card.c_expire_date
+																			,v_card.c_issue_numer
+																			,v_card.c_vendor);
+				--
+				--
+				UPDATE "IPYME_FINAL"."USER"
+				SET u_customer = v_customer.c_id
+				WHERE u_id = v_cur_u_id;
+				--
+			ELSE
+				--
+				v_customer.c_id := v_cur_u_customer;
+				--
+			END IF;
+			--
+			v_customer_created := TRUE;
+			--
+		END IF;
+		--
+		--
+		--
+		IF NOT v_customer_order_created THEN
+			--
+			SELECT NEXTVAL('"IPYME_FINAL"."ORDER_CUSTOMER_oc_id_seq"') INTO v_order_customer.oc_id;
+			v_order_customer.od_customer 	:= v_customer.c_id;
+			v_order_customer.od_date 			:= now();
+			INSERT INTO "IPYME_FINAL"."ORDER_CUSTOMER" (oc_id
+																								,od_customer
+																								,od_date)
+																					VALUES (v_order_customer.oc_id
+																								,v_order_customer.od_customer
+																								,v_order_customer.od_date);
+			--
+			v_customer_order_created := TRUE;
+			--
+		END IF;
+		--
+		--
+		SELECT NEXTVAL('"IPYME_FINAL"."PRODUCT_LIST_pl_id_seq"') INTO v_product_list.pl_id;
+		v_product_list.pl_order_customer			:= v_order_customer.oc_id;
+		v_product_list.pl_order_provider			:= NULL;
+		v_product_list.pl_product							:= v_cur_bl_product;
+		v_product_list.pl_quantity						:= v_cur_bl_quantity;
+		v_product_list.pl_currency						:= NULL;
+		v_product_list.pl_store 							:= NULL;
+		v_product_list.pl_quantity_dispatched	:= 0;
+		--
+		SELECT p_price, p_currency
+		INTO v_product_list.pl_price, v_product_list.pl_currency
+		FROM "IPYME_FINAL"."PRICES"
+		WHERE p_product = v_cur_bl_product
+		AND p_status = 1;
+		--												
+		INSERT INTO "IPYME_FINAL"."PRODUCT_LIST"(pl_id 
+																						,pl_order_customer
+																						,pl_order_provider
+																						,pl_product
+																						,pl_quantity
+																						,pl_price 
+																						,pl_currency
+																						,pl_store 
+																						,pl_quantity_dispatched)
+																		VALUES (v_product_list.pl_id 
+																						,v_product_list.pl_order_customer
+																						,v_product_list.pl_order_provider
+																						,v_product_list.pl_product
+																						,v_product_list.pl_quantity
+																						,v_product_list.pl_price 
+																						,v_product_list.pl_currency
+																						,v_product_list.pl_store 
+																						,v_product_list.pl_quantity_dispatched);
+		--
+		--	
+	END LOOP;
+	--
+	/*
+	EXCEPTION
+		WHEN OTHERS THEN
+			NULL;
+			*/
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
 \dn
 
 

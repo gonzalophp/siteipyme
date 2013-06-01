@@ -8,22 +8,22 @@
         <div class="paymentcheckout"  collapse="model.iscollapsed">
             <fieldset>
                 <div>
-                    <h3>Invoice Details</h3>
+                    <h4>Invoice Details</h4>
                     <p>
                         <label for="name">Name</label>
-                        <input id="name" type="text" ng-model="model.customer.name"/>
+                        <input type="text" ng-model="model.customer.name"/>
                     </p>
                     <p>
                         <label for="surname">Surname</label>
-                        <input id="surname" type="text" ng-model="model.customer.surname"/>
+                        <input type="text" ng-model="model.customer.surname"/>
                     </p>
                     <p>
                         <label for="company">Company</label>
-                        <input id="company" type="text" ng-model="model.customer.company"/>
+                        <input type="text" ng-model="model.customer.company"/>
                     </p>
                     <p>
                         <label for="date">Date</label>
-                        <input id="date" type="text" ui-date="model.dateoptions" ng-model="model.customer.dob" />
+                        <input type="text" ui-date="model.dateoptions" ng-model="model.customer.dob" />
                     </p>
                     <p>
                         <label for="address1">Address</label>
@@ -47,10 +47,9 @@
                     </p>
                     <p class="text">
                         <label for="phone">Home phone</label>
-                        <input type="text" class="text" name="phone" id="phone" ng-model="model.customer.phone">
+                        <input type="text" class="text" name="phone" ng-model="model.customer.phone">
                     </p>
-
-                    <h3>Payment Details</h3>
+                    <h4>Payment Details</h4>
                     <p>
                         <label for="cardname">Name on card</label>
                         <input type="text" id="cardname" ng-model="model.customer.card.name" />
@@ -68,10 +67,13 @@
                         <input type="text" id="cardexpire" ng-model="model.customer.card.issue" />
                     </p>
                     <p>
-                        <button class="shop" ng-click="confirm()">Confirm</button>
+                        <button class="shop confirm" ng-click="confirm()">Confirm</button>
                     </p>
                 </div>
             </fieldset>
         </div>
     </div>
+    <footer>
+        <p>2013 - Gonzalo Grado </p>
+    </footer>
 </div>
