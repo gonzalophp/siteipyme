@@ -1,12 +1,6 @@
 <link rel="stylesheet" href="css/basket.css"/>
 <div class="ipymeshop">
-    <div class="ipymeshoptopmenu">
-        <ul>
-            <li class="admin"><a href="/#/admin"><span>(admin panel)</span></a></li>
-            <li class="user"><span>gonzalo</span></li>
-            <li class="logout"><span>logout</span></li>
-        </ul>
-    </div>
+    <shoptopbar></shoptopbar>
     <div class="ipymeshopbody" ng-controller="basketCtrl">
         <div class="basket">
             <basketsummary class="basketsummary" persist="basketpersist" ng-model="model"></basketsummary> 

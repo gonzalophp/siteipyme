@@ -4,8 +4,10 @@ namespace User\Model;
 class UserCredentials implements \Zend\ServiceManager\FactoryInterface{
     public $serviceLocator;
     public $oUser;
+    public $bInitialized = false;
     
-    public function isAuthenticated() {
+    public function initialize() {
+        if ($this->bInitialized) return;
         @session_start();
         $sSessionId = session_id();
         
@@ -16,11 +18,16 @@ class UserCredentials implements \Zend\ServiceManager\FactoryInterface{
             , array(':p_u_session' => $sSessionId));
         
         $this->oUser = $oResultSet->current();
-        
+        $this->bInitialized = true;
+    }
+    
+    public function isAuthenticated() {
+        $this->initialize();
         return ($this->oUser!==FALSE);
     }
     
     public function getUserDetails() {
+        $this->initialize();
         return $this->oUser;
     }
 

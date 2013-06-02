@@ -4,7 +4,7 @@ namespace User\Controller;
 class SigninController extends \Zend\Mvc\Controller\AbstractActionController {
     
     public function indexAction() {
-//        $this->getRequest()->setContent('{"user_name":"GONZALO","user_password":"gonzalo","user_remember":false}');
+//        $this->getRequest()->setContent('{"user_name":"gonzalo","user_password":"gonzalo","user_remember":false}');
 //        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
         
         $bAuthenticated = false;
@@ -19,12 +19,14 @@ class SigninController extends \Zend\Mvc\Controller\AbstractActionController {
             $sSessionId = session_id();
             
             $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+            $aFunctionParams = array( ':p_u_session'         => $sSessionId
+                                    ,':p_u_name'            => $sUser_name
+                                    ,':p_u_password_hash'   => $sUser_password_hash);
+
             $oResultSet = $oDataFunctionGateway->getDataRecordSet(
                 'IPYME_FINAL'
                 , 'user_login'
-                , array( ':p_u_session'         => $sSessionId
-                        ,':p_u_name'            => $sUser_name
-                        ,':p_u_password_hash'   => $sUser_password_hash));
+                , $aFunctionParams);
             
             $bAuthenticated = ($oResultSet->count() == 1);
         }

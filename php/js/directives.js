@@ -44,87 +44,79 @@ angular.module('iPymeApp.Menu')
     });
     
 angular.module('iPymeApp')
-    .directive('productTable',function(){
-        return {
-            restrict:'E',
-            replace:true,
-            template:'<p>product table template</p>'
-        }
-    })
-    
-    .directive('ipymeedit', function(){
-        return {
-            restrict:'E',  
-            replace:true,
-            template:'<div class="attribute"><button ng-click="removeItem()">x</button><p ng-hide="showinput">{{data.pca_attribute}}</p><input ng-show="showinput" type="text" ng-model="inputdata"/></div>',
-            scope:{values:'=',
-                   remove:'=', 
-                   edited:'='
-            },   
-            link: function(scope,element,attr,ctrl){
-                scope.inputdata = '';
-                scope.input = element.find('input');
-                if((scope.inputdata == '') && (scope.values[scope.$parent.$index].pca_attribute == '')) {
-                    scope.showinput = true;
-                    scope.input.editing = true;
-                } 
-                else {
-                    scope.showinput = false;
-                    scope.input.editing = false;
-                }
-                scope.data = {pca_attribute: scope.values[scope.$parent.$index].pca_attribute};
-                element.bind('keydown', function(e) {
-                    switch(e.which) {
-                        case 27: // [esc] 
-                            if (scope.inputdata == '') {
-                                scope.removeItem();
-                            }
-                            scope.showinput = false;
-                            scope.inputdata=scope.data.pca_attribute;
-                        break;
-                        case 13: // 
-                            if (scope.inputdata == "") {
-                                scope.removeItem();
-                            }
-                            else {
-                                scope.data.pca_attribute = scope.inputdata;
-                                scope.showinput = false;
-                            }
-                        break;
-                    }
-                    scope.$apply();
-                });
-                element.bind('dblclick', function(e) {
-                    scope.inputdata = scope.values[scope.$parent.$index].pca_attribute;
-                    scope.showinput = true;
-                    scope.$apply();
-                    scope.input.focus();
-                    scope.input.editing = true;
-                });
-                scope.removeItem = function(){
-                    scope.remove(scope.$parent.$index);
-                }
-                
-                scope.input.bind('blur', function(e){ 
-                    if(scope.input.editing){
-                        scope.input.editing = false;
-                        if (scope.inputdata == ''){
-                             scope.removeItem();
-                        }
-                        else {
-                            scope.values[scope.$parent.$index].pca_attribute = scope.inputdata;
-                            scope.edited();
+.directive('ipymeedit', function(){
+    return {
+        restrict:'E',  
+        replace:true,
+        template:'<div class="attribute"><button ng-click="removeItem()">x</button><p ng-hide="showinput">{{data.pca_attribute}}</p><input ng-show="showinput" type="text" ng-model="inputdata"/></div>',
+        scope:{values:'=',
+               remove:'=', 
+               edited:'='
+        },   
+        link: function(scope,element,attr,ctrl){
+            scope.inputdata = '';
+            scope.input = element.find('input');
+            if((scope.inputdata == '') && (scope.values[scope.$parent.$index].pca_attribute == '')) {
+                scope.showinput = true;
+                scope.input.editing = true;
+            } 
+            else {
+                scope.showinput = false;
+                scope.input.editing = false;
+            }
+            scope.data = {pca_attribute: scope.values[scope.$parent.$index].pca_attribute};
+            element.bind('keydown', function(e) {
+                switch(e.which) {
+                    case 27: // [esc] 
+                        if (scope.inputdata == '') {
+                            scope.removeItem();
                         }
                         scope.showinput = false;
-                        scope.$root.$$phase || scope.$root.$apply();
-                    }
-                    
-                }); 
-                
+                        scope.inputdata=scope.data.pca_attribute;
+                    break;
+                    case 13: // 
+                        if (scope.inputdata == "") {
+                            scope.removeItem();
+                        }
+                        else {
+                            scope.data.pca_attribute = scope.inputdata;
+                            scope.showinput = false;
+                        }
+                    break;
+                }
+                scope.$apply();
+            });
+            element.bind('dblclick', function(e) {
+                scope.inputdata = scope.values[scope.$parent.$index].pca_attribute;
+                scope.showinput = true;
+                scope.$apply();
                 scope.input.focus();
+                scope.input.editing = true;
+            });
+            scope.removeItem = function(){
+                scope.remove(scope.$parent.$index);
             }
+
+            scope.input.bind('blur', function(e){ 
+                if(scope.input.editing){
+                    scope.input.editing = false;
+                    if (scope.inputdata == ''){
+                         scope.removeItem();
+                    }
+                    else {
+                        scope.values[scope.$parent.$index].pca_attribute = scope.inputdata;
+                        scope.edited();
+                    }
+                    scope.showinput = false;
+                    scope.$root.$$phase || scope.$root.$apply();
+                }
+
+            }); 
+
+            scope.input.focus();
         }
-    })
+    }
+})
 .directive('relatedattribute', function(){
     return {
         restrict:'E',
@@ -261,7 +253,6 @@ angular.module('iPymeApp')
         }
     }
 })
-
 .directive('basketsummary', function($window,$location){
     return {
         restrict:'E',
@@ -316,7 +307,51 @@ angular.module('iPymeApp')
         }
     }
 })
-
+.directive('shoptopbar', function(ipymeajax,$window,$location){
+    return {
+        restrict:'E',
+        scope:{},
+        replace:true,
+        template:'<div class="ipymeshoptopbar">\
+                    <ul>\
+                        <li ng-show="user.admin==1" ng-click="admin()" class="admin"><span>(admin panel)</span></li>\
+                        <li ng-click="login()" ng-switch on="user.name" class="user">\
+                            <span ng-switch-when="">log in</span>\
+                            <span ng-switch-default>{{user.name}}</span>\
+                        </li>\
+                        <li ng-show="user.name" ng-click="logout()" class="logout"><span>logout</span></li>\
+                    </ul>\
+                </div>',
+        link:function(scope,element,attr) {
+            scope.reset = function(){
+                scope.user = {u_valid_session: 0 
+                            , name:""
+                            , admin: 0};
+            }
+            
+            scope.logout = function(){
+                ipymeajax('/user/logout', {})
+                .success(function(responseData){
+                    $location.path('/user/logout');
+                });
+            }
+            
+            scope.login = function(){
+                $location.path('/user/signin');
+            }
+            
+            scope.admin = function() {
+                $location.path('/admin');
+            }
+            
+            scope.reset();
+            ipymeajax('/user/authenticate', {})
+            .success(function(responseData){
+                scope.user = responseData;
+            });
+        }
+    }
+})
 
                                 
                                 

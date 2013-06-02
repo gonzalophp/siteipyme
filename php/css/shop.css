@@ -472,7 +472,7 @@ button.addtobasket {
     float:right;
 }
 
-div.ipymeshoptopmenu{
+div.ipymeshoptopbar{
     /*margin-top: 30px;*/
     background-color:rgba(0,0,0,0.4);
     color:#ccc;
@@ -480,7 +480,7 @@ div.ipymeshoptopmenu{
     height: 30px;
 }
 
-div.ipymeshoptopmenu > ul > li{
+div.ipymeshoptopbar > ul > li{
     padding: 8px 5px 9px 5px;
     list-style: none;
     display: inline;
@@ -491,32 +491,36 @@ div.ipymeshoptopmenu > ul > li{
     margin-left: 5px;
 }
 
-div.ipymeshoptopmenu > ul > li span {
+div.ipymeshoptopbar > ul > li a{
+    text-decoration: none;
+}
+
+div.ipymeshoptopbar > ul > li span {
     font-size: 14px;
     font-weight: bold;
     color: yellow;
 }
 
-div.ipymeshoptopmenu > ul > li:hover {
+div.ipymeshoptopbar > ul > li:hover {
     background-color: rgb(26, 43, 51);
     cursor: pointer;
 }
 
-div.ipymeshoptopmenu > ul > li:hover span{
+div.ipymeshoptopbar > ul > li:hover span{
     color:rgb(158, 230, 131);
 }
 
-div.ipymeshoptopmenu > ul > li.logout{
+div.ipymeshoptopbar > ul > li.logout{
     padding-right: 25px;
     background: url('images/logout.png') 95% 45%  no-repeat;
 }
 
-div.ipymeshoptopmenu > ul > li.admin{
+div.ipymeshoptopbar > ul > li.admin{
     padding-right: 35px;
     background: url('images/admin.png') 95% 45%  no-repeat;
 }
 
-div.ipymeshoptopmenu > ul > li.user{
+div.ipymeshoptopbar > ul > li.user{
     padding-right: 25px;
     background: url('images/user.png') 95% 45%  no-repeat;
 }

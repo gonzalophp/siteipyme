@@ -745,11 +745,8 @@ angular.module('iPymeApp')
         return (menuitem.nodes && menuitem.nodes.length > 0) ? 'submenu':'';
     }
 }])
-.controller('logoutCtrl',['$location','ipymeajax', function ($location, ipymeajax) {
-    ipymeajax('/user/logout', {})
-    .success(function(responseData){
-        $location.path('/shop');
-    });
+.controller('logoutCtrl',['$location', function ($location) {
+    $location.path('/shop');
 }])
 
 

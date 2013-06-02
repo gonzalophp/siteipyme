@@ -4,7 +4,12 @@ namespace User\Controller;
 class AuthenticateController extends \Zend\Mvc\Controller\AbstractActionController {
     
     public function indexAction() {
-        $aResponse = array('u_valid_session' => ($this->getServiceLocator()->get('User\Model\UserCredentials')->isAuthenticated() ? 1 :0), 'session_id' => session_id());
+        $oUserCredentials = $this->getServiceLocator()->get('User\Model\UserCredentials');
+        $oUser = $oUserCredentials->getUserDetails();
+        $aResponse = array('u_valid_session'    => ($oUserCredentials->isAuthenticated() ? 1 :0)
+                         , 'name'               => (!is_null($oUser['u_name'])?$oUser['u_name']:'')
+                         , 'admin'              => $oUser['u_admin']);
+        
         return new \Zend\View\Model\JsonModel($aResponse);
     }
 }

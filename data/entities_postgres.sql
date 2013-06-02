@@ -268,6 +268,7 @@ CREATE TABLE "IPYME_AUX"."USER" (
     , U_CUSTOMER BIGINT REFERENCES "IPYME_AUX"."CUSTOMER"
     , U_NAME VARCHAR(30) UNIQUE 
     , U_PASSWORD_HASH VARCHAR(100) 
+    , U_ADMIN INTEGER DEFAULT 0
 );
 
 CREATE TABLE "IPYME_AUX"."CUSTOMER_CATEGORY_DETAILS" (
@@ -1797,7 +1798,9 @@ $BODY$
   ROWS 1000;
 
 
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".user_login(p_u_session character varying, p_u_name character varying, p_u_password_hash character varying) RETURNS SETOF "IPYME_FINAL"."USER" AS $BODY$
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".user_login(p_u_session character varying, p_u_name character varying, p_u_password_hash character varying)
+  RETURNS SETOF "IPYME_FINAL"."USER" AS
+$BODY$
 DECLARE
 v_anonymous_user "IPYME_FINAL"."USER";
 v_user "IPYME_FINAL"."USER";
@@ -1807,14 +1810,7 @@ BEGIN
 		RETURN;
 	END IF;
 	--
-	SELECT *
-	INTO v_anonymous_user
-	FROM "IPYME_FINAL"."USER"
-	WHERE u_session = p_u_session;
-	--
-	IF NOT FOUND THEN
-		RETURN;
-	END IF;
+	
 	--
 	SELECT *
 	INTO v_user
@@ -1829,24 +1825,43 @@ BEGIN
 		--
 	ELSE
 		--
-		IF NOT v_anonymous_user.u_id = v_user.u_id THEN
+		SELECT *
+		INTO v_anonymous_user
+		FROM "IPYME_FINAL"."USER"
+		WHERE u_session = p_u_session;
+		--
+		IF NOT FOUND THEN
 			--
-			v_user.u_basket = v_anonymous_user.u_basket;
-			v_user.u_session = v_anonymous_user.u_session;
+			v_user.u_session := p_u_session;
+			v_user.u_basket := NULL;
 			--
 			UPDATE "IPYME_FINAL"."USER"
-			SET u_basket = NULL
-				, u_session = 'MOVING TO REAL USER' -- KEEPING BASKET REFERENCE
-			WHERE u_id = v_anonymous_user.u_id;
-			--
-			UPDATE "IPYME_FINAL"."USER"
-			SET u_basket = v_user.u_basket
-				, u_session = v_user.u_session
+			SET u_session = v_user.u_session
 				, u_last_login = now()
 			WHERE u_id = v_user.u_id;
 			--
-			DELETE FROM "IPYME_FINAL"."USER"
-			WHERE u_id = v_anonymous_user.u_id;
+		ELSE
+			--
+			IF NOT v_anonymous_user.u_id = v_user.u_id THEN
+				--
+				v_user.u_basket := v_anonymous_user.u_basket;
+				v_user.u_session := v_anonymous_user.u_session;
+				--
+				UPDATE "IPYME_FINAL"."USER"
+				SET u_basket = NULL
+					, u_session = 'MOVING TO REAL USER' -- KEEPING BASKET REFERENCE
+				WHERE u_id = v_anonymous_user.u_id;
+				--
+				UPDATE "IPYME_FINAL"."USER"
+				SET u_basket = v_user.u_basket
+					, u_session = v_user.u_session
+					, u_last_login = now()
+				WHERE u_id = v_user.u_id;
+				--
+				DELETE FROM "IPYME_FINAL"."USER"
+				WHERE u_id = v_anonymous_user.u_id;
+				--
+			END IF;
 			--
 		END IF;
 		--
