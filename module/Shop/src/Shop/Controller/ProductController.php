@@ -13,6 +13,7 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
                 array('field' => "p_description", 'displayName' => "Description", 'width' => 150),
                 array('field' => "p_long_description", 'displayName' => "Long Description", 'width' => 200),
                 array('field' => "p_price", 'displayName' => "Price", 'width' => 50),
+                array('field' => "c_name", 'displayName' => "Currency", 'width' => 50),
             )
         );
         
@@ -115,7 +116,7 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
     
     
     public function SaveAction(){
-//        $this->getRequest()->setContent('{"fields":{"p_ref":"ddr232mb","p_description":"ddr2 32mb","p_long_description":"ddr2"},"categoryselected":{"id":"17","category":"DDR2"},"category_attribute":{"7":{"pca_id":7,"pca_attribute":"RETAIL","attribute_value_selected":"oem","attribute_values":[]},"12":{"pca_id":12,"pca_attribute":"SIZE","attribute_value_selected":"32","attribute_values":[]},"13":{"pca_id":13,"pca_attribute":"SPEED","attribute_value_selected":"800","attribute_values":[]},"14":{"pca_id":14,"pca_attribute":"ECC","attribute_value_selected":"no","attribute_values":[]},"16":{"pca_id":16,"pca_attribute":"BRAND","attribute_value_selected":"corsair","attribute_values":[]}}}');
+//        $this->getRequest()->setContent('{"fields":{"p_ref":"asus p5k ref","p_description":"asus p5k desc","p_long_description":"asus p5k long","p_price":"100"},"categoryselected":{"id":"19","category":"MOTHERBOARD"},"category_attribute":{"7":{"pca_id":7,"pca_attribute":"RETAIL","attribute_value_selected":"RETAIL","attribute_values":["OEM","RETAIL"],"attributes":[{"id":7,"value":"OEM"},{"id":7,"value":"RETAIL"}]},"8":{"pca_id":8,"pca_attribute":"CHIPSET","attribute_value_selected":"i480","attribute_values":[],"attributes":[]},"9":{"pca_id":9,"pca_attribute":"LAN","attribute_value_selected":"1000Gbps","attribute_values":[],"attributes":[]},"10":{"pca_id":10,"pca_attribute":"WIFI","attribute_value_selected":"no","attribute_values":[],"attributes":[]},"11":{"pca_id":11,"pca_attribute":"AUDIO","attribute_value_selected":"ac97","attribute_values":[],"attributes":[]},"16":{"pca_id":16,"pca_attribute":"BRAND","attribute_value_selected":"asus","attribute_values":["CORSAIR","INTEL"],"attributes":[{"id":16,"value":"CORSAIR"},{"id":16,"value":"INTEL"}]}},"currencies":{"selected":"USD","array":["GBP","EUR","USD"],"details":[{"c_id":1,"c_name":"GBP"},{"c_id":2,"c_name":"EUR"},{"c_id":3,"c_name":"USD"}]}}');
 //        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
 //        
         if ($this->getRequest()->isXmlHttpRequest()) {
@@ -132,7 +133,8 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
                         ,':p_p_long_description' => array_key_exists('p_long_description',$aRequest['fields'])?$aRequest['fields']['p_long_description']:null
                         ,':p_p_category'         => $aRequest['categoryselected']['id']
                         ,':p_p_price'            => array_key_exists('p_price',$aRequest['fields'])?$aRequest['fields']['p_price']:null
-                        ,':p_p_image_path'       => array_key_exists('p_image_path',$aRequest['fields'])?$aRequest['fields']['p_image_path']:null));
+                        ,':p_p_image_path'       => array_key_exists('p_image_path',$aRequest['fields'])?$aRequest['fields']['p_image_path']:null
+                        ,':p_c_name'             => array_key_exists('c_name',$aRequest['fields'])?$aRequest['fields']['c_name']:null));
             
             $aResponse = $oResultSet->current();
             if ($oResultSet->count()==1){

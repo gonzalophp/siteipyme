@@ -848,7 +848,11 @@ $BODY$
 
 -- DROP FUNCTION "IPYME_FINAL".set_product(bigint, character varying, character varying, character varying, numeric, character varying);
 
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_product(p_p_id bigint, p_p_ref character varying, p_p_description character varying, p_p_long_description character varying, p_p_category bigint, p_p_price numeric, p_p_image_path text)
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_product(p_p_id bigint
+, p_p_ref character varying, p_p_description character varying
+, p_p_long_description character varying, p_p_category bigint, p_p_price numeric
+, p_p_image_path text
+, p_c_name text)
   RETURNS SETOF "IPYME_FINAL".get_product AS
 $BODY$
 DECLARE
@@ -886,7 +890,7 @@ BEGIN
 		--
 	END IF;
 	--
-	PERFORM "IPYME_FINAL".set_price_to_product(v_p_id, p_p_price);
+	PERFORM "IPYME_FINAL".set_price_to_product(v_p_id, p_p_price, p_c_name);
 	--
 	RETURN  QUERY SELECT * FROM "IPYME_FINAL".get_product(v_p_id); 
 	--
@@ -1064,11 +1068,14 @@ $BODY$
   COST 100;
 
 
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_price_to_product(p_p_product bigint, p_p_price numeric)
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_price_to_product(p_p_product bigint
+, p_p_price numeric
+, p_c_name text)
   RETURNS SETOF "IPYME_FINAL"."PRICES" AS
 $BODY$
 DECLARE
 v_p_id BIGINT;
+v_c_id INTEGER;
 BEGIN
 	--
 	IF (p_p_product IS NULL) OR (p_p_price IS NULL) THEN
@@ -1083,6 +1090,11 @@ BEGIN
 		--
 		SELECT NEXTVAL('"IPYME_FINAL"."PRICES_p_id_seq"') INTO v_p_id;
 		--
+		SELECT c_id
+		INTO v_c_id
+		FROM "IPYME_FINAL"."CURRENCY"
+		WHERE LOWER(c_name) = LOWER(p_c_name);
+		--
 		INSERT INTO "IPYME_FINAL"."PRICES" (p_id
 																			, p_date 
 																			, p_product
@@ -1093,7 +1105,7 @@ BEGIN
 																			, CURRENT_TIMESTAMP
 																			, p_p_product
 																			, 1
-																			, NULL	
+																			, v_c_id	
 																			, p_p_price);
 		RETURN QUERY SELECT * 
 		FROM "IPYME_FINAL"."PRICES" PR
@@ -2223,6 +2235,25 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
+
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_currency(p_c_id integer)
+  RETURNS SETOF "IPYME_FINAL"."CURRENCY" AS
+$BODY$
+DECLARE
+BEGIN
+	--
+	RETURN QUERY 	SELECT * 
+								FROM "IPYME_FINAL"."CURRENCY"
+								WHERE c_id = p_c_id OR p_c_id IS NULL;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
 
 \dn
 

@@ -72,6 +72,7 @@ return array(
             'Shop\Controller\ImageUpload'   => 'Shop\Controller\ImageUploadController',
             'Shop\Controller\Basket'        => 'Shop\Controller\BasketController',
             'Shop\Controller\Payment'        => 'Shop\Controller\PaymentController',
+            'Shop\Controller\Currency'        => 'Shop\Controller\CurrencyController',
             
         ),
     ),

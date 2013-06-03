@@ -135,9 +135,15 @@ angular.module('iPymeApp')
                 dialog.data.category_attribute = responseData.category_attribute;
             }
         });
+        ipymeajax('/shop/currency/get', {})
+        .success(function(responseData){
+            if (responseData.success == 1){
+                dialog.data.currencies = responseData.currencies;
+            }
+        });
+        
     }
         
-    
     $scope.do = function(e,task){
         e.preventDefault();
         $scope.dialogForm.button[task]();
