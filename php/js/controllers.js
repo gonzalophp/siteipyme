@@ -163,13 +163,15 @@ angular.module('iPymeApp')
                         , user_remember:false};
 
     $scope.click = function() {
-        ipymeajax('/user/signin', $scope.user_data)
+        var hash_password = ($scope.user_data.user_password!=$cookieStore.get('ipyme_u_p'))?CryptoJS.SHA1($scope.user_data.user_password).toString():$scope.user_data.user_password;
+        ipymeajax('/user/signin', {user_name:$scope.user_data.user_name
+                                  ,hash_user_password:hash_password})
         .success(function(responseData){
             if (responseData.u_authenticated == 1){
                 $scope.user_data.user_sessionid = responseData.u_sessionid;
                 if ($scope.user_data.user_remember) {
                     $cookieStore.put('ipyme_u_n',$scope.user_data.user_name);
-                    $cookieStore.put('ipyme_u_p',$scope.user_data.user_password);
+                    $cookieStore.put('ipyme_u_p',hash_password);
                 }
                 $location.path( "/" );
             }

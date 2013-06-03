@@ -12,9 +12,7 @@ class SigninController extends \Zend\Mvc\Controller\AbstractActionController {
             $oDataRequest = json_decode($sJSONDataRequest);
                     
             $sUser_name     = isset($oDataRequest->user_name)?$oDataRequest->user_name:null;
-            $sUser_password = isset($oDataRequest->user_password)?$oDataRequest->user_password:null;
-            $bUser_remember = $oDataRequest->user_remember;
-            $sUser_password_hash = sha1($sUser_password);
+            $sUser_password_hash = isset($oDataRequest->hash_user_password)?$oDataRequest->hash_user_password:null;
             session_start();
             $sSessionId = session_id();
             

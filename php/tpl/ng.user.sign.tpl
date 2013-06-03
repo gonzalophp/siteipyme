@@ -1,4 +1,5 @@
 <link rel="stylesheet" href="css/signin.css"/>
+<script src="lib/sha1.js"></script>
 <div class="ipymedialog">
     <div class="ipymeSignin">
         <table>
