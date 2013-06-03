@@ -1882,6 +1882,7 @@ CREATE OR REPLACE FUNCTION "IPYME_FINAL".user_signup(p_u_session character varyi
 $BODY$
 DECLARE
 v_user "IPYME_FINAL"."USER";
+v_anonymous_user "IPYME_FINAL"."USER";
 BEGIN
 	--
 	IF 	p_u_name IS NULL OR 
@@ -1893,39 +1894,71 @@ BEGIN
 		--
 	END IF;
 	--
-	SELECT NEXTVAL('"IPYME_FINAL"."USER_u_id_seq"') INTO v_user.u_id;
+	SELECT * 
+	INTO v_anonymous_user
+	FROM "IPYME_FINAL"."USER"
+	WHERE u_session = p_u_session
+	AND u_status = 0
+	AND u_name IS NULL
+	AND u_customer IS NULL;
 	--
-  v_user.u_session 				:= p_u_session;
-  v_user.u_last_login			:= now();
-  v_user.u_email 					:= LOWER(p_u_email);
-  v_user.u_status 				:= 0;
-  v_user.u_basket 				:= NULL;
-  v_user.u_customer 			:= NULL;
-  v_user.u_name 					:= LOWER(p_u_name);
-  v_user.u_password_hash 	:= p_u_password_hash;
-  v_user.u_admin			  	:= 0;
-  
+	IF FOUND THEN
+		--
+		v_user.u_id			 				:= v_anonymous_user.u_id;
+		v_user.u_session 				:= v_anonymous_user.u_session;
+		v_user.u_last_login			:= v_anonymous_user.u_last_login;
+		v_user.u_email 					:= LOWER(p_u_email);
+		v_user.u_status 				:= v_anonymous_user.u_status;
+		v_user.u_basket 				:= v_anonymous_user.u_basket;
+		v_user.u_customer 			:= v_anonymous_user.u_customer;
+		v_user.u_name 					:= LOWER(p_u_name);
+		v_user.u_password_hash 	:= p_u_password_hash;
+		v_user.u_admin			  	:= v_anonymous_user.u_admin;
+		--
+		UPDATE "IPYME_FINAL"."USER" 
+		SET u_email 				= v_user.u_email 	
+				,u_name 					= v_user.u_name 		 
+				,u_password_hash = v_user.u_password_hash
+		WHERE u_id = v_user.u_id;
+		--
+	ELSE
+		--
+				--
+		SELECT NEXTVAL('"IPYME_FINAL"."USER_u_id_seq"') INTO v_user.u_id;
+		--
+		v_user.u_session 				:= p_u_session;
+		v_user.u_last_login			:= now();
+		v_user.u_email 					:= LOWER(p_u_email);
+		v_user.u_status 				:= 0;
+		v_user.u_basket 				:= NULL;
+		v_user.u_customer 			:= NULL;
+		v_user.u_name 					:= LOWER(p_u_name);
+		v_user.u_password_hash 	:= p_u_password_hash;
+		v_user.u_admin			  	:= 0;
+		--
+		INSERT INTO "IPYME_FINAL"."USER" ( u_id 
+																			,u_session 
+																			,u_last_login
+																			,u_email 
+																			,u_status
+																			,u_basket
+																			,u_customer
+																			,u_name 
+																			,u_password_hash
+																			,u_admin)
+															VALUES ( v_user.u_id 
+																			,v_user.u_session 
+																			,v_user.u_last_login
+																			,v_user.u_email 
+																			,v_user.u_status
+																			,v_user.u_basket
+																			,v_user.u_customer
+																			,v_user.u_name 
+																			,v_user.u_password_hash
+																			,v_user.u_admin);
+		--
+	END IF;
 	--
-	INSERT INTO "IPYME_FINAL"."USER" ( u_id 
-																		,u_session 
-																		,u_last_login
-																		,u_email 
-																		,u_status
-																		,u_basket
-																		,u_customer
-																		,u_name 
-																		,u_password_hash
-																		,u_admin)
-														VALUES ( v_user.u_id 
-																		,v_user.u_session 
-																		,v_user.u_last_login
-																		,v_user.u_email 
-																		,v_user.u_status
-																		,v_user.u_basket
-																		,v_user.u_customer
-																		,v_user.u_name 
-																		,v_user.u_password_hash
-																		,v_user.u_admin);
 	--
 	RETURN QUERY SELECT v_user.*;
 	--
