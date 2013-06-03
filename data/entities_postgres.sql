@@ -1877,11 +1877,7 @@ $BODY$
 
 
 
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".user_signup(
-	p_u_session character varying
-, p_u_name character varying
-, p_u_password_hash character varying
-, p_u_email character varying)
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".user_signup(p_u_session character varying, p_u_name character varying, p_u_password_hash character varying, p_u_email character varying)
   RETURNS SETOF "IPYME_FINAL"."USER" AS
 $BODY$
 DECLARE
@@ -1907,6 +1903,8 @@ BEGIN
   v_user.u_customer 			:= NULL;
   v_user.u_name 					:= LOWER(p_u_name);
   v_user.u_password_hash 	:= p_u_password_hash;
+  v_user.u_admin			  	:= 0;
+  
 	--
 	INSERT INTO "IPYME_FINAL"."USER" ( u_id 
 																		,u_session 
@@ -1916,7 +1914,8 @@ BEGIN
 																		,u_basket
 																		,u_customer
 																		,u_name 
-																		,u_password_hash)
+																		,u_password_hash
+																		,u_admin)
 														VALUES ( v_user.u_id 
 																		,v_user.u_session 
 																		,v_user.u_last_login
@@ -1925,7 +1924,8 @@ BEGIN
 																		,v_user.u_basket
 																		,v_user.u_customer
 																		,v_user.u_name 
-																		,v_user.u_password_hash);
+																		,v_user.u_password_hash
+																		,v_user.u_admin);
 	--
 	RETURN QUERY SELECT v_user.*;
 	--

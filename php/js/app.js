@@ -25,6 +25,9 @@ angular.module('iPymeApp', ['iPymeApp.filters', 'iPymeApp.services', 'iPymeApp.d
     .when('/shop/product/:id', {
         templateUrl: 'tpl/ng.product.tpl', 
     })
+    .when('/user', {
+        templateUrl: 'tpl/ng.user.sign.tpl', 
+    })
     .when('/user/signin', {
         templateUrl: 'tpl/ng.user.sign.tpl', 
     })
