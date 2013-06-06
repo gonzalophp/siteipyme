@@ -903,6 +903,9 @@ var ngDomAccessProvider = function (grid) {
 	};
 };
 var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
+    setInterval(function() {
+        domUtilityService.RebuildGrid($scope,grid);
+    }, 30);
     var self = this;
     // The init method gets called during the ng-grid directive execution.
     self.colToMove = undefined;
