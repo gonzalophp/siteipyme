@@ -946,9 +946,6 @@ ngDomAccessProvider.prototype.selectionHandlers = function ($scope, elm) {
     });
 };
 var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
-    setInterval(function() {
-        domUtilityService.RebuildGrid($scope,grid);
-    }, 30);
     var self = this;
     // The init method gets called during the ng-grid directive execution.
     self.colToMove = undefined;
@@ -2904,7 +2901,8 @@ ngGridDirectives.directive('ngGrid', ['$compile', '$filter', '$templateCache', '
                                 grid.buildColumns();
                                 grid.configureColumnWidths();
                                 grid.eventProvider.assignEvents();
-                                domUtilityService.RebuildGrid($scope, grid);
+                                setTimeout(function() {domUtilityService.RebuildGrid($scope,grid);}, 1);
+//                                domUtilityService.RebuildGrid($scope, grid);
                             }, true);
                         }
                         else {
