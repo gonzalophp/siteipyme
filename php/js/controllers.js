@@ -1,5 +1,5 @@
 'use strict';
-
+    
 angular.module('iPymeApp')
 .controller('MainMenuController',['$scope','$location',"ipymeajax", function MainMenuController($scope,$location,ipymeajax) {
     var requestData = {};
@@ -45,12 +45,14 @@ angular.module('iPymeApp')
     }
         
     $scope.openDialog = function(start_empty, form_template, buttons, readonly) { 
+        console.log(buttons);
         var dialog = $dialog.dialog({templateUrl: 'tpl/forms/ng.'+form_template+'.tpl',
                                      controller: 'FormDialogController'});
 
         if ((start_empty==0) && ($scope.selectedItems.length == 0)) return;
         dialog.buttons=buttons;
         dialog.readonly=readonly;
+        dialog.formContext = $routeParams.list;
         dialog.selectedItems = $scope.selectedItems[0];
         
         dialog.data = {fields: ((start_empty==0) && ($scope.selectedItems.length > 0)) ? $scope.selectedItems[0] : {}
@@ -83,7 +85,7 @@ angular.module('iPymeApp')
 
     $scope.refreshData();
 }])
-.controller('FormDialogController',['$scope', '$routeParams','dialog','ipymeajax', function FormDialogController($scope, $routeParams, dialog,ipymeajax){
+.controller('FormDialogController',['$scope','dialog','ipymeajax', function FormDialogController($scope, dialog,ipymeajax){
     $scope.dialogForm = {
         readonly:(dialog.readonly==1),
         button_actions:{},
@@ -96,7 +98,7 @@ angular.module('iPymeApp')
                 closeDialog({button:$scope.dialogForm.action.cancel, success:1,response:null});
             },   
             save: function(){
-                ipymeajax('/shop/'+$routeParams.list+'/save', dialog.data)
+                ipymeajax('/shop/'+dialog.formContext+'/save', dialog.data)
                 .success(function(responseData){
                     if (responseData.success == 1){
                         closeDialog({button:$scope.dialogForm.action.save
@@ -107,7 +109,7 @@ angular.module('iPymeApp')
                 
             },
             delete: function(){
-                ipymeajax('/shop/'+$routeParams.list+'/delete', dialog.data)
+                ipymeajax('/shop/'+dialog.formContext+'/delete', dialog.data)
                 .success(function(responseData){
                     if (responseData.success == 1){
                         closeDialog({button:$scope.dialogForm.action.delete
@@ -125,7 +127,7 @@ angular.module('iPymeApp')
             $scope.dialogForm.data.fields.p_image_path=responseData.imagepath;
         });
     }
-    if ($routeParams.list == 'product'){
+    if (dialog.formContext == 'product'){
         $scope.product = {attributes: []
                           ,categoryselected: dialog.data.categoryselected};
 
@@ -756,6 +758,123 @@ angular.module('iPymeApp')
 .controller('logoutCtrl',['$location', function ($location) {
     $location.path('/shop');
 }])
+.controller('UserController',['$scope','$location', '$dialog','ipymeajax', function ($scope,$location,$dialog,ipymeajax) {
+    var select2CountryFormat=function(state) {
+                                    if (!state) return;
+                                    if (!state.id) return state.text; // optgroup
+                                    return '<img class="flag flag-'+state.id+'"/>'+state.text;
+                                }
+                                
+    $scope.$watch('model.panes', function(panes){
+        if (panes.filter(function(tab){return tab.active})[0].title=='Orders'){
+            var gridOptions = $scope.model.orders.ordersGridOptions;
+            setTimeout(function(){gridOptions.$gridServices.DomUtilityService.RebuildGrid(gridOptions.$gridScope,gridOptions.ngGrid)},1);
+        }
+    },true);
+    
+    $scope.model = {panes:[{ title:"Account", template:'paneaccount'},
+                            { title:"Address", template:"paneaddress" , active:true},
+                            { title:"Payments", template:"panepayments" },
+                            { title:"Orders", template:"paneorders"},],
+                    countries:{available:[],
+                                selected:null,
+                                selectcountryoptions:{allowClear: true, 
+                                                        placeholder: "Select country",
+                                                        formatResult: select2CountryFormat,
+                                                        formatSelection: select2CountryFormat,
+                                                        escapeMarkup: function(m) { return m; },},},
+                    orders:{columnDefs:[{field : "u_id", displayName : "ID", width : 50},
+                                        {field : "u_session", displayName : "Session", width : 250},
+                                        {field : "u_basket", displayName : "Basket", width : 70}],
+                             data: [{u_id:'ddd'
+                                    ,u_session:'ddd'
+                                    ,u_basket:'ddd'},
+                                    {u_id:'ddd'
+                                    ,u_session:'ddd'
+                                    ,u_basket:'ddd'}],                           
+                             ordersGridOptions:{enableColumnResize:true,
+                                                  enableColumnReordering:true,
+                                                  pagingOptions:{ pageSizes: [5, 10, 20], pageSize: 10, totalServerItems: 0, currentPage: 1 },
+                                                  columnDefs:'model.orders.columnDefs',
+                                                  data: 'model.orders.data',
+                                                  selectedItems: [],},},
+                    user_details:{},
+                    }
+            
+    ipymeajax('/shop/user/getCountries', {})
+    .success(function(responseData){
+        $scope.model.countries.available = responseData.available;
+    });
+    
+    ipymeajax('/shop/user/get', {})
+    .success(function(responseData){
+        $scope.model.user_details = responseData.user_details;
+        $scope.model.user_details.country_selected = $scope.model.user_details.addresses[0].country_c_code;
+        $scope.model.user_details.address_selected = $scope.model.user_details.addresses[0];
+        
+        
+        console.log($scope);
+    });
+    
+    $scope.addAddressButtons = [{action: "save",class: "btn-primary",displayName: "Save"}
+                                ,{action: "cancel",class: "btn-default",displayName: "Cancel"}];
+    
+    $scope.addAddress = function() {
+        var aAllData = {countries:$scope.model.countries,
+                            fields:{address_detail_ad_country: 575,
+                                                address_detail_ad_description: "new address",
+                                                address_detail_ad_id: 0,
+                                                address_detail_ad_line1: "",
+                                                address_detail_ad_line2: "",
+                                                address_detail_ad_post_code: "",
+                                                address_detail_ad_town: "",
+                                                country_c_code: "gb",
+                                                country_c_id: 575,
+                                                country_c_name: "",}};
+        $scope.openDialog(aAllData,0, 'address', $scope.addAddressButtons, false);
+                                            
+//        $scope.model.user_details.address_selected = aNewAddress;
+    }
+    
+    $scope.openDialog = function(aAllData,start_empty, form_template, buttons, readonly) { 
+        var dialog = $dialog.dialog({templateUrl: 'tpl/forms/ng.'+form_template+'.tpl',
+                                     controller: 'FormDialogController'});
+
+        dialog.buttons=$scope.addAddressButtons;
+        dialog.readonly=readonly;
+        dialog.formContext = 'user/address';
+        dialog.data = aAllData.fields;
+        dialog.alldata = aAllData;
+                
+        dialog.open().then(function(oReturn) {
+            console.log(oReturn);
+            if (oReturn && oReturn.success == 1) {
+                if (oReturn.button == 1){
+                    if (start_empty==1){
+                        
+//                        $scope.datagrid.push(oReturn.response);
+                    }
+                }
+                else if (oReturn.button == 2){
+                    console.log('222222222');
+                }
+            }
+        });
+    } 
+    
+    
+    $scope.dale = function() {
+        console.log($scope.model.panes);
+    }
+    
+    
+    
+   
+}])
+.controller('FormDialogAddressController',['$location', function ($location) {
+    console.log('ffffffff');
+}])
+
 
 
 ;

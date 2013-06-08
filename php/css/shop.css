@@ -236,7 +236,7 @@ div.ipymeshopcolumns > table > tbody > tr > td:nth-child(2) {
 
 div.ipymeshopcolumns > table > tbody > tr > td:nth-child(3) {
     width: 15%;
-    min-width:19em;
+    min-width:27em;
     padding: 1em 1em 1em 1em;
 }
 
@@ -525,3 +525,75 @@ div.ipymeshoptopbar > ul > li.user{
     background: url('images/user.png') 95% 45%  no-repeat;
 }
 
+div.tabbable div.tab-content{
+    /*border:solid 4px red;*/
+    border-bottom: solid 1px #ddd;
+    border-left: solid 1px #ddd;
+    border-right: solid 1px #ddd;
+    border-radius: 5px;
+    padding: 1em;
+}
+div.tabbable ul {
+    margin:0;
+}
+
+div.tabbable div.tab-pane {
+    padding:1em;
+    margin:1em;
+}
+
+div.tabbable .nav-tabs li{
+    font-weight: bold;
+}
+
+div.tabbable .nav-tabs li:hover{
+    cursor:pointer;
+}
+
+div.tabbable .nav-tabs li a{
+    color:#777;
+}
+
+div.tabbable .nav-tabs li:hover a{
+    color:#333;
+}
+
+div.tab-pane input {
+    height: 1em;
+    float:left;
+}
+
+div.tab-pane table {
+    margin:auto;
+}
+
+div.tab-pane table select {
+    height:1.75em;
+    line-height: 0.5em;
+    padding:0;
+}
+
+div.tab-pane table button {
+    margin:0;
+}
+
+div.tab-pane table > tbody > tr > td:nth-child(3) {
+    vertical-align: top;
+    padding-left: 1em;
+}
+
+div.modal-body table > tbody > tr > td:nth-child(1),
+div.tab-pane table > tbody > tr > td:nth-child(1) {
+    padding-right: 2em;
+    text-align: right;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+div.select2-container img {
+    margin-right:1em;
+}
+
+div.modal-body {
+    overflow: hidden;
+}

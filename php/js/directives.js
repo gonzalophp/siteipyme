@@ -315,7 +315,7 @@ angular.module('iPymeApp')
         template:'<div class="ipymeshoptopbar">\
                     <ul>\
                         <li ng-show="user.admin==1" ng-click="admin()" class="admin"><span>(admin panel)</span></li>\
-                        <li ng-click="login()" ng-switch on="user.name" class="user">\
+                        <li ng-click="user_details()" ng-switch on="user.name" class="user">\
                             <span ng-switch-when="">log in</span>\
                             <span ng-switch-default>{{user.name}}</span>\
                         </li>\
@@ -336,8 +336,9 @@ angular.module('iPymeApp')
                 });
             }
             
-            scope.login = function(){
-                $location.path('/user/signin');
+            scope.user_details = function(){
+                if (scope.user.name == "") $location.path('/user/signin');
+                else $location.path('/user');
             }
             
             scope.admin = function() {

@@ -103,8 +103,11 @@ CREATE TABLE "IPYME_AUX"."BASKET_LIST" (
 
 CREATE TABLE "IPYME_AUX"."COUNTRY" (
     C_ID SERIAL PRIMARY KEY
-    , C_NAME VARCHAR(100)
+    , C_NAME TEXT
+    , C_CODE TEXT
 );
+
+CREATE UNIQUE INDEX COUNTRY_unique_idx ON "IPYME_AUX"."COUNTRY"(C_CODE);
 
 CREATE TABLE "IPYME_AUX"."INVOICE_ENTITY" (
     IE_ID BIGSERIAL PRIMARY KEY
@@ -114,6 +117,7 @@ CREATE TABLE "IPYME_AUX"."INVOICE_ENTITY" (
 
 CREATE TABLE "IPYME_AUX"."PEOPLE" (
     P_ID BIGSERIAL PRIMARY KEY
+    , P_TITLE TEXT
     , P_NAME VARCHAR(100)
     , P_SURNAME VARCHAR(100)
     , P_PHONE VARCHAR(20)
@@ -224,7 +228,7 @@ CREATE TABLE "IPYME_AUX"."CARD" (
 CREATE TABLE "IPYME_AUX"."BANK_ACCOUNT" (
     BA_ID BIGSERIAL PRIMARY KEY
     , BA_INVOICE_ENTITY BIGINT REFERENCES "IPYME_AUX"."INVOICE_ENTITY"
-    , BA_NUMER VARCHAR(100)
+    , BA_NUMBER VARCHAR(100)
 );
 
 CREATE TABLE "IPYME_AUX"."PAYMENT" (
@@ -328,7 +332,315 @@ CREATE TYPE "IPYME_AUX".payment_confirmation AS(u_id 	BIGINT
                                                 , bl_quantity 	NUMERIC(5,3));
 
 
+
+CREATE TYPE "IPYME_FINAL".user_details AS
+   (user_u_id bigint,
+    user_u_session character varying(100),
+    user_u_last_login timestamp with time zone,
+    user_u_email character varying(200),
+    user_u_status integer,
+    user_u_basket bigint,
+    user_u_customer bigint,
+    user_u_name character varying(30),
+    user_u_password_hash character varying(100),
+    user_u_admin integer,
+    customer_c_id bigint,
+    customer_c_customer_name character varying(100),
+    customer_c_invoice_entity bigint,
+    invoice_entity_ie_id bigint,
+    invoice_entity_ie_legal_id character varying(100),
+    invoice_entity_ie_invoice_name character varying(100),
+    card_c_id bigint,
+    card_c_invoice_entity bigint,
+    card_c_description character varying(100),
+    card_c_card_number character varying(20),
+    card_c_name character varying(100),
+    card_c_expire_date character varying(8),
+    card_c_issue_numer character varying(20),
+    card_c_vendor integer,
+    people_p_id bigint,
+    people_p_title TEXT,
+    people_p_name character varying(100),
+    people_p_surname character varying(100),
+    people_p_phone character varying(20),
+    people_p_invoice_entity bigint,
+    card_vendor_cv_id integer,
+    card_vendor_cv_name character varying(100),
+    bank_account_ba_id bigint,
+    bank_account_ba_invoice_entity bigint,
+    bank_account_ba_number character varying(100),
+    address_detail_ad_id bigint,
+    address_detail_ad_line1 character varying(100),
+    address_detail_ad_line2 character varying(100),
+    address_detail_ad_town character varying(100),
+    address_detail_ad_post_code character varying(10),
+    address_detail_ad_country integer,
+    address_detail_ad_description character varying(100),
+    address_detail_ad_invoice_entity bigint,
+    country_c_id integer,
+    country_c_name character varying(100),
+    country_c_code text);
+
+
+
+
+
 SET search_path = "IPYME_AUX", pg_catalog;
+
+
+COPY "COUNTRY"(c_code, c_name) FROM stdin DELIMITERS '|';
+ad|andorra
+ae|united arab emirates
+af|afghanistan
+ag|antigua and barbuda
+ai|anguilla
+al|albania
+am|armenia
+ao|angola
+aq|antarctica
+ar|argentina
+as|american samoa
+at|austria
+au|australia
+aw|aruba
+ax|åland islands
+az|azerbaijan
+ba|bosnia and herzegovina
+bb|barbados
+bd|bangladesh
+be|belgium
+bf|burkina faso
+bg|bulgaria
+bh|bahrain
+bi|burundi
+bj|benin
+bl|saint barthélemy
+bm|bermuda
+bn|brunei darussalam
+bo|bolivia
+bq|bonaire, sint eustatius and saba
+br|brazil
+bs|bahamas
+bt|bhutan
+bv|bouvet island
+bw|botswana
+by|belarus
+bz|belize
+ca|canada
+cc|cocos (keeling) islands
+cd|congo, the democratic republic of the
+cf|central african republic
+cg|congo
+ch|switzerland
+ci|côte d''ivoire
+ck|cook islands
+cl|chile
+cm|cameroon
+cn|china
+co|colombia
+cr|costa rica
+cu|cuba
+cv|cape verde
+cw|curaçao
+cx|christmas island
+cy|cyprus
+cz|czech republic
+de|germany
+dj|djibouti
+dk|denmark
+dm|dominica
+do|dominican republic
+dz|algeria
+ec|ecuador
+ee|estonia
+eg|egypt
+eh|western sahara
+er|eritrea
+es|spain
+et|ethiopia
+fi|finland
+fj|fiji
+fk|falkland islands (malvinas)
+fm|micronesia
+fo|faroe islands
+fr|france
+ga|gabon
+gb|united kingdom
+gd|grenada
+ge|georgia
+gf|french guiana
+gg|guernsey
+gh|ghana
+gi|gibraltar
+gl|greenland
+gm|gambia
+gn|guinea
+gp|guadeloupe
+gq|equatorial guinea
+gr|greece
+gs|south georgia and the south sandwich islands
+gt|guatemala
+gu|guam
+gw|guinea-bissau
+gy|guyana
+hk|hong kong
+hm|heard island and mcdonald islands
+hn|honduras
+hr|croatia
+ht|haiti
+hu|hungary
+id|indonesia
+ie|ireland
+il|israel
+im|isle of man
+in|india
+io|british indian ocean territory
+iq|iraq
+ir|iran, islamic republic of
+is|iceland
+it|italy
+je|jersey
+jm|jamaica
+jo|jordan
+jp|japan
+ke|kenya
+kg|kyrgyzstan
+kh|cambodia
+ki|kiribati
+km|comoros
+kn|saint kitts and nevis
+kp|korea, democratic people's republic of
+kr|korea, republic of
+kw|kuwait
+ky|cayman islands
+kz|kazakhstan
+la|lao people's democratic republic
+lb|lebanon
+lc|saint lucia
+li|liechtenstein
+lk|sri lanka
+lr|liberia
+ls|lesotho
+lt|lithuania
+lu|luxembourg
+lv|latvia
+ly|libyan arab jamahiriya
+ma|morocco
+mc|monaco
+md|moldova, republic of
+me|montenegro
+mf|saint martin (french part)
+mg|madagascar
+mh|marshall islands
+mk|macedonia, the former yugoslav republic of
+ml|mali
+mm|myanmar
+mn|mongolia
+mo|macao
+mp|northern mariana islands
+mq|martinique
+mr|mauritania
+ms|montserrat
+mt|malta
+mu|mauritius
+mv|maldives
+mw|malawi
+mx|mexico
+my|malaysia
+mz|mozambique
+na|namibia
+nc|new caledonia
+ne|niger
+nf|norfolk island
+ng|nigeria
+ni|nicaragua
+nl|netherlands
+no|norway
+np|nepal
+nr|nauru
+nu|niue
+nz|new zealand
+om|oman
+pa|panama
+pe|peru
+pf|french polynesia
+pg|papua new guinea
+ph|philippines
+pk|pakistan
+pl|poland
+pm|saint pierre and miquelon
+pn|pitcairn
+pr|puerto rico
+ps|palestine, state of
+pt|portugal
+pw|palau
+py|paraguay
+qa|qatar
+re|réunion
+ro|romania
+rs|serbia
+ru|russian federation
+rw|rwanda
+sa|saudi arabia
+sb|solomon islands
+sc|seychelles
+sd|sudan
+se|sweden
+sg|singapore
+sh|saint helena, ascension and tristan da cunha
+si|slovenia
+sj|svalbard and jan mayen
+sk|slovakia
+sl|sierra leone
+sm|san marino
+sn|senegal
+so|somalia
+sr|suriname
+ss|south sudan
+st|sao tome and principe
+sv|el salvador
+sx|sint maarten (dutch part)
+sy|syrian arab republic
+sz|swaziland
+tc|turks and caicos islands
+td|chad
+tf|french southern territories
+tg|togo
+th|thailand
+tj|tajikistan
+tk|tokelau
+tl|timor-leste
+tm|turkmenistan
+tn|tunisia
+to|tonga
+tr|turkey
+tt|trinidad and tobago
+tv|tuvalu
+tw|taiwan, province of china
+tz|tanzania, united republic of
+ua|ukraine
+ug|uganda
+um|united states minor outlying islands
+us|united states
+uy|uruguay
+uz|uzbekistan
+va|holy see (vatican city state)
+vc|saint vincent and the grenadines
+ve|venezuela, bolivarian republic of
+vg|virgin islands, british
+vi|virgin islands, u.s.
+vn|viet nam
+vu|vanuatu
+wf|wallis and futuna
+ws|samoa
+ye|yemen
+yt|mayotte
+za|south africa
+zm|zambia
+zw|Zimbabwe
+\.
+
+
 
 COPY "USER" (u_session, u_last_login, u_email, u_status, u_basket, u_customer, u_name, u_password_hash, u_id) FROM stdin;
 9od4p5ehecs9ne451ea0fgnv60	\N	gonzalophp@gmail.com	1	\N	\N	gonzalo	8e43bec6c9a4aba7dc358247a21ab52d301a2840	223
@@ -2255,6 +2567,104 @@ $BODY$
   ROWS 1000;
 
 
-\dn
 
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_user_details(p_u_session character varying)
+  RETURNS SETOF "IPYME_FINAL".user_details AS
+$BODY$
+DECLARE
+BEGIN
+	--
+	RETURN QUERY SELECT	U.u_id 									AS user_u_id
+				,U.u_session						AS user_u_session
+				,U.u_last_login 				AS user_u_last_login
+				,U.u_email							AS user_u_email
+				,U.u_status							AS user_u_status
+				,U.u_basket							AS user_u_basket
+				,U.u_customer						AS user_u_customer
+				,U.u_name								AS user_u_name
+				,U.u_password_hash 			AS user_u_password_hash
+				,U.u_admin							AS user_u_admin
+				,C.c_id									AS customer_c_id
+				,C.c_customer_name 			AS customer_c_customer_name
+				,C.c_invoice_entity			AS customer_c_invoice_entity
+				,IE.ie_id 							AS invoice_entity_ie_id
+				,IE.ie_legal_id 				AS invoice_entity_ie_legal_id
+				,IE.ie_invoice_name			AS invoice_entity_ie_invoice_name
+				,CARD.c_id 							AS card_c_id
+				,CARD.c_invoice_entity 	AS card_c_invoice_entity
+				,CARD.c_description 		AS card_c_description
+				,CARD.c_card_number 		AS card_c_card_number
+				,CARD.c_name 						AS card_c_name
+				,CARD.c_expire_date			AS card_c_expire_date
+				,CARD.c_issue_numer 		AS card_c_issue_numer
+				,CARD.c_vendor 					AS card_c_vendor
+				,P.p_id 								AS people_p_id
+				,P.p_title							AS people_p_title 
+				,P.p_name 							AS people_p_name
+				,P.p_surname 						AS people_p_surname
+				,P.p_phone  						AS people_p_phone
+				,P.p_invoice_entity 		AS people_p_invoice_entity
+				,CV.cv_id								AS card_vendor_cv_id
+				,CV.cv_name 						AS card_vendor_cv_name
+				,BA.ba_id								AS bank_account_ba_id
+				,BA.ba_invoice_entity		AS bank_account_ba_invoice_entity
+				,BA.ba_numer 						AS bank_account_ba_numer
+				,AD.ad_id								AS address_detail_ad_id
+				,AD.ad_line1 						AS address_detail_ad_line1
+				,AD.ad_line2 						AS address_detail_ad_line2
+				,AD.ad_town 						AS address_detail_ad_town
+				,AD.ad_post_code				AS address_detail_ad_post_code
+				,AD.ad_country 					AS address_detail_ad_country
+				,AD.ad_description			AS address_detail_ad_description
+				,AD.ad_invoice_entity 	AS address_detail_ad_invoice_entity
+				,COUNTRY.c_id 					AS country_c_id							
+				,COUNTRY.c_name  				AS country_c_name
+				,COUNTRY.c_code  				AS country_c_code
+	FROM "IPYME_FINAL"."USER" U
+	INNER JOIN "IPYME_FINAL"."CUSTOMER" C
+	ON U.u_customer = C.c_id
+	INNER JOIN "IPYME_FINAL"."INVOICE_ENTITY" IE
+	ON IE.ie_id = C.c_invoice_entity
+	LEFT JOIN "IPYME_FINAL"."CARD" CARD
+	ON CARD.c_invoice_entity = IE.ie_id
+	LEFT JOIN "IPYME_FINAL"."CARD_VENDOR" CV
+	ON CARD.c_vendor = CV.cv_id
+	LEFT JOIN "IPYME_FINAL"."ADDRESS_DETAIL" AD
+	ON AD.ad_invoice_entity = IE.ie_id
+	LEFT JOIN "IPYME_FINAL"."COUNTRY" COUNTRY
+	ON COUNTRY.c_id = AD.ad_country
+	LEFT JOIN "IPYME_FINAL"."BANK_ACCOUNT" BA
+	ON BA.ba_invoice_entity = IE.ie_id
+	LEFT JOIN "IPYME_FINAL"."PEOPLE" P
+	ON P.p_invoice_entity = IE.ie_id
+	WHERE u_session = p_u_session;
+	--
+
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_countries(p_c_id integer)
+  RETURNS SETOF "IPYME_FINAL"."COUNTRY" AS
+$BODY$
+DECLARE
+BEGIN
+	--
+	RETURN QUERY 	SELECT * 
+								FROM "IPYME_FINAL"."COUNTRY"
+								WHERE c_id = p_c_id OR p_c_id IS NULL;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
+
+\dn
 

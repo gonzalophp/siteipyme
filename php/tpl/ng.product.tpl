@@ -12,11 +12,9 @@
                             <p><img ng-src="{{model.product.p_image_path}}"/></p>
                             <p>{{model.product.p_description}}</p>
                             <p>{{model.product.p_long_description}}</p>
-                            <p>{{model.product.p_price}}</p>
+                            <p>{{model.product.c_name}}&nbsp;{{model.product.p_price}}</p>
                             <div class="ipymeButtonsGroup">
                                 <button class="shop" ng-click="redirect('/shop')">Continue Shopping</button>
-                                
-                                
                                 <button class="shop addtobasket" ng-click="addbutton(model.product)">Add to Basket</button>
                                 <quantity class="basketquantity" ng-model="model.product.quantity"></quantity>
                             </div>

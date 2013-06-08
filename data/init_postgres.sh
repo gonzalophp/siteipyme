@@ -13,4 +13,5 @@ else
     export PGUSER=$OPENSHIFT_POSTGRESQL_DB_USERNAME
 fi
 
-psql -f entities_postgres.sql
+#psql -f entities_postgres.sql
+psql -f $1
