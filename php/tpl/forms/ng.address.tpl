@@ -4,6 +4,7 @@
 <div class="modal-body">
     <table>
         <tbody>
+            <input type="hidden" ng-model="dialogForm.data.fields.address_detail_ad_id" />
             <tr>
                 <td>Address Description</td>
                 <td><input type="text" ng-model="dialogForm.data.fields.address_detail_ad_description" /></td>

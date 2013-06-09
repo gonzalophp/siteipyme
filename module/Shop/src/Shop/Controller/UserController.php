@@ -77,8 +77,8 @@ class UserController extends \Zend\Mvc\Controller\AbstractActionController {
     }
     
     public function getAction(){
-        $this->getRequest()->setContent('{}');
-        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
+//        $this->getRequest()->setContent('{}');
+//        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
         
         
         if ($this->getRequest()->isXmlHttpRequest()) {
@@ -113,7 +113,8 @@ class UserController extends \Zend\Mvc\Controller\AbstractActionController {
                         'card_c_name'           => $aRow['card_c_name'],
                         'card_c_expire_date'    => $aRow['card_c_expire_date'],
                         'card_c_issue_numer'    => $aRow['card_c_issue_numer'],
-                        'card_c_vendor'         => $aRow['card_c_vendor'],);
+                        'card_c_vendor'         => $aRow['card_c_vendor'],
+                        'card_vendor_cv_name'   => $aRow['card_vendor_cv_name'],);
                 }
                 
                 if (!array_key_exists($aRow['address_detail_ad_id'], $aUserDetails['addresses'])){
@@ -171,8 +172,41 @@ class UserController extends \Zend\Mvc\Controller\AbstractActionController {
     }
     
     public function addressAction() {
-        $sAddressAction =  $this->getEvent()->getRouteMatch()->getParam('id');
-        return new \Zend\View\Model\JsonModel(array('success' => 1, 'address_action' => $sAddressAction));
+//        $this->getRequest()->setContent('{"country_c_code":"al","address_detail_ad_description":"aaaaaaa1","address_detail_ad_line1":"aaaaaaa2","address_detail_ad_line2":"aaaaa3","address_detail_ad_town":"aaaaaa4","address_detail_ad_post_code":"aaaaaaaa5"}');
+//        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
+//        
+        
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            $sJSONDataRequest = $this->getRequest()->getContent();
+            $aRequest = (array)json_decode($sJSONDataRequest);
+            
+            $aFunctionParams = array(':p_u_session'         => session_id()
+                                    ,':p_ad_id'             => array_key_exists('address_detail_ad_id',$aRequest)?$aRequest['address_detail_ad_id']:0
+                                    ,':p_ad_line1'          => array_key_exists('address_detail_ad_line1',$aRequest)?$aRequest['address_detail_ad_line1']:''
+                                    ,':p_ad_line2'          => array_key_exists('address_detail_ad_line2',$aRequest)?$aRequest['address_detail_ad_line2']:''
+                                    ,':p_ad_town'           => array_key_exists('address_detail_ad_town',$aRequest)?$aRequest['address_detail_ad_town']:''
+                                    ,':p_ad_post_code'      => array_key_exists('address_detail_ad_post_code',$aRequest)?$aRequest['address_detail_ad_post_code']:''
+                                    ,':p_ad_description'    => array_key_exists('address_detail_ad_description',$aRequest)?$aRequest['address_detail_ad_description']:''
+                                    ,':p_c_code'            => array_key_exists('country_c_code',$aRequest)?$aRequest['country_c_code']:'');
+            
+  
+//            var_dump($aRequest,$aFunctionParams);
+            $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+            $oResultSet = $oDataFunctionGateway->getDataRecordSet(
+                    'IPYME_FINAL'
+                    , 'set_address'
+                    , $aFunctionParams);
+                
+            
+            
+            $aResultSet = $oResultSet->current();
+            $bSuccess = ($oResultSet->count() == 1);
+        }
+        else {
+            $bSuccess=false;
+        }
+        
+        return new \Zend\View\Model\JsonModel(array('success' => ($bSuccess?1:0), 'address' => $aResultSet));
     }
     
     public function paymentAction() {

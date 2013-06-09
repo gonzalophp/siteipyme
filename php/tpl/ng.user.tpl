@@ -9,9 +9,7 @@
                 <tr>
                     <td>Title</td>
                     <td>
-                        <select>
-                            <option>{{model.user_details.people[0].people_p_title}}</option>
-                        </select>
+                        <select ng-model="model.user_details.people[0].people_p_title" ng-options="title for title in model.titles"></select>
                     </td>
                 </tr>
                 <tr>
@@ -24,7 +22,7 @@
                 </tr>
                 <tr>
                     <td>Email</td>
-                    <td><input type="text" ng-model="model.user_details.people[0].user_u_email"></td>
+                    <td><input type="text" ng-model="model.user_details.user_u_email"></td>
                 </tr>
                 <tr>
                     <td>Home phone</td>
@@ -54,32 +52,27 @@
                 </tr>
                 <tr>
                     <td>Address Line 1</td>
-                    <td><input type="text" id="address1" ng-model="model.user_details.address_selected.address_detail_ad_line1" /></td>
+                    <td>{{model.user_details.address_selected.address_detail_ad_line1}}</td>
                     <td></td>
                 </tr>
                 <tr>
                     <td>Address Line 2</td>
-                    <td><input type="text" id="address2" ng-model="model.user_details.address_selected.address_detail_ad_line2" /></td>
+                    <td>{{model.user_details.address_selected.address_detail_ad_line2}}</td>
                     <td></td>
                 </tr>
                 <tr>
                     <td>Post Code</td>
-                    <td><input type="text" id="address2" ng-model="model.user_details.address_selected.address_detail_ad_town" /></td>
+                    <td>{{model.user_details.address_selected.address_detail_ad_town}}</td>
                     <td></td>
                 </tr>
                 <tr>
                     <td>Town</td>
-                    <td><input type="text" id="postcode" ng-model="model.user_details.address_selected.address_detail_ad_post_code" /></td>
+                    <td>{{model.user_details.address_selected.address_detail_ad_post_code}}</td>
                     <td></td>
                 </tr>
                 <tr>
                     <td>Country</td>
-                    <td>
-                        <select ui-select2='model.countries.selectcountryoptions' ng-model="model.user_details.address_selected.country_c_code" >
-                            <option value=""></option>
-                            <option ng-repeat="country in model.countries.available" value="{{country.c_code}}">{{country.c_name}}</option>
-                        </select>
-                    </td>
+                    <td><img class="flag flag-{{model.user_details.address_selected.country_c_code}}"/> {{model.user_details.address_selected.country_c_name}}</td>
                     <td></td>
                 </tr>
             </tbody>
@@ -103,20 +96,24 @@
                     <td><button class="shop" ng-click="editPayment()">Edit</button></td>
                 </tr>
                 <tr>
+                    <td>Card vendor</td>
+                    <td>{{model.user_details.card[0].card_vendor_cv_name}}</td>
+                </tr>
+                <tr>
                     <td>Name on card</td>
-                    <td><input type="text" ng-model="model.user_details.card[0].card_c_name" /></td>
+                    <td>{{model.user_details.card[0].card_c_name}}</td>
                 </tr>
                 <tr>
                     <td>Card number</td>
-                    <td><input type="text" ng-model="model.user_details.card[0].card_c_card_number" /></td>
+                    <td>{{model.user_details.card[0].card_c_card_number}}</td>
                 </tr>
                 <tr>
                     <td>Expire:</td>
-                    <td><input type="text" ng-model="model.user_details.card[0].card_c_expire_date" /></td>
+                    <td>{{model.user_details.card[0].card_c_expire_date}}</td>
                 </tr>
                 <tr>
                     <td>Issue number</td>
-                    <td><input type="text" ng-model="model.user_details.card[0].card_c_issue_numer" /></td>
+                    <td>{{model.user_details.card[0].card_c_issue_numer}}</td>
                 </tr>
             </tbody>
         </table>

@@ -6,21 +6,14 @@
         <tbody>
             <tr>
                 <td>Card Description</td>
-                <td>
-                    <select>
-                        <option value="">{{dialogForm.data.fields.card_c_description}}</option>
-                    </select>
-                </td>
+                <td><input type="text" ng-model="dialogForm.data.fields.card_c_description" /></td>
             </tr>
             <tr>
                 <td>Vendor</td>
                 <td>
-                    <select ui-select2='dialogForm.data.countries.selectcountryoptions' ng-model="dialogForm.data.fields.country_c_code" >
-                        <option value=""></option>
-                        <option ng-repeat="country in dialogForm.data.countries.available" value="{{country.c_code}}">{{country.c_name}}</option>
-                    </select>
+                    <select ng-model="dialogForm.data.fields.card_vendor_cv_name" ng-options="card_vendor.cv_name for card_vendor in dialogForm.data.card_vendors.available"></select>
                 </td>
-                <td></td>
+                <td>{{dialogForm.data.fields.card_vendor_cv_name}}</td>
             </tr>
             <tr>
                 <td>Name on card</td>

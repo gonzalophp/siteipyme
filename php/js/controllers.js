@@ -777,9 +777,9 @@ console.log(dialog.data.fields);
         }
     },true);
     
-    $scope.model = {panes:[{ title:"Account", template:'paneaccount'},
-                            { title:"Address", template:"paneaddress" },
-                            { title:"Payments", template:"panepayments", active:true },
+    $scope.model = {panes:[{ title:"Account", template:'paneaccount' },
+                            { title:"Address", template:"paneaddress" , active:true},
+                            { title:"Payments", template:"panepayments"},
                             { title:"Orders", template:"paneorders"},],
                     countries:{available:[],
                                 selected:null,
@@ -788,6 +788,11 @@ console.log(dialog.data.fields);
                                                         formatResult: select2CountryFormat,
                                                         formatSelection: select2CountryFormat,
                                                         escapeMarkup: function(m) { return m; },},},
+                    card_vendors:{available:[{cv_id:1, cv_name:'visa'},{cv_id:2, cv_name:'master card'},{cv_id:3, cv_name:'electron'}],
+                                   selected:null,
+                                   selectcardoptions:{allowClear: false, 
+                                                        placeholder: "Select vendor"},},
+                    titles:['Mr.','Mrs.','Ms.'],
                     orders:{columnDefs:[{field : "u_id", displayName : "ID", width : 50},
                                         {field : "u_session", displayName : "Session", width : 250},
                                         {field : "u_basket", displayName : "Basket", width : 70}],
@@ -800,12 +805,18 @@ console.log(dialog.data.fields);
                              ordersGridOptions:{enableColumnResize:true,
                                                   enableColumnReordering:true,
                                                   multiSelect:false,
+//                                                  jqueryUITheme:true,
+                                                  showFilter:true,
+                                                  showFooter:true,
+                                                  enablePaging:true,
+                                                  enableRowSelection: true,
+                                                   showSelectionCheckbox: true,
                                                   pagingOptions:{ pageSizes: [5, 10, 20], pageSize: 10, totalServerItems: 0, currentPage: 1 },
                                                   columnDefs:'model.orders.columnDefs',
                                                   data: 'model.orders.data',
                                                   selectedItems: [],},},
                     user_details:{},
-                    }
+    }
             
     ipymeajax('/shop/user/getCountries', {})
     .success(function(responseData){
@@ -818,6 +829,8 @@ console.log(dialog.data.fields);
         $scope.model.user_details.country_selected = $scope.model.user_details.addresses[0].country_c_code;
         $scope.model.user_details.address_selected = $scope.model.user_details.addresses[0];
         $scope.model.user_details.card_selected = $scope.model.user_details.card[0];
+        
+        console.log($scope.model.user_details);
     });
     
     $scope.addAddressButtons = [{action: "save",class: "btn-primary",displayName: "Save"}
@@ -825,25 +838,13 @@ console.log(dialog.data.fields);
     
     $scope.addAddress = function() {
         var aData = {countries:$scope.model.countries,
-                    fields:{address_detail_ad_country: 575,
-                                        address_detail_ad_description: "new address",
-                                        address_detail_ad_id: 0,
-                                        address_detail_ad_line1: "",
-                                        address_detail_ad_line2: "",
-                                        address_detail_ad_post_code: "",
-                                        address_detail_ad_town: "",
-                                        country_c_code: "gb",
-                                        country_c_id: 575,
-                                        country_c_name: "",}};
+                    fields:{ country_c_code: "gb"}};
         $scope.openDialog(aData,0, 'address', $scope.addAddressButtons, false);
     }
     
     $scope.addPayment = function() {
-        var aData = {countries:$scope.model.countries,
-                    fields:{card_c_name: 'name',
-                            card_c_card_number: 'number',
-                            card_c_expire_date: 'exp',
-                            card_c_issue_numer: "iss",}};
+        var aData = {card_vendors:$scope.model.card_vendors,
+                    fields:{}};
             
         $scope.openDialog(aData,0, 'card', $scope.addAddressButtons, false);
     }
@@ -852,7 +853,7 @@ console.log(dialog.data.fields);
     $scope.editPayment = function() {
         console.log($scope.model);
         
-         var aData = {countries:$scope.model.countries,
+         var aData = {card_vendors:$scope.model.card_vendors,
                     fields:$scope.model.user_details.card_selected};
         $scope.openDialog(aData, 0, 'card', $scope.addAddressButtons, false);
     }

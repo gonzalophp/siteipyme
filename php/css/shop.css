@@ -590,6 +590,14 @@ div.tab-pane table > tbody > tr > td:nth-child(1) {
     font-weight: bold;
 }
 
+div.tab-pane table > tbody > tr > td:nth-child(2) {
+    font-size: 1.6em;
+    color:black;
+    padding:0.1em 0em 0.1em 1em;
+    margin:0.5em;
+    border-spacing: 1em
+}
+
 div.select2-container img {
     margin-right:1em;
 }
