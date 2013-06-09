@@ -333,7 +333,7 @@ CREATE TYPE "IPYME_AUX".payment_confirmation AS(u_id 	BIGINT
 
 
 
-CREATE TYPE "IPYME_FINAL".user_details AS
+CREATE TYPE "IPYME_AUX".user_details AS
    (user_u_id bigint,
     user_u_session character varying(100),
     user_u_last_login timestamp with time zone,
