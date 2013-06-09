@@ -4,29 +4,37 @@
     <shoptopbar></shoptopbar>
     
     <script type="text/ng-template" id="paneaccount">
+        <table>
+            <tbody>
+                <tr>
+                    <td>Title</td>
+                    <td>
+                        <select>
+                            <option>{{model.user_details.people[0].people_p_title}}</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>First Name</td>
+                    <td><input type="text" ng-model="model.user_details.people[0].people_p_name"></td>
+                </tr>
+                <tr>
+                    <td>surname</td>
+                    <td><input type="text" ng-model="model.user_details.people[0].people_p_surname"></td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td><input type="text" ng-model="model.user_details.people[0].user_u_email"></td>
+                </tr>
+                <tr>
+                    <td>Home phone</td>
+                    <td><input type="text" ng-model="model.user_details.people[0].people_p_phone"></td>
+                </tr>
+            </tbody>
+        </table>
         <p>
-            <label for="name">Title</label>
-            <select>
-                <option>{{model.user_details.people[0].people_p_title}}</option>
-            </select>
+            <button class="shop confirm" ng-click="dale()">Update</button>
         </p>
-        <p class="text">
-            <label for="phone">First Name</label>
-            <input type="text" class="text" name="phone" ng-model="model.user_details.people[0].people_p_name">
-        </p>
-        <p class="text">
-            <label for="surname">surname</label>
-            <input type="text" class="text" name="phone" ng-model="model.user_details.people[0].people_p_surname">
-        </p>
-        <p>
-            <label for="surname">Email</label>
-            <input type="text" ng-model="model.user_details.user_u_email"/>
-        </p>
-        <p class="text">
-            <label for="phone">Home phone</label>
-            <input type="text" class="text" name="phone" ng-model="model.user_details.people[0].people_p_phone">
-        </p>
-        
     </script>
     <script type="text/ng-template" id="paneaddress">
         <table>
@@ -79,29 +87,39 @@
     </script>
     
     <script type="text/ng-template" id="panepayments">
-        <p>
-            <label for="address1">Description</label>
-            <select>
-                <option value="">{{model.user_details.card[0].card_c_description}}</option>
-            </select>
-            
-        </p>
-        <p>
-            <label for="cardname">Name on card</label>
-            <input type="text" id="cardname" ng-model="model.user_details.card[0].card_c_name" />
-        </p>
-        <p>
-            <label for="cardnumber">Card number:</label>
-            <input type="text" id="cardnumber" ng-model="model.user_details.card[0].card_c_card_number" />
-        </p>
-        <p>
-            <label for="cardexpire">Expire:</label>
-            <input type="text" id="cardexpire" ng-model="model.user_details.card[0].card_c_expire_date" />
-        </p>
-        <p>
-            <label for="cardexpire">Issue number</label>
-            <input type="text" id="cardexpire" ng-model="model.user_details.card[0].card_c_issue_numer" />
-        </p>
+        <table>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td colspan="2">
+                        <button style="margin-bottom:1em" class="shop" ng-click="addPayment()">New Card</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Description</td>
+                    <td>
+                        <select ng-model="model.user_details.card_selected" ng-options="card.card_c_description for card in model.user_details.card"></select>
+                    </td>
+                    <td><button class="shop" ng-click="editPayment()">Edit</button></td>
+                </tr>
+                <tr>
+                    <td>Name on card</td>
+                    <td><input type="text" ng-model="model.user_details.card[0].card_c_name" /></td>
+                </tr>
+                <tr>
+                    <td>Card number</td>
+                    <td><input type="text" ng-model="model.user_details.card[0].card_c_card_number" /></td>
+                </tr>
+                <tr>
+                    <td>Expire:</td>
+                    <td><input type="text" ng-model="model.user_details.card[0].card_c_expire_date" /></td>
+                </tr>
+                <tr>
+                    <td>Issue number</td>
+                    <td><input type="text" ng-model="model.user_details.card[0].card_c_issue_numer" /></td>
+                </tr>
+            </tbody>
+        </table>
     </script>
     
     <script type="text/ng-template" id="paneorders">
@@ -115,9 +133,6 @@
                 <div ng-include="pane.template"></div>
             </pane>
         </tabs>
-        <p>
-            <button class="shop confirm" ng-click="dale()">Save</button>
-        </p>
     </div>
     <footer>
         <p>2013 - Gonzalo Grado </p>

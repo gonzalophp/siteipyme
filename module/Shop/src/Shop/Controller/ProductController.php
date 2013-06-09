@@ -116,25 +116,29 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
     
     
     public function SaveAction(){
-//        $this->getRequest()->setContent('{"fields":{"p_ref":"asus p5k ref","p_description":"asus p5k desc","p_long_description":"asus p5k long","p_price":"100"},"categoryselected":{"id":"19","category":"MOTHERBOARD"},"category_attribute":{"7":{"pca_id":7,"pca_attribute":"RETAIL","attribute_value_selected":"RETAIL","attribute_values":["OEM","RETAIL"],"attributes":[{"id":7,"value":"OEM"},{"id":7,"value":"RETAIL"}]},"8":{"pca_id":8,"pca_attribute":"CHIPSET","attribute_value_selected":"i480","attribute_values":[],"attributes":[]},"9":{"pca_id":9,"pca_attribute":"LAN","attribute_value_selected":"1000Gbps","attribute_values":[],"attributes":[]},"10":{"pca_id":10,"pca_attribute":"WIFI","attribute_value_selected":"no","attribute_values":[],"attributes":[]},"11":{"pca_id":11,"pca_attribute":"AUDIO","attribute_value_selected":"ac97","attribute_values":[],"attributes":[]},"16":{"pca_id":16,"pca_attribute":"BRAND","attribute_value_selected":"asus","attribute_values":["CORSAIR","INTEL"],"attributes":[{"id":16,"value":"CORSAIR"},{"id":16,"value":"INTEL"}]}},"currencies":{"selected":"USD","array":["GBP","EUR","USD"],"details":[{"c_id":1,"c_name":"GBP"},{"c_id":2,"c_name":"EUR"},{"c_id":3,"c_name":"USD"}]}}');
+//        $this->getRequest()->setContent('{"p_category":"18","p_category_name":"DDR3","category_attribute":{"7":{"pca_id":7,"pca_attribute":"RETAIL","attribute_value_selected":"RETAIL","attribute_values":["OEM","RETAIL"],"attributes":[{"id":7,"value":"OEM"},{"id":7,"value":"RETAIL"}]},"12":{"pca_id":12,"pca_attribute":"SIZE","attribute_value_selected":"4Gb","attribute_values":["8GB"],"attributes":[{"id":12,"value":"8GB"}]},"13":{"pca_id":13,"pca_attribute":"SPEED","attribute_value_selected":"800MHZ","attribute_values":["800MHZ"],"attributes":[{"id":13,"value":"800MHZ"}]},"14":{"pca_id":14,"pca_attribute":"ECC","attribute_value_selected":"NO","attribute_values":["NO"],"attributes":[{"id":14,"value":"NO"}]},"16":{"pca_id":16,"pca_attribute":"BRAND","attribute_value_selected":"CORSAIR","attribute_values":["ASUS","CORSAIR","INTEL"],"attributes":[{"id":16,"value":"ASUS"},{"id":16,"value":"CORSAIR"},{"id":16,"value":"INTEL"}]}},"p_ref":"memotest","p_description":"memotestdesc","p_image_path":"http://siteipyme/img/igor.png","p_long_description":"dddddddddddddddd","p_price":"112233","c_name":"GBP"}');
 //        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
 //        
         if ($this->getRequest()->isXmlHttpRequest()) {
             $sJSONDataRequest = $this->getRequest()->getContent();
             $aRequest = (array)json_decode($sJSONDataRequest, true);
             $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
-            $nProductId = array_key_exists('p_id',$aRequest['fields'])?$aRequest['fields']['p_id']:null;
+            $nProductId = array_key_exists('p_id',$aRequest)?$aRequest['p_id']:null;
+            
+            $aFunctionParams = array(':p_p_id'                => $nProductId
+                        ,':p_p_ref'              => $aRequest['p_ref']
+                        ,':p_p_description'      => array_key_exists('p_description',$aRequest)?$aRequest['p_description']:null
+                        ,':p_p_long_description' => array_key_exists('p_long_description',$aRequest)?$aRequest['p_long_description']:null
+                        ,':p_p_category'         => $aRequest['p_category']
+                        ,':p_p_price'            => array_key_exists('p_price',$aRequest)?$aRequest['p_price']:null
+                        ,':p_p_image_path'       => array_key_exists('p_image_path',$aRequest)?$aRequest['p_image_path']:null
+                        ,':p_c_name'             => array_key_exists('c_name',$aRequest)?$aRequest['c_name']:null);
+            
+//            var_dump($aFunctionParams);
             $oResultSet = $oDataFunctionGateway->getDataRecordSet(
                 'IPYME_FINAL'
                 , 'set_product'
-                , array(':p_p_id'                => $nProductId
-                        ,':p_p_ref'              => $aRequest['fields']['p_ref']
-                        ,':p_p_description'      => array_key_exists('p_description',$aRequest['fields'])?$aRequest['fields']['p_description']:null
-                        ,':p_p_long_description' => array_key_exists('p_long_description',$aRequest['fields'])?$aRequest['fields']['p_long_description']:null
-                        ,':p_p_category'         => $aRequest['categoryselected']['id']
-                        ,':p_p_price'            => array_key_exists('p_price',$aRequest['fields'])?$aRequest['fields']['p_price']:null
-                        ,':p_p_image_path'       => array_key_exists('p_image_path',$aRequest['fields'])?$aRequest['fields']['p_image_path']:null
-                        ,':p_c_name'             => array_key_exists('c_name',$aRequest['fields'])?$aRequest['fields']['c_name']:null));
+                , $aFunctionParams);
             
             $aResponse = $oResultSet->current();
             if ($oResultSet->count()==1){
@@ -177,7 +181,7 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
             $oResultSet = $oDataFunctionGateway->getDataRecordSet(
                 'IPYME_FINAL'
                 , 'delete_product'
-                , array(':p_p_id'                => array_key_exists('p_id',$aRequest['fields'])?$aRequest['fields']['p_id']:null));
+                , array(':p_p_id'                => array_key_exists('p_id',$aRequest)?$aRequest['p_id']:null));
             
             
             $aResponse = $oResultSet->current();

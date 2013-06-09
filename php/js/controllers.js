@@ -20,6 +20,7 @@ angular.module('iPymeApp')
 //        enablePaging:true,
         enableColumnReordering:true,
 //        showFooter:true,
+        multiSelect:false,
         pagingOptions:{ pageSizes: [5, 10, 20], pageSize: 10, totalServerItems: 0, currentPage: 1 },
         data: 'datagrid',
         columnDefs:'columnDefs',
@@ -86,6 +87,7 @@ angular.module('iPymeApp')
     $scope.refreshData();
 }])
 .controller('FormDialogController',['$scope','dialog','ipymeajax', function FormDialogController($scope, dialog,ipymeajax){
+console.log(dialog.data.fields);
     $scope.dialogForm = {
         readonly:(dialog.readonly==1),
         button_actions:{},
@@ -98,7 +100,7 @@ angular.module('iPymeApp')
                 closeDialog({button:$scope.dialogForm.action.cancel, success:1,response:null});
             },   
             save: function(){
-                ipymeajax('/shop/'+dialog.formContext+'/save', dialog.data)
+                ipymeajax('/shop/'+dialog.formContext+'/save', dialog.data.fields)
                 .success(function(responseData){
                     if (responseData.success == 1){
                         closeDialog({button:$scope.dialogForm.action.save
@@ -106,10 +108,9 @@ angular.module('iPymeApp')
                             ,response:responseData});
                     }
                 });
-                
             },
             delete: function(){
-                ipymeajax('/shop/'+dialog.formContext+'/delete', dialog.data)
+                ipymeajax('/shop/'+dialog.formContext+'/delete', dialog.data.fields)
                 .success(function(responseData){
                     if (responseData.success == 1){
                         closeDialog({button:$scope.dialogForm.action.delete
@@ -128,13 +129,18 @@ angular.module('iPymeApp')
         });
     }
     if (dialog.formContext == 'product'){
+        console.log(dialog.data);
+        dialog.data.fields.p_category= dialog.data.categoryselected.id;
+        dialog.data.fields.p_category_name= dialog.data.categoryselected.category;
+
+
         $scope.product = {attributes: []
                           ,categoryselected: dialog.data.categoryselected};
 
-        ipymeajax('/shop/category/getAttributeValuesRelated/'+dialog.data.categoryselected.id+','+dialog.data.fields.p_id, {})
+        ipymeajax('/shop/category/getAttributeValuesRelated/'+dialog.data.fields.p_category+','+dialog.data.fields.p_id, {})
         .success(function(responseData){
             if (responseData.success == 1){
-                dialog.data.category_attribute = responseData.category_attribute;
+                dialog.data.fields.category_attribute = responseData.category_attribute;
             }
         });
         ipymeajax('/shop/currency/get', {})
@@ -143,7 +149,6 @@ angular.module('iPymeApp')
                 dialog.data.currencies = responseData.currencies;
             }
         });
-        
     }
         
     $scope.do = function(e,task){
@@ -773,8 +778,8 @@ angular.module('iPymeApp')
     },true);
     
     $scope.model = {panes:[{ title:"Account", template:'paneaccount'},
-                            { title:"Address", template:"paneaddress" , active:true},
-                            { title:"Payments", template:"panepayments" },
+                            { title:"Address", template:"paneaddress" },
+                            { title:"Payments", template:"panepayments", active:true },
                             { title:"Orders", template:"paneorders"},],
                     countries:{available:[],
                                 selected:null,
@@ -794,6 +799,7 @@ angular.module('iPymeApp')
                                     ,u_basket:'ddd'}],                           
                              ordersGridOptions:{enableColumnResize:true,
                                                   enableColumnReordering:true,
+                                                  multiSelect:false,
                                                   pagingOptions:{ pageSizes: [5, 10, 20], pageSize: 10, totalServerItems: 0, currentPage: 1 },
                                                   columnDefs:'model.orders.columnDefs',
                                                   data: 'model.orders.data',
@@ -811,40 +817,60 @@ angular.module('iPymeApp')
         $scope.model.user_details = responseData.user_details;
         $scope.model.user_details.country_selected = $scope.model.user_details.addresses[0].country_c_code;
         $scope.model.user_details.address_selected = $scope.model.user_details.addresses[0];
-        
-        
-        console.log($scope);
+        $scope.model.user_details.card_selected = $scope.model.user_details.card[0];
     });
     
     $scope.addAddressButtons = [{action: "save",class: "btn-primary",displayName: "Save"}
                                 ,{action: "cancel",class: "btn-default",displayName: "Cancel"}];
     
     $scope.addAddress = function() {
-        var aAllData = {countries:$scope.model.countries,
-                            fields:{address_detail_ad_country: 575,
-                                                address_detail_ad_description: "new address",
-                                                address_detail_ad_id: 0,
-                                                address_detail_ad_line1: "",
-                                                address_detail_ad_line2: "",
-                                                address_detail_ad_post_code: "",
-                                                address_detail_ad_town: "",
-                                                country_c_code: "gb",
-                                                country_c_id: 575,
-                                                country_c_name: "",}};
-        $scope.openDialog(aAllData,0, 'address', $scope.addAddressButtons, false);
-                                            
-//        $scope.model.user_details.address_selected = aNewAddress;
+        var aData = {countries:$scope.model.countries,
+                    fields:{address_detail_ad_country: 575,
+                                        address_detail_ad_description: "new address",
+                                        address_detail_ad_id: 0,
+                                        address_detail_ad_line1: "",
+                                        address_detail_ad_line2: "",
+                                        address_detail_ad_post_code: "",
+                                        address_detail_ad_town: "",
+                                        country_c_code: "gb",
+                                        country_c_id: 575,
+                                        country_c_name: "",}};
+        $scope.openDialog(aData,0, 'address', $scope.addAddressButtons, false);
     }
     
-    $scope.openDialog = function(aAllData,start_empty, form_template, buttons, readonly) { 
+    $scope.addPayment = function() {
+        var aData = {countries:$scope.model.countries,
+                    fields:{card_c_name: 'name',
+                            card_c_card_number: 'number',
+                            card_c_expire_date: 'exp',
+                            card_c_issue_numer: "iss",}};
+            
+        $scope.openDialog(aData,0, 'card', $scope.addAddressButtons, false);
+    }
+    
+    
+    $scope.editPayment = function() {
+        console.log($scope.model);
+        
+         var aData = {countries:$scope.model.countries,
+                    fields:$scope.model.user_details.card_selected};
+        $scope.openDialog(aData, 0, 'card', $scope.addAddressButtons, false);
+    }
+    
+    $scope.editAddress = function() {
+         var aData = {countries:$scope.model.countries,
+                    fields:$scope.model.user_details.address_selected};
+        $scope.openDialog(aData, 0, 'address', $scope.addAddressButtons, false);
+    }
+    
+    $scope.openDialog = function(aData,start_empty, form_template, buttons, readonly) { 
         var dialog = $dialog.dialog({templateUrl: 'tpl/forms/ng.'+form_template+'.tpl',
                                      controller: 'FormDialogController'});
 
         dialog.buttons=$scope.addAddressButtons;
         dialog.readonly=readonly;
         dialog.formContext = 'user/address';
-        dialog.data = aAllData.fields;
-        dialog.alldata = aAllData;
+        dialog.data = aData;
                 
         dialog.open().then(function(oReturn) {
             console.log(oReturn);
@@ -871,10 +897,5 @@ angular.module('iPymeApp')
     
    
 }])
-.controller('FormDialogAddressController',['$location', function ($location) {
-    console.log('ffffffff');
-}])
-
-
 
 ;

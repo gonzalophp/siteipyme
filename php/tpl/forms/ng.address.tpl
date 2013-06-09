@@ -6,36 +6,36 @@
         <tbody>
             <tr>
                 <td>Address Description</td>
-                <td><input type="text" id="address1" ng-model="dialogForm.data.fields.address_selected.address_detail_ad_line1" /></td>
+                <td><input type="text" ng-model="dialogForm.data.fields.address_detail_ad_description" /></td>
                 <td>
                 </td>
             </tr>
             <tr>
                 <td>Address Line 1</td>
-                <td><input type="text" id="address1" ng-model="dialogForm.data.fields.address_selected.address_detail_ad_line1" /></td>
+                <td><input type="text" ng-model="dialogForm.data.fields.address_detail_ad_line1" /></td>
                 <td></td>
             </tr>
             <tr>
                 <td>Address Line 2</td>
-                <td><input type="text" id="address2" ng-model="dialogForm.data.fields.address_selected.address_detail_ad_line2" /></td>
+                <td><input type="text" ng-model="dialogForm.data.fields.address_detail_ad_line2" /></td>
                 <td></td>
             </tr>
             <tr>
                 <td>Post Code</td>
-                <td><input type="text" id="address2" ng-model="dialogForm.data.fields.address_selected.address_detail_ad_town" /></td>
+                <td><input type="text" ng-model="dialogForm.data.fields.address_detail_ad_town" /></td>
                 <td></td>
             </tr>
             <tr>
                 <td>Town</td>
-                <td><input type="text" id="postcode" ng-model="dialogForm.data.fields.address_selected.address_detail_ad_post_code" /></td>
+                <td><input type="text" ng-model="dialogForm.data.fields.address_detail_ad_post_code" /></td>
                 <td></td>
             </tr>
             <tr>
                 <td>Country</td>
                 <td>
-                    <select ui-select2='dialogForm.alldata.countries.selectcountryoptions' ng-model="address.country_c_code" >
+                    <select ui-select2='dialogForm.data.countries.selectcountryoptions' ng-model="dialogForm.data.fields.country_c_code" >
                         <option value=""></option>
-                        <option ng-repeat="country in dialogForm.alldata.countries.available" value="{{country.c_code}}">{{country.c_name}}</option>
+                        <option ng-repeat="country in dialogForm.data.countries.available" value="{{country.c_code}}">{{country.c_name}}</option>
                     </select>
                 </td>
                 <td></td>

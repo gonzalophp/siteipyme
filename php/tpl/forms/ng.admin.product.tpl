@@ -30,7 +30,7 @@
                     <table class="product_details">
                         <tbody>
                             <tr>
-                                <td>Category:</td><td>{{product.categoryselected.category}}</td>
+                                <td>Category:</td><td>{{dialogForm.data.fields.p_category_name}}</td>
                             </tr>
                             <tr>
                                 <td>ID:</td><td>{{dialogForm.data.fields.p_id}}</td>
@@ -62,7 +62,7 @@
                         <p class="ipymeTitle">Tags Values</p>
                         <table>
                             <tbody>
-                                <tr ng-repeat="productattribute in dialogForm.data.category_attribute">
+                                <tr ng-repeat="productattribute in dialogForm.data.fields.category_attribute">
                                     <td>{{productattribute.pca_attribute}}</td>
                                     <td><input type="text" ng-model="productattribute.attribute_value_selected" typeahead="attributevalue for attributevalue in productattribute.attribute_values  | filter:$viewValue "></td>
                                 </tr>
