@@ -72,8 +72,8 @@
                 </tr>
                 <tr>
                     <td>Country</td>
-                    <td><img class="flag flag-{{model.user_details.address_selected.country_c_code}}"/> {{model.user_details.address_selected.country_c_name}}</td>
-                    <td></td>
+                    <td><img class="flag flag-{{model.user_details.address_selected.address_detail_ad_country.country_c_code}}"/> {{model.user_details.address_selected.address_detail_ad_country.country_c_name}}</td>
+                    <td>{{model.user_details.address_selected.address_detail_ad_country}}</td>
                 </tr>
             </tbody>
         </table>
@@ -91,29 +91,29 @@
                 <tr>
                     <td>Description</td>
                     <td>
-                        <select ng-model="model.user_details.card_selected" ng-options="card.card_c_description for card in model.user_details.card"></select>
+                        <select ng-model="model.user_details.card_selected"    ng-options="card.card_c_description                  for card    in model.user_details.card"></select>
                     </td>
                     <td><button class="shop" ng-click="editPayment()">Edit</button></td>
                 </tr>
                 <tr>
                     <td>Card vendor</td>
-                    <td>{{model.user_details.card[0].card_vendor_cv_name}}</td>
+                    <td>{{model.user_details.card_selected.card_vendor_cv_name}}</td>
                 </tr>
                 <tr>
                     <td>Name on card</td>
-                    <td>{{model.user_details.card[0].card_c_name}}</td>
+                    <td>{{model.user_details.card_selected.card_c_name}}</td>
                 </tr>
                 <tr>
                     <td>Card number</td>
-                    <td>{{model.user_details.card[0].card_c_card_number}}</td>
+                    <td>{{model.user_details.card_selected.card_c_card_number}}</td>
                 </tr>
                 <tr>
                     <td>Expire:</td>
-                    <td>{{model.user_details.card[0].card_c_expire_date}}</td>
+                    <td>{{model.user_details.card_selected.card_c_expire_date}}</td>
                 </tr>
                 <tr>
                     <td>Issue number</td>
-                    <td>{{model.user_details.card[0].card_c_issue_numer}}</td>
+                    <td>{{model.user_details.card_selected.card_c_issue_numer}}</td>
                 </tr>
             </tbody>
         </table>

@@ -4,7 +4,7 @@
 /* Services */
 
 angular.module('iPymeApp.services')
-        .value('backendSourceHost','<?php echo "http://".$_SERVER['SERVER_NAME'] ?>');
+        .value('backendSourceHost','<?php echo "http://".$_SERVER['SERVER_NAME']."/backend.php" ?>');
 
 angular.module('iPymeApp')
     .factory('getParentByTagName',function() { 
@@ -24,6 +24,19 @@ angular.module('iPymeApp')
                 xhr_options.headers = {'Content-Type': 'application/x-www-form-urlencoded'}
             }
             return $http.post(backendSourceHost+url, postdata, xhr_options);
+        }
+    })
+    .factory('buttonset', function() {
+        return function(buttons){
+            var aAvailableButtons = {save:  {action: "save",class: "btn-primary",displayName: "Save"},
+                                     cancel:{action: "cancel",class: "btn-default",displayName: "Cancel"},
+                                     delete:{action: "delete",class: "btn-danger",displayName: "Delete"},},
+                aButtonSet =[];
+            for(var key in buttons) {
+            console.log(buttons[key]);
+            aButtonSet.push(aAvailableButtons[buttons[key]]);
+            }
+            return aButtonSet;
         }
     });
  

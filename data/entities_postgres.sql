@@ -383,6 +383,19 @@ CREATE TYPE "IPYME_AUX".user_details AS
 
 
 
+CREATE TYPE "IPYME_AUX".address AS
+   (ad_id bigint,
+    ad_line1 character varying(100),
+    ad_line2 character varying(100),
+    ad_town character varying(100),
+    ad_post_code character varying(10),
+    ad_country integer,
+    ad_description character varying(100),
+    ad_invoice_entity bigint,
+    c_id integer,
+    c_name character varying(100),
+    c_code text);
+
 
 
 SET search_path = "IPYME_AUX", pg_catalog;
@@ -2665,6 +2678,189 @@ $BODY$
   COST 100
   ROWS 1000;
 
+
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_payment_card(p_u_session text, p_c_id bigint, p_c_description text, p_c_card_number text, p_c_name text, p_c_expire_date text, p_c_issue_numer text, p_c_vendor text, p_cv_name text)
+  RETURNS SETOF "IPYME_FINAL"."CARD" AS
+$BODY$
+DECLARE
+v_card "IPYME_FINAL"."CARD";
+v_card_vendor "IPYME_FINAL"."CARD_VENDOR";
+v_invoice_entity BIGINT;
+BEGIN
+	--
+	SELECT C.c_invoice_entity
+	INTO v_invoice_entity
+	FROM "IPYME_FINAL"."USER" U
+	INNER JOIN "IPYME_FINAL"."CUSTOMER" C
+	ON U.u_customer = C.c_id
+	WHERE u_session = p_u_session
+		AND u_status =1;
+	--
+	IF NOT FOUND THEN
+		RETURN;
+	END IF;
+	--
+	SELECT *
+	INTO v_card_vendor
+	FROM "IPYME_FINAL"."CARD_VENDOR"
+	WHERE cv_name = p_cv_name;
+	--
+	IF NOT FOUND THEN
+		RETURN;
+	END IF;
+	--
+	SELECT *
+	INTO v_card
+	FROM "IPYME_FINAL"."CARD"
+	WHERE c_invoice_entity = v_invoice_entity
+		AND c_id = p_c_id;
+	--
+  v_card.c_invoice_entity	:= v_invoice_entity;
+  v_card.c_description 		:= p_c_description;
+  v_card.c_card_number 		:= p_c_card_number;
+  v_card.c_name 					:= p_c_name;
+  v_card.c_expire_date 		:= p_c_expire_date;
+  v_card.c_issue_numer 		:= p_c_issue_numer;
+  v_card.c_vendor 				:= v_card_vendor.cv_id;
+	--
+	IF NOT FOUND THEN
+		--
+		SELECT NEXTVAL('"IPYME_FINAL"."CARD_c_id_seq"') INTO v_card.c_id;
+		--
+		INSERT INTO "IPYME_FINAL"."CARD"(c_id
+																		,c_invoice_entity	
+																		,c_description 		
+																		,c_card_number 		
+																		,c_name 					
+																		,c_expire_date 	
+																		,c_issue_numer 		
+																		,c_vendor)
+														VALUES (v_card.c_id
+																		,v_card.c_invoice_entity	
+																		,v_card.c_description 		
+																		,v_card.c_card_number 		
+																		,v_card.c_name 					
+																		,v_card.c_expire_date 	
+																		,v_card.c_issue_numer 		
+																		,v_card.c_vendor);
+		--
+	ELSE
+		--
+		v_card.c_id := p_c_id;
+		--
+		UPDATE "IPYME_FINAL"."CARD"
+		SET c_invoice_entity 	= v_card.c_invoice_entity	
+				,c_description 		=	v_card.c_description 		
+				,c_card_number 		= v_card.c_card_number 		
+				,c_name 					= v_card.c_name 					
+				,c_expire_date 		= v_card.c_expire_date 	
+				,c_issue_numer 		= v_card.c_issue_numer 		
+				,c_vendor 				= v_card.c_vendor
+		WHERE c_id = v_card.c_id;
+		--
+	END IF;
+	--
+	RETURN QUERY SELECT v_card.*;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_address(p_u_session text, p_ad_id bigint, p_ad_line1 text, p_ad_line2 text, p_ad_town text, p_ad_post_code text, p_ad_description text, p_c_code text)
+  RETURNS SETOF "IPYME_FINAL".address AS
+$BODY$
+DECLARE
+v_address "IPYME_FINAL".address;
+v_address_detail "IPYME_FINAL"."ADDRESS_DETAIL";
+v_invoice_entity BIGINT;
+v_country "IPYME_FINAL"."COUNTRY";
+BEGIN
+	--
+	SELECT C.c_invoice_entity
+	INTO v_invoice_entity
+	FROM "IPYME_FINAL"."USER" U
+	INNER JOIN "IPYME_FINAL"."CUSTOMER" C
+	ON U.u_customer = C.c_id
+	WHERE u_session = p_u_session
+		AND u_status =1;
+	--
+	IF NOT FOUND THEN
+		RETURN;
+	END IF;
+	--
+	SELECT *
+	INTO v_country
+	FROM "IPYME_FINAL"."COUNTRY"
+	WHERE c_code = p_c_code;
+	--
+	IF NOT FOUND THEN
+		RETURN;
+	END IF;
+	--
+	SELECT *
+	INTO v_address_detail
+	FROM "IPYME_FINAL"."ADDRESS_DETAIL"
+	WHERE ad_invoice_entity = v_invoice_entity
+		AND ad_id = p_ad_id;
+	--
+	v_address_detail.ad_line1 					:= p_ad_line1;
+	v_address_detail.ad_line2 					:= p_ad_line2;
+	v_address_detail.ad_town 						:= p_ad_town;
+	v_address_detail.ad_post_code				:= p_ad_post_code;
+	v_address_detail.ad_country					:= v_country.c_id;
+	v_address_detail.ad_description			:= p_ad_description;
+	v_address_detail.ad_invoice_entity 	:= v_invoice_entity;
+	--
+	IF NOT FOUND THEN
+		--
+		SELECT NEXTVAL('"IPYME_FINAL"."ADDRESS_DETAIL_ad_id_seq"') INTO v_address_detail.ad_id;
+		--
+		INSERT INTO "IPYME_FINAL"."ADDRESS_DETAIL" (ad_id
+																							,ad_line1 		
+																							,ad_line2 	
+																							,ad_town 	
+																							,ad_post_code
+																							,ad_country	
+																							,ad_description
+																							,ad_invoice_entity)
+																			VALUES (v_address_detail.ad_id
+																							,v_address_detail.ad_line1 		
+																							,v_address_detail.ad_line2 	
+																							,v_address_detail.ad_town 	
+																							,v_address_detail.ad_post_code
+																							,v_address_detail.ad_country	
+																							,v_address_detail.ad_description
+																							,v_address_detail.ad_invoice_entity);
+		--
+	ELSE
+		--
+		v_address_detail.ad_id := p_ad_id;
+		--
+		UPDATE "IPYME_FINAL"."ADDRESS_DETAIL"
+		SET ad_line1 				 		= v_address_detail.ad_line1 				 
+				,ad_line2 					= v_address_detail.ad_line2 					
+				,ad_town 						=	v_address_detail.ad_town 						
+				,ad_post_code				=	v_address_detail.ad_post_code				
+				,ad_country					= v_address_detail.ad_country					
+				,ad_description	 		= v_address_detail.ad_description			
+				,ad_invoice_entity 	=	v_address_detail.ad_invoice_entity 	
+		WHERE ad_id = v_address_detail.ad_id;
+		--
+	END IF;
+	--
+	RETURN QUERY SELECT v_address_detail.*, v_country.*;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
 
 \dn
 

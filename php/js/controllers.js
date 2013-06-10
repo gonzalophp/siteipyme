@@ -27,14 +27,6 @@ angular.module('iPymeApp')
         selectedItems: $scope.selectedItems,
     }
 
-    $scope.refreshData = function() {
-        ipymeajax('/shop/'+$scope.adminList,{}) 
-        .success(function(responseData){
-            $scope.columnDefs = responseData.columnDefs;
-            $scope.datagrid = responseData.datagrid;
-        });
-    }
-    
     if ($scope.adminList == 'product'){
         $scope.categoryselected = {id:-1,category:'ALL'};
         $scope.refreshProductByCategory = function() {
@@ -83,8 +75,12 @@ angular.module('iPymeApp')
             }
         });
     } 
-
-    $scope.refreshData();
+    
+    ipymeajax('/shop/'+$scope.adminList,{}) 
+    .success(function(responseData){
+        $scope.columnDefs = responseData.columnDefs;
+        $scope.datagrid = responseData.datagrid;
+    });
 }])
 .controller('FormDialogController',['$scope','dialog','ipymeajax', function FormDialogController($scope, dialog,ipymeajax){
 console.log(dialog.data.fields);
@@ -96,7 +92,7 @@ console.log(dialog.data.fields);
         action: {cancel:0, save:1, delete:2},
         button:{
             cancel: function(){
-                for(var key in $scope.dialogForm.data_backup) dialog.data.fields[key]=$scope.dialogForm.data_backup.fields[key];
+                for(var key in $scope.dialogForm.data_backup.fields) dialog.data.fields[key]=$scope.dialogForm.data_backup.fields[key];
                 closeDialog({button:$scope.dialogForm.action.cancel, success:1,response:null});
             },   
             save: function(){
@@ -763,7 +759,7 @@ console.log(dialog.data.fields);
 .controller('logoutCtrl',['$location', function ($location) {
     $location.path('/shop');
 }])
-.controller('UserController',['$scope','$location', '$dialog','ipymeajax', function ($scope,$location,$dialog,ipymeajax) {
+.controller('UserController',['$scope','$location', '$dialog','ipymeajax','buttonset', function ($scope,$location,$dialog,ipymeajax,buttonset) {
     var select2CountryFormat=function(state) {
                                     if (!state) return;
                                     if (!state.id) return state.text; // optgroup
@@ -778,8 +774,8 @@ console.log(dialog.data.fields);
     },true);
     
     $scope.model = {panes:[{ title:"Account", template:'paneaccount' },
-                            { title:"Address", template:"paneaddress" , active:true},
-                            { title:"Payments", template:"panepayments"},
+                            { title:"Address", template:"paneaddress" },
+                            { title:"Payments", template:"panepayments", active:true},
                             { title:"Orders", template:"paneorders"},],
                     countries:{available:[],
                                 selected:null,
@@ -788,7 +784,7 @@ console.log(dialog.data.fields);
                                                         formatResult: select2CountryFormat,
                                                         formatSelection: select2CountryFormat,
                                                         escapeMarkup: function(m) { return m; },},},
-                    card_vendors:{available:[{cv_id:1, cv_name:'visa'},{cv_id:2, cv_name:'master card'},{cv_id:3, cv_name:'electron'}],
+                    card_vendors:{available:['visa','master card','electron'],
                                    selected:null,
                                    selectcardoptions:{allowClear: false, 
                                                         placeholder: "Select vendor"},},
@@ -833,52 +829,53 @@ console.log(dialog.data.fields);
         console.log($scope.model.user_details);
     });
     
-    $scope.addAddressButtons = [{action: "save",class: "btn-primary",displayName: "Save"}
-                                ,{action: "cancel",class: "btn-default",displayName: "Cancel"}];
-    
     $scope.addAddress = function() {
         var aData = {countries:$scope.model.countries,
                     fields:{ country_c_code: "gb"}};
-        $scope.openDialog(aData,0, 'address', $scope.addAddressButtons, false);
+        $scope.openDialog(aData,0, 'address', buttonset(['save','cancel']), false);
     }
     
     $scope.addPayment = function() {
         var aData = {card_vendors:$scope.model.card_vendors,
                     fields:{}};
             
-        $scope.openDialog(aData,0, 'card', $scope.addAddressButtons, false);
+        $scope.openDialog(aData,0, 'card', buttonset(['save','cancel']), false);
     }
     
     
     $scope.editPayment = function() {
         console.log($scope.model);
         
-         var aData = {card_vendors:$scope.model.card_vendors,
+        var aData = {card_vendors:$scope.model.card_vendors,
                     fields:$scope.model.user_details.card_selected};
-        $scope.openDialog(aData, 0, 'card', $scope.addAddressButtons, false);
+        $scope.openDialog(aData, 0, 'card', buttonset(['save','cancel']), false);
     }
+    
     
     $scope.editAddress = function() {
          var aData = {countries:$scope.model.countries,
                     fields:$scope.model.user_details.address_selected};
-        $scope.openDialog(aData, 0, 'address', $scope.addAddressButtons, false);
+        console.log(aData);
+        $scope.openDialog(aData, 0, 'address', buttonset(['save','cancel']), false);
     }
     
-    $scope.openDialog = function(aData,start_empty, form_template, buttons, readonly) { 
+    $scope.openDialog = function(aData, start_empty, form_template, buttons, readonly) { 
         var dialog = $dialog.dialog({templateUrl: 'tpl/forms/ng.'+form_template+'.tpl',
                                      controller: 'FormDialogController'});
 
-        dialog.buttons=$scope.addAddressButtons;
+        dialog.buttons=buttons;
         dialog.readonly=readonly;
-        dialog.formContext = 'user/address';
+        dialog.formContext = 'user/'+form_template;
         dialog.data = aData;
                 
         dialog.open().then(function(oReturn) {
             console.log(oReturn);
             if (oReturn && oReturn.success == 1) {
                 if (oReturn.button == 1){
+                    if (form_template == 'address') $scope.model.user_details.address_selected.address_detail_ad_country = oReturn.response.address.address_detail_ad_country;
+                    
                     if (start_empty==1){
-                        
+                        console.log(44);
 //                        $scope.datagrid.push(oReturn.response);
                     }
                 }

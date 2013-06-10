@@ -11,9 +11,8 @@
             <tr>
                 <td>Vendor</td>
                 <td>
-                    <select ng-model="dialogForm.data.fields.card_vendor_cv_name" ng-options="card_vendor.cv_name for card_vendor in dialogForm.data.card_vendors.available"></select>
+                    <select ng-model="dialogForm.data.fields.card_vendor_cv_name" ng-options="card_vendor for card_vendor in dialogForm.data.card_vendors.available"></select>
                 </td>
-                <td>{{dialogForm.data.fields.card_vendor_cv_name}}</td>
             </tr>
             <tr>
                 <td>Name on card</td>

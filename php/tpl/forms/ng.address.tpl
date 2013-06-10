@@ -34,7 +34,7 @@
             <tr>
                 <td>Country</td>
                 <td>
-                    <select ui-select2='dialogForm.data.countries.selectcountryoptions' ng-model="dialogForm.data.fields.country_c_code" >
+                    <select ui-select2='dialogForm.data.countries.selectcountryoptions' ng-model="dialogForm.data.fields.address_detail_ad_country.country_c_code" >
                         <option value=""></option>
                         <option ng-repeat="country in dialogForm.data.countries.available" value="{{country.c_code}}">{{country.c_name}}</option>
                     </select>
