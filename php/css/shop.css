@@ -577,9 +577,15 @@ div.tab-pane table button {
     margin:0;
 }
 
-div.tab-pane table > tbody > tr > td:nth-child(3) {
-    vertical-align: top;
-    padding-left: 1em;
+div.tab-pane table > tbody > tr > td > button.shop {
+    margin-top: 1em;
+}
+
+div.tab-pane table > tbody > tr > td > button.edit {
+    float:right;
+}
+div.tab-pane table > tbody > tr > td > button.new {
+    float:left;
 }
 
 div.modal-body table > tbody > tr > td:nth-child(1),

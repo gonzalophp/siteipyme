@@ -831,21 +831,18 @@ console.log(dialog.data.fields);
     
     $scope.addAddress = function() {
         var aData = {countries:$scope.model.countries,
-                    fields:{ country_c_code: "gb"}};
+                    fields:{ address_detail_ad_country:{country_c_code: "gb"}}};
         $scope.openDialog(aData,1, 'address', buttonset(['save','cancel']), false);
     }
     
     $scope.addPayment = function() {
         var aData = {card_vendors:$scope.model.card_vendors,
                     fields:{}};
-            
         $scope.openDialog(aData,1, 'card', buttonset(['save','cancel']), false);
     }
     
     
     $scope.editPayment = function() {
-        console.log($scope.model);
-        
         var aData = {card_vendors:$scope.model.card_vendors,
                     fields:$scope.model.user_details.card_selected};
         $scope.openDialog(aData, 0, 'card', buttonset(['save','cancel']), false);
@@ -855,8 +852,13 @@ console.log(dialog.data.fields);
     $scope.editAddress = function() {
          var aData = {countries:$scope.model.countries,
                     fields:$scope.model.user_details.address_selected};
-        console.log(aData);
         $scope.openDialog(aData, 0, 'address', buttonset(['save','cancel']), false);
+    }
+    
+    $scope.editAccount = function() {
+         var aData = {titles:$scope.model.titles,
+                    fields:$scope.model.user_details.people[0]};
+        $scope.openDialog(aData, 0, 'account', buttonset(['save','cancel']), false);
     }
     
     $scope.openDialog = function(aData, start_empty, form_template, buttons, readonly) { 
@@ -867,7 +869,6 @@ console.log(dialog.data.fields);
         dialog.readonly=readonly;
         dialog.formContext = 'user/'+form_template;
         dialog.data = aData;
-        console.log(start_empty        );
         dialog.open().then(function(oReturn) {
             console.log(oReturn);
             if (oReturn && oReturn.success == 1) {
@@ -886,12 +887,6 @@ console.log(dialog.data.fields);
                             $scope.model.user_details.card.push(oReturn.response.card);
                             $scope.model.user_details.card_selected = oReturn.response.card;
                         }
-                        
-                    }
-                    
-                    if (start_empty==1){
-                        console.log(44);
-//                        $scope.datagrid.push(oReturn.response);
                     }
                 }
                 else if (oReturn.button == 2){

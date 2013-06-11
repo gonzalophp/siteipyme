@@ -9,71 +9,78 @@
                 <tr>
                     <td>Title</td>
                     <td>
-                        <select ng-model="model.user_details.people[0].people_p_title" ng-options="title for title in model.titles"></select>
+<!--                        <select ng-model="model.user_details.people[0].people_p_title" ng-options="title for title in model.titles"></select>-->
+                        {{model.user_details.people[0].people_p_title}}
                     </td>
                 </tr>
                 <tr>
                     <td>First Name</td>
-                    <td><input type="text" ng-model="model.user_details.people[0].people_p_name"></td>
+                    <td>
+                    <!--<input type="text" ng-model="model.user_details.people[0].people_p_name">-->
+                    {{model.user_details.people[0].people_p_name}}
+                    </td>
                 </tr>
                 <tr>
                     <td>surname</td>
-                    <td><input type="text" ng-model="model.user_details.people[0].people_p_surname"></td>
+                    <td>
+<!--                        <input type="text" ng-model="model.user_details.people[0].people_p_surname">-->
+                            {{model.user_details.people[0].people_p_surname}}
+                    </td>
                 </tr>
                 <tr>
                     <td>Email</td>
-                    <td><input type="text" ng-model="model.user_details.user_u_email"></td>
+                    <td>{{model.user_details.user_u_email}}</td>
                 </tr>
                 <tr>
                     <td>Home phone</td>
-                    <td><input type="text" ng-model="model.user_details.people[0].people_p_phone"></td>
+                    <td>
+                        <!--<input type="text" ng-model="model.user_details.people[0].people_p_phone">-->
+                         {{model.user_details.people[0].people_p_phone}}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button class="shop edit" ng-click="editAccount()">Edit</button>
+                    </td>
                 </tr>
             </tbody>
         </table>
-        <p>
-            <button class="shop confirm" ng-click="dale()">Update</button>
-        </p>
     </script>
     <script type="text/ng-template" id="paneaddress">
         <table>
             <tbody>
                 <tr>
-                    <td></td>
-                    <td colspan="2">
-                        <button style="margin-bottom:1em" class="shop" ng-click="addAddress()">New Address</button>
-                    </td>
-                </tr>
-                <tr>
                     <td>Address Description</td>
                     <td>
                         <select ng-model="model.user_details.address_selected" ng-options="address.address_detail_ad_description for address in model.user_details.addresses"></select>
                     </td>
-                    <td><button class="shop" ng-click="editAddress()">Edit</button></td>
+                    
                 </tr>
                 <tr>
                     <td>Address Line 1</td>
                     <td>{{model.user_details.address_selected.address_detail_ad_line1}}</td>
-                    <td></td>
                 </tr>
                 <tr>
                     <td>Address Line 2</td>
                     <td>{{model.user_details.address_selected.address_detail_ad_line2}}</td>
-                    <td></td>
                 </tr>
                 <tr>
                     <td>Post Code</td>
                     <td>{{model.user_details.address_selected.address_detail_ad_town}}</td>
-                    <td></td>
                 </tr>
                 <tr>
                     <td>Town</td>
                     <td>{{model.user_details.address_selected.address_detail_ad_post_code}}</td>
-                    <td></td>
                 </tr>
                 <tr>
                     <td>Country</td>
                     <td><img class="flag flag-{{model.user_details.address_selected.address_detail_ad_country.country_c_code}}"/> {{model.user_details.address_selected.address_detail_ad_country.country_c_name}}</td>
-                    <td>{{model.user_details.address_selected.address_detail_ad_country}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button class="shop new" ng-click="addAddress()">New Address</button>
+                        <button class="shop edit" ng-click="editAddress()">Edit</button>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -83,17 +90,10 @@
         <table>
             <tbody>
                 <tr>
-                    <td></td>
-                    <td colspan="2">
-                        <button style="margin-bottom:1em" class="shop" ng-click="addPayment()">New Card</button>
-                    </td>
-                </tr>
-                <tr>
                     <td>Description</td>
                     <td>
                         <select ng-model="model.user_details.card_selected"    ng-options="card.card_c_description                  for card    in model.user_details.card"></select>
                     </td>
-                    <td><button class="shop" ng-click="editPayment()">Edit</button></td>
                 </tr>
                 <tr>
                     <td>Card vendor</td>
@@ -114,6 +114,12 @@
                 <tr>
                     <td>Issue number</td>
                     <td>{{model.user_details.card_selected.card_c_issue_numer}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button class="shop new" ng-click="addPayment()">New Card</button>
+                        <button class="shop edit" ng-click="editPayment()">Edit</button>
+                    </td>
                 </tr>
             </tbody>
         </table>

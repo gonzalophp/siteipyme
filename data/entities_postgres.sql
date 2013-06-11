@@ -378,7 +378,7 @@ CREATE TYPE "IPYME_AUX".user_details AS
     address_detail_ad_description character varying(100),
     address_detail_ad_invoice_entity bigint,
     country_c_id integer,
-    country_c_name character varying(100),
+    country_c_name text,
     country_c_code text);
 
 
@@ -2636,7 +2636,7 @@ BEGIN
 				,CV.cv_name 						AS card_vendor_cv_name
 				,BA.ba_id								AS bank_account_ba_id
 				,BA.ba_invoice_entity		AS bank_account_ba_invoice_entity
-				,BA.ba_numer 						AS bank_account_ba_numer
+				,BA.ba_number 						AS bank_account_ba_number
 				,AD.ad_id								AS address_detail_ad_id
 				,AD.ad_line1 						AS address_detail_ad_line1
 				,AD.ad_line2 						AS address_detail_ad_line2
