@@ -384,18 +384,31 @@ CREATE TYPE "IPYME_AUX".user_details AS
 
 
 CREATE TYPE "IPYME_AUX".address AS
-   (ad_id bigint,
-    ad_line1 character varying(100),
-    ad_line2 character varying(100),
-    ad_town character varying(100),
-    ad_post_code character varying(10),
-    ad_country integer,
-    ad_description character varying(100),
-    ad_invoice_entity bigint,
-    c_id integer,
-    c_name character varying(100),
-    c_code text);
+   (address_detail_ad_id bigint,
+    address_detail_ad_line1 character varying(100),
+    address_detail_ad_line2 character varying(100),
+    address_detail_ad_town character varying(100),
+    address_detail_ad_post_code character varying(10),
+    address_detail_ad_country integer,
+    address_detail_ad_description character varying(100),
+    address_detail_ad_invoice_entity bigint,
+    country_c_id integer,
+    country_c_name character varying(100),
+    country_c_code text);
 
+
+
+CREATE TYPE "IPYME_AUX".card AS (
+card_c_id bigint, 
+  card_c_invoice_entity bigint,
+  card_c_description character varying(100),
+  card_c_card_number character varying(20),
+  card_c_name character varying(100),
+  card_c_expire_date character varying(8),
+  card_c_issue_numer character varying(20),
+  card_c_vendor integer,
+  card_vendor_cv_id integer,
+  card_vendor_cv_name character varying(100));
 
 
 SET search_path = "IPYME_AUX", pg_catalog;
@@ -2682,7 +2695,7 @@ $BODY$
 
 
 CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_payment_card(p_u_session text, p_c_id bigint, p_c_description text, p_c_card_number text, p_c_name text, p_c_expire_date text, p_c_issue_numer text, p_c_vendor text, p_cv_name text)
-  RETURNS SETOF "IPYME_FINAL"."CARD" AS
+  RETURNS SETOF "IPYME_FINAL".card AS
 $BODY$
 DECLARE
 v_card "IPYME_FINAL"."CARD";
@@ -2762,7 +2775,7 @@ BEGIN
 		--
 	END IF;
 	--
-	RETURN QUERY SELECT v_card.*;
+	RETURN QUERY SELECT v_card.*, v_card_vendor.*;
 	--
 END;
 $BODY$
@@ -2861,6 +2874,26 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
   ROWS 1000;
+
+
+
+	CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_card_vendor(p_cv_id integer)
+  RETURNS SETOF "IPYME_FINAL"."CARD_VENDOR" AS
+$BODY$
+DECLARE
+BEGIN
+	--
+	RETURN QUERY 	SELECT * 
+								FROM "IPYME_FINAL"."CARD_VENDOR"
+								WHERE cv_id = p_cv_id OR p_cv_id IS NULL;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
+
 
 \dn
 

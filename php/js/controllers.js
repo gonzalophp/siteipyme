@@ -784,7 +784,7 @@ console.log(dialog.data.fields);
                                                         formatResult: select2CountryFormat,
                                                         formatSelection: select2CountryFormat,
                                                         escapeMarkup: function(m) { return m; },},},
-                    card_vendors:{available:['visa','master card','electron'],
+                    card_vendors:{available:[],
                                    selected:null,
                                    selectcardoptions:{allowClear: false, 
                                                         placeholder: "Select vendor"},},
@@ -825,21 +825,21 @@ console.log(dialog.data.fields);
         $scope.model.user_details.country_selected = $scope.model.user_details.addresses[0].country_c_code;
         $scope.model.user_details.address_selected = $scope.model.user_details.addresses[0];
         $scope.model.user_details.card_selected = $scope.model.user_details.card[0];
-        
+        $scope.model.card_vendors.available = responseData.user_details.card_vendor;
         console.log($scope.model.user_details);
     });
     
     $scope.addAddress = function() {
         var aData = {countries:$scope.model.countries,
                     fields:{ country_c_code: "gb"}};
-        $scope.openDialog(aData,0, 'address', buttonset(['save','cancel']), false);
+        $scope.openDialog(aData,1, 'address', buttonset(['save','cancel']), false);
     }
     
     $scope.addPayment = function() {
         var aData = {card_vendors:$scope.model.card_vendors,
                     fields:{}};
             
-        $scope.openDialog(aData,0, 'card', buttonset(['save','cancel']), false);
+        $scope.openDialog(aData,1, 'card', buttonset(['save','cancel']), false);
     }
     
     
@@ -867,12 +867,27 @@ console.log(dialog.data.fields);
         dialog.readonly=readonly;
         dialog.formContext = 'user/'+form_template;
         dialog.data = aData;
-                
+        console.log(start_empty        );
         dialog.open().then(function(oReturn) {
             console.log(oReturn);
             if (oReturn && oReturn.success == 1) {
                 if (oReturn.button == 1){
-                    if (form_template == 'address') $scope.model.user_details.address_selected.address_detail_ad_country = oReturn.response.address.address_detail_ad_country;
+                    if (form_template == 'address') {
+                        if (start_empty==1) {
+                            $scope.model.user_details.addresses.push(oReturn.response.address) 
+                            $scope.model.user_details.address_selected = oReturn.response.address;
+                        }
+                        $scope.model.user_details.address_selected.address_detail_ad_country = oReturn.response.address.address_detail_ad_country;
+                        
+                        console.log($scope.model.user_details.addresses);
+                    }
+                    if (form_template == 'card') {
+                        if (start_empty==1) {
+                            $scope.model.user_details.card.push(oReturn.response.card);
+                            $scope.model.user_details.card_selected = oReturn.response.card;
+                        }
+                        
+                    }
                     
                     if (start_empty==1){
                         console.log(44);

@@ -142,10 +142,17 @@ class UserController extends \Zend\Mvc\Controller\AbstractActionController {
                 }
             }
             
+            
             $aUserDetails['card']      = array_values($aUserDetails['card']);
             $aUserDetails['addresses'] = array_values($aUserDetails['addresses']);
             $aUserDetails['people']    = array_values($aUserDetails['people']);
-                    
+            $aUserDetails['card_vendor'] = array();
+            
+            $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL','get_card_vendor', array(':p_cv_id' => null));
+            foreach($oResultSet as $aRow) {
+                $aUserDetails['card_vendor'][] = $aRow['cv_name'];
+            }
+            
         }
         
 //        var_dump($aUserDetails);
@@ -173,7 +180,7 @@ class UserController extends \Zend\Mvc\Controller\AbstractActionController {
     }
     
     public function addressAction() {
-//        $this->getRequest()->setContent('{"address_detail_ad_description":"aaaaaaa1tttttttt","address_detail_ad_id":19,"address_detail_ad_line1":"aaaaaaa2","address_detail_ad_line2":"aaaaa3","address_detail_ad_town":"aaaaaa4","address_detail_ad_post_code":"aaaaaaaa5","address_detail_ad_country":{"country_c_id":725,"country_c_name":"tuvalu","country_c_code":"am"}}');
+//        $this->getRequest()->setContent('{"address_detail_ad_description":"ertraaaaaaa","address_detail_ad_id":21,"address_detail_ad_line1":"ertredddddddddddd","address_detail_ad_line2":"retreDDDD","address_detail_ad_town":"retre","address_detail_ad_post_code":"ertretert","address_detail_ad_country":{"country_c_id":527,"country_c_name":"bolivia","country_c_code":"bo"}}');
 //        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
 //        
         
@@ -202,9 +209,9 @@ class UserController extends \Zend\Mvc\Controller\AbstractActionController {
             
             $aResultSet = $oResultSet->current();
             if ($bSuccess = ($oResultSet->count() == 1)){
-                $aResultSet['address_detail_ad_country'] = array('country_c_code' => $aResultSet['c_code']
-                                                                ,'country_c_id' => $aResultSet['c_id']
-                                                                ,'country_c_name' => $aResultSet['c_name']);
+                $aResultSet['address_detail_ad_country'] = array('country_c_code' => $aResultSet['country_c_code']
+                                                                ,'country_c_id' => $aResultSet['country_c_id']
+                                                                ,'country_c_name' => $aResultSet['country_c_name']);
             }
         }
         else {
@@ -215,15 +222,13 @@ class UserController extends \Zend\Mvc\Controller\AbstractActionController {
     }
     
     public function cardAction() {
-//        $this->getRequest()->setContent('{"card_c_id":11,"card_c_description":"PRIMARY CARD","card_c_card_number":"cardnumber","card_c_name":"cardnameuuu","card_c_expire_date":"expire","card_c_issue_numer":"issue","card_c_vendor":2,"card_vendor_cv_name":"master card"}');
+//        $this->getRequest()->setContent('{"card_c_description":"bbbbbb","card_vendor_cv_name":"electron","card_c_name":"bbbbbb","card_c_card_number":"bbbbbb","card_c_expire_date":"bbbbbb","card_c_issue_numer":"bbbbbb"}');
 //        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
 //        
-        
         if ($this->getRequest()->isXmlHttpRequest()) {
             $sJSONDataRequest = $this->getRequest()->getContent();
             $aRequest = (array)json_decode($sJSONDataRequest);
             
-//            var_dump($aRequest);
             
             $aFunctionParams = array(':p_u_session'     => session_id()
                                     ,':p_c_id'          => array_key_exists('card_c_id',$aRequest)?$aRequest['card_c_id']:0
