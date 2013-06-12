@@ -86,6 +86,8 @@ class UserController extends \Zend\Mvc\Controller\AbstractActionController {
             $aRequest = (array)json_decode($sJSONDataRequest);
             $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
             
+            $aUser = $this->getServiceLocator()->get('User\Model\UserCredentials')->getUserDetails();
+            
             $oResultSet = $oDataFunctionGateway->getDataRecordSet(
                     'IPYME_FINAL',
                     'get_user_details', 
@@ -104,7 +106,7 @@ class UserController extends \Zend\Mvc\Controller\AbstractActionController {
                         $aUserDetails['people']    = array();
                     }
 
-                    if (!array_key_exists($aRow['card_c_id'], $aUserDetails['card'])){
+                    if (!is_null($aRow['card_c_id']) && !array_key_exists($aRow['card_c_id'], $aUserDetails['card'])){
                         $aUserDetails['card'][$aRow['card_c_id']] = array(
                             'card_c_id'             => $aRow['card_c_id'],
                             'card_c_description'    => $aRow['card_c_description'],
@@ -115,8 +117,7 @@ class UserController extends \Zend\Mvc\Controller\AbstractActionController {
                             'card_c_vendor'         => $aRow['card_c_vendor'],
                             'card_vendor_cv_name'   => $aRow['card_vendor_cv_name'],);
                     }
-
-                    if (!array_key_exists($aRow['address_detail_ad_id'], $aUserDetails['addresses'])){
+                    if (!is_null($aRow['address_detail_ad_id']) && !array_key_exists($aRow['address_detail_ad_id'], $aUserDetails['addresses'])){
                         $aUserDetails['addresses'][$aRow['address_detail_ad_id']] = array(
                             'address_detail_ad_description' => $aRow['address_detail_ad_description'],
                             'address_detail_ad_id'          => $aRow['address_detail_ad_id'],
@@ -131,7 +132,7 @@ class UserController extends \Zend\Mvc\Controller\AbstractActionController {
                         );
                     }
 
-                    if (!array_key_exists($aRow['people_p_id'], $aUserDetails['people'])){
+                    if (!is_null($aRow['people_p_id']) && !array_key_exists($aRow['people_p_id'], $aUserDetails['people'])){
                         $aUserDetails['people'][$aRow['people_p_id']] = array(
                             'people_p_id'       => $aRow['people_p_id'],
                             'people_p_title'    => $aRow['people_p_title'],
@@ -157,6 +158,8 @@ class UserController extends \Zend\Mvc\Controller\AbstractActionController {
             foreach($oResultSet as $aRow) {
                 $aUserDetails['card_vendor'][] = $aRow['cv_name'];
             }
+            
+            $aUserDetails['user_u_email'] = $aUser['u_email'];
         }
         
 //        var_dump($aUserDetails);
@@ -261,6 +264,38 @@ class UserController extends \Zend\Mvc\Controller\AbstractActionController {
         }
         
         return new \Zend\View\Model\JsonModel(array('success' => ($bSuccess?1:0), 'card' => $aResultSet));
+    }
+    
+    public function accountAction() {
+//        $this->getRequest()->setContent('{"people_p_title":"Mr.","people_p_name":"gfff","people_p_surname":"fdffd","people_p_phone":"fddfd"}');
+//        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
+//        
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            $sJSONDataRequest = $this->getRequest()->getContent();
+            $aRequest = (array)json_decode($sJSONDataRequest);
+            
+            $aFunctionParams = array(':p_u_session' => session_id()
+                                    ,':p_p_id'      => array_key_exists('people_p_id',$aRequest)?$aRequest['people_p_id']:0
+                                    ,':p_title'     => array_key_exists('people_p_title',$aRequest)?$aRequest['people_p_title']:''
+                                    ,':p_p_name'    => array_key_exists('people_p_name',$aRequest)?$aRequest['people_p_name']:''
+                                    ,':p_p_surname' => array_key_exists('people_p_surname',$aRequest)?$aRequest['people_p_surname']:''
+                                    ,':p_p_phone'   => array_key_exists('people_p_phone',$aRequest)?$aRequest['people_p_phone']:'');
+//            var_dump($aRequest,$aFunctionParams);
+//            exit;
+            $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
+            $oResultSet = $oDataFunctionGateway->getDataRecordSet(
+                    'IPYME_FINAL'
+                    , 'set_people'
+                    , $aFunctionParams);
+            
+            $aResultSet = $oResultSet->current();
+            $bSuccess = ($oResultSet->count() == 1);
+        }
+        else {
+            $bSuccess=false;
+        }
+        
+        return new \Zend\View\Model\JsonModel(array('success' => ($bSuccess?1:0), 'people' => $aResultSet));
     }
 }
 ?>

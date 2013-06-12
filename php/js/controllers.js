@@ -773,9 +773,9 @@ console.log(dialog.data.fields);
         }
     },true);
     
-    $scope.model = {panes:[{ title:"Account", template:'paneaccount' },
+    $scope.model = {panes:[{ title:"Account", template:'paneaccount', active:true },
                             { title:"Address", template:"paneaddress" },
-                            { title:"Payments", template:"panepayments", active:true},
+                            { title:"Payments", template:"panepayments"},
                             { title:"Orders", template:"paneorders"},],
                     countries:{available:[],
                                 selected:null,
@@ -822,9 +822,10 @@ console.log(dialog.data.fields);
     ipymeajax('/shop/user/get', {})
     .success(function(responseData){
         $scope.model.user_details = responseData.user_details;
-        $scope.model.user_details.country_selected = $scope.model.user_details.addresses[0].country_c_code;
+        $scope.model.user_details.addresses[0] && ($scope.model.user_details.country_selected = $scope.model.user_details.addresses[0].country_c_code);
         $scope.model.user_details.address_selected = $scope.model.user_details.addresses[0];
         $scope.model.user_details.card_selected = $scope.model.user_details.card[0];
+        $scope.model.user_details.people_selected = $scope.model.user_details.people[0];
         $scope.model.card_vendors.available = responseData.user_details.card_vendor;
         console.log($scope.model.user_details);
     });
@@ -857,7 +858,7 @@ console.log(dialog.data.fields);
     
     $scope.editAccount = function() {
          var aData = {titles:$scope.model.titles,
-                    fields:$scope.model.user_details.people[0]};
+                    fields:$scope.model.user_details.people_selected};
         $scope.openDialog(aData, 0, 'account', buttonset(['save','cancel']), false);
     }
     
@@ -875,7 +876,9 @@ console.log(dialog.data.fields);
                 if (oReturn.button == 1){
                     if (form_template == 'address') {
                         if (start_empty==1) {
-                            $scope.model.user_details.addresses.push(oReturn.response.address) 
+                            if ($scope.model.user_details.addresses.length > 0)
+                            $scope.model.user_details.addresses.push(oReturn.response.address);
+                            else $scope.model.user_details.addresses=[oReturn.response.address];
                             $scope.model.user_details.address_selected = oReturn.response.address;
                         }
                         $scope.model.user_details.address_selected.address_detail_ad_country = oReturn.response.address.address_detail_ad_country;
@@ -886,6 +889,13 @@ console.log(dialog.data.fields);
                         if (start_empty==1) {
                             $scope.model.user_details.card.push(oReturn.response.card);
                             $scope.model.user_details.card_selected = oReturn.response.card;
+                        }
+                    }
+                    
+                    if (form_template == 'account') {
+                        if (start_empty==1) {
+                            $scope.model.user_details.card.push(oReturn.response.card);
+                            $scope.model.user_details.people_selected = oReturn.response.people;
                         }
                     }
                 }

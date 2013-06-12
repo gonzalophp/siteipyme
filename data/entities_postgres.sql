@@ -127,18 +127,18 @@ CREATE TABLE "IPYME_AUX"."PEOPLE" (
 CREATE TABLE "IPYME_AUX"."PEOPLE_REPONSIBILITY" (
     PR_REF VARCHAR(50) PRIMARY KEY
     , PR_DESCRIPTION VARCHAR(100) 
-    , PR_PEOPLE BIGINT REFERENCES "IPYME_AUX"."PEOPLE"
+    , PR_PEOPLE BIGINT NOT NULL REFERENCES "IPYME_AUX"."PEOPLE"
 );
 
 CREATE TABLE "IPYME_AUX"."COURIER" (
     C_ID BIGSERIAL PRIMARY KEY
-    , C_INVOICE_ENTITY BIGINT REFERENCES "IPYME_AUX"."INVOICE_ENTITY"
+    , C_INVOICE_ENTITY BIGINT NOT NULL REFERENCES "IPYME_AUX"."INVOICE_ENTITY"
 );
 
 CREATE TABLE "IPYME_AUX"."CUSTOMER" (
     C_ID BIGSERIAL PRIMARY KEY
     , C_CUSTOMER_NAME VARCHAR(100)
-    , C_INVOICE_ENTITY BIGINT REFERENCES "IPYME_AUX"."INVOICE_ENTITY"
+    , C_INVOICE_ENTITY BIGINT NOT NULL REFERENCES "IPYME_AUX"."INVOICE_ENTITY"
     , CONSTRAINT unique_customer_name_entity UNIQUE(C_CUSTOMER_NAME, C_INVOICE_ENTITY)
 );
 
@@ -393,7 +393,7 @@ CREATE TYPE "IPYME_AUX".address AS
     address_detail_ad_description character varying(100),
     address_detail_ad_invoice_entity bigint,
     country_c_id integer,
-    country_c_name character varying(100),
+    country_c_name text,
     country_c_code text);
 
 
@@ -410,6 +410,14 @@ card_c_id bigint,
   card_vendor_cv_id integer,
   card_vendor_cv_name character varying(100));
 
+
+CREATE TYPE "IPYME_AUX".people as (
+people_p_id bigint,
+  people_p_name TEXT,
+  people_p_surname TEXT,
+  people_p_phone TEXT,
+  people_p_invoice_entity bigint,
+  people_p_title text);
 
 SET search_path = "IPYME_AUX", pg_catalog;
 
@@ -2893,6 +2901,122 @@ $BODY$
   COST 100
   ROWS 1000;
 
+
+
+
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_people(p_u_session text, p_p_id bigint, p_title text, p_p_name text, p_p_surname text, p_p_phone text)    RETURNS SETOF "IPYME_FINAL".people AS $BODY$
+DECLARE
+v_people "IPYME_FINAL"."PEOPLE";
+v_user "IPYME_FINAL"."USER";
+v_customer "IPYME_FINAL"."CUSTOMER";
+v_invoice_entity "IPYME_FINAL"."INVOICE_ENTITY";
+BEGIN
+	--
+	SELECT * 
+	INTO v_user
+	FROM "IPYME_FINAL"."USER" U
+	WHERE U.u_session = p_u_session;
+	--
+	IF NOT FOUND THEN
+		RETURN;
+	END IF;
+	--
+	IF v_user.u_customer IS NULL THEN
+		--
+		SELECT nextval('"IPYME_FINAL"."INVOICE_ENTITY_ie_id_seq"') INTO v_invoice_entity.ie_id;
+		v_invoice_entity.ie_legal_id := '';
+		v_invoice_entity.ie_invoice_name := '';
+		--
+		INSERT INTO "IPYME_FINAL"."INVOICE_ENTITY"(ie_id 
+																							,ie_legal_id 
+																							,ie_invoice_name)
+																			VALUES (v_invoice_entity.ie_id 
+																							,v_invoice_entity.ie_legal_id 
+																							,v_invoice_entity.ie_invoice_name); 
+		--
+		SELECT NEXTVAL('"IPYME_FINAL"."CUSTOMER_c_id_seq"') INTO v_customer.c_id;
+		v_customer.c_customer_name := '';
+		v_customer.c_invoice_entity := v_invoice_entity.ie_id;
+		--
+		INSERT INTO "IPYME_FINAL"."CUSTOMER" (c_id
+																				,c_customer_name
+																				,c_invoice_entity)
+																	VALUES (v_customer.c_id
+																				,v_customer.c_customer_name
+																				,v_customer.c_invoice_entity);
+		--
+		UPDATE "IPYME_FINAL"."USER"
+		SET u_customer = v_customer.c_id
+		WHERE u_id = v_user.u_id;
+		--
+	ELSE
+		--
+		SELECT *
+		INTO v_customer
+		FROM "IPYME_FINAL"."CUSTOMER" C
+		WHERE C.c_id = v_user.u_customer;		
+		--
+		SELECT *
+		INTO v_invoice_entity
+		FROM "IPYME_FINAL"."INVOICE_ENTITY" IE
+		WHERE IE.ie_id = v_customer.c_invoice_entity;
+		--
+	END IF;
+	--
+	--
+	SELECT *
+	INTO v_people
+	FROM "IPYME_FINAL"."PEOPLE"
+	WHERE p_invoice_entity = v_invoice_entity.ie_id;
+		--AND p_id = p_p_id; -- ONLY ONE PERSON ALLOWED FOR THE BETA VERSION
+	--
+  v_people.p_name 					:= p_p_name;
+  v_people.p_surname 				:= p_p_surname;
+  v_people.p_phone 					:= p_p_name;
+  v_people.p_invoice_entity	:= v_invoice_entity.ie_id;
+  v_people.p_title 					:= p_title;
+	-- 
+	IF NOT FOUND THEN
+		--
+		SELECT NEXTVAL('"IPYME_FINAL"."PEOPLE_p_id_seq"') INTO v_people.p_id;
+		--
+		INSERT INTO "IPYME_FINAL"."PEOPLE"(p_id
+																			,p_name 
+																			,p_surname
+																			,p_phone
+																			,p_invoice_entity
+																			,p_title)
+															VALUES (v_people.p_id
+																			,v_people.p_name 
+																			,v_people.p_surname
+																			,v_people.p_phone
+																			,v_people.p_invoice_entity
+																			,v_people.p_title);
+		--
+	ELSE
+		--
+		UPDATE "IPYME_FINAL"."PEOPLE"
+		SET p_name 						= v_people.p_name	
+				,p_surname 				=	v_people.p_surname 		
+				,p_phone 					= v_people.p_phone 	
+				,p_invoice_entity	= v_people.p_invoice_entity
+				,p_title 					= v_people.p_title
+		WHERE p_id = v_people.p_id;
+		--
+	END IF;
+  --
+	RETURN QUERY SELECT v_people.p_id
+											,v_people.p_name::text 
+											,v_people.p_surname::text
+											,v_people.p_phone::text
+											,v_people.p_invoice_entity
+											,v_people.p_title;
+	--
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
 
 
 \dn
