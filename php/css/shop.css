@@ -480,15 +480,21 @@ div.ipymeshoptopbar{
     height: 30px;
 }
 
-div.ipymeshoptopbar > ul > li{
-    padding: 8px 5px 9px 5px;
+div.ipymeshoptopbar > ul {
+   margin:0;
+}
+
+div.ipymeshoptopbar > ul li{
+    padding: 0px 5px 0px 5px;
+    height:30px;
     list-style: none;
-    display: inline;
     position: relative;
-    top:4px;
     border: solid 1px rgb(77, 77, 77);
     border-radius: 2px;
-    margin-left: 5px;
+    
+    margin:-1px 0px 0px 5px;
+    line-height: 30px;
+    float:right;
 }
 
 div.ipymeshoptopbar > ul > li a{
@@ -523,6 +529,13 @@ div.ipymeshoptopbar > ul > li.admin{
 div.ipymeshoptopbar > ul > li.user{
     padding-right: 25px;
     background: url('images/user.png') 95% 45%  no-repeat;
+}
+
+div.ipymeshoptopbar > ul > li.shopmain{
+    margin-left:0px;
+    background: url('images/shopping.png') 95% 45%  no-repeat;
+    float:left;
+    padding-right: 25px;
 }
 
 div.tabbable div.tab-content{

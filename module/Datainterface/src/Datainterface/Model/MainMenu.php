@@ -22,7 +22,7 @@ class MainMenu {
         $aMenuList = array(
             (object) array(
                 'label' => 'iPyME'
-                , 'url' => ''
+                , 'url' => '#/shop'
                 , 'nodes' => array(
                     (object) array(
                         'label' => 'Purchase'

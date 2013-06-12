@@ -314,12 +314,13 @@ angular.module('iPymeApp')
         replace:true,
         template:'<div class="ipymeshoptopbar">\
                     <ul>\
-                        <li ng-show="user.admin==1" ng-click="admin()" class="admin"><span>(admin panel)</span></li>\
+                        <li ng-click="shopmain()" class="shopmain"><span>iPyME</span></li>\
+                        <li ng-show="user.name" ng-click="logout()" class="logout"><span>logout</span></li>\
                         <li ng-click="user_details()" ng-switch on="user.name" class="user">\
                             <span ng-switch-when="">log in</span>\
                             <span ng-switch-default>{{user.name}}</span>\
                         </li>\
-                        <li ng-show="user.name" ng-click="logout()" class="logout"><span>logout</span></li>\
+                        <li ng-show="user.admin==1" ng-click="admin()" class="admin"><span>(admin panel)</span></li>\
                     </ul>\
                 </div>',
         link:function(scope,element,attr) {
@@ -334,6 +335,10 @@ angular.module('iPymeApp')
                 .success(function(responseData){
                     $location.path('/user/logout');
                 });
+            }
+            
+            scope.shopmain = function(){
+                $location.path('/shop');
             }
             
             scope.user_details = function(){

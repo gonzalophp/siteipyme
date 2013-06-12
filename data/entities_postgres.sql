@@ -716,6 +716,14 @@ COPY "PRODUCT_CATEGORY" (pc_tax_rate, pc_description, pc_path) FROM stdin;
 \.
 
 
+
+COPY "CARD_VENDOR" (cv_id, cv_name) FROM stdin;
+1	visa
+2	visa electron
+3	master card
+\.
+
+
 --
 -- TOC entry 2114 (class 0 OID 31711)
 -- Dependencies: 180 2115
