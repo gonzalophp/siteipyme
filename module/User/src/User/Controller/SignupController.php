@@ -7,11 +7,8 @@ class SignupController extends \Zend\Mvc\Controller\AbstractActionController {
         if ($this->getRequest()->isOptions()) return;
         parent::indexAction();
         
-        $this->getRequest()->getHeaders()->addHeaderLine('X-Requested-With: XMLHttpRequest');
-        $oDataRequest = (object) array('user_name' => 'gonzalo'
-                                    , 'user_password' => 'gonzalo'
-                                    , 'user_password2' => 'gonzalo'
-                                    , 'user_email' => 'gonzalophp@gmail.com');
+//        $this->getRequest()->setContent('{"user_name":"user","user_email":"user@ipyme.net","user_password":"user","user_password2":"user"}');
+//        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
         
         $nSignUpSuccess = 0;
         $sFail = 'unknown';
@@ -35,6 +32,7 @@ class SignupController extends \Zend\Mvc\Controller\AbstractActionController {
                 $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
                 
                 session_start();
+                session_regenerate_id();
                 
                 $aFunctionParams = array( ':p_u_session'         => session_id()
                                         ,':p_u_name'            => $oDataRequest->user_name

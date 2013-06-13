@@ -312,7 +312,7 @@ angular.module('iPymeApp')
         restrict:'E',
         scope:{},
         replace:true,
-        template:'<div class="ipymeshoptopbar">\
+        template:'<div ng-show="user.initialized==1" class="ipymeshoptopbar">\
                     <ul>\
                         <li ng-click="shopmain()" class="shopmain"><span>iPyME</span></li>\
                         <li ng-show="user.name" ng-click="logout()" class="logout"><span>logout</span></li>\
@@ -324,12 +324,6 @@ angular.module('iPymeApp')
                     </ul>\
                 </div>',
         link:function(scope,element,attr) {
-            scope.reset = function(){
-                scope.user = {u_valid_session: 0 
-                            , name:""
-                            , admin: 0};
-            }
-            
             scope.logout = function(){
                 ipymeajax('/user/logout', {})
                 .success(function(responseData){
@@ -350,10 +344,13 @@ angular.module('iPymeApp')
                 $location.path('/admin');
             }
             
-            scope.reset();
+            scope.user = {u_valid_session: 0 
+                        , name:""
+                        , admin: 0};
             ipymeajax('/user/authenticate', {})
             .success(function(responseData){
                 scope.user = responseData;
+                scope.user.initialized=1;
             });
         }
     }

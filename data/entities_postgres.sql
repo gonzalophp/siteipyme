@@ -411,7 +411,7 @@ card_c_id bigint,
   card_vendor_cv_name character varying(100));
 
 
-CREATE TYPE "IPYME_AUX".people as (
+CREATE TYPE "IPYME_AUX".people_details as (
 people_p_id bigint,
   people_p_name TEXT,
   people_p_surname TEXT,
@@ -675,12 +675,10 @@ zw|Zimbabwe
 \.
 
 
-
-COPY "USER" (u_session, u_last_login, u_email, u_status, u_basket, u_customer, u_name, u_password_hash, u_id) FROM stdin;
-9od4p5ehecs9ne451ea0fgnv60	\N	gonzalophp@gmail.com	1	\N	\N	gonzalo	8e43bec6c9a4aba7dc358247a21ab52d301a2840	223
+COPY "USER" (u_session, u_last_login, u_email, u_status, u_basket, u_customer, u_name, u_password_hash, u_admin) FROM stdin;
+sujpig3kuf2clh6im5f7sf0035	2013-06-13 13:37:02.100457+01	user@ipyme.net	1	\N	\N	user	12dea96fec20593566ab75692c9949596833adc9	0
+bkrh0pksg0anu5tt75oif4kl04	2013-06-13 13:36:16.446135+01	admin@ipyme.net	1	\N	\N	admin	d033e22ae348aeb5660fc2140aec35850c4da997	1
 \.
-
-
 
 COPY "CURRENCY" (C_NAME) FROM stdin;
 GBP
@@ -2176,8 +2174,6 @@ BEGIN
 		RETURN;
 	END IF;
 	--
-	
-	--
 	SELECT *
 	INTO v_user
 	FROM "IPYME_FINAL"."USER"
@@ -2215,7 +2211,7 @@ BEGIN
 				--
 				UPDATE "IPYME_FINAL"."USER"
 				SET u_basket = NULL
-					, u_session = 'MOVING TO REAL USER' -- KEEPING BASKET REFERENCE
+					, u_session = md5(now()::text||random()::text||v_anonymous_user.u_id::TEXT) -- KEEPING BASKET REFERENCE
 				WHERE u_id = v_anonymous_user.u_id;
 				--
 				UPDATE "IPYME_FINAL"."USER"
@@ -2224,8 +2220,10 @@ BEGIN
 					, u_last_login = now()
 				WHERE u_id = v_user.u_id;
 				--
-				DELETE FROM "IPYME_FINAL"."USER"
-				WHERE u_id = v_anonymous_user.u_id;
+				IF v_anonymous_user.u_name IS NULL THEN
+					DELETE FROM "IPYME_FINAL"."USER"
+					WHERE u_id = v_anonymous_user.u_id;
+				END IF;
 				--
 			END IF;
 			--
@@ -2912,7 +2910,9 @@ $BODY$
 
 
 
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_people(p_u_session text, p_p_id bigint, p_title text, p_p_name text, p_p_surname text, p_p_phone text)    RETURNS SETOF "IPYME_FINAL".people AS $BODY$
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_people(p_u_session text, p_p_id bigint, p_p_title text, p_p_name text, p_p_surname text, p_p_phone text)
+  RETURNS SETOF "IPYME_FINAL".people_details AS
+$BODY$
 DECLARE
 v_people "IPYME_FINAL"."PEOPLE";
 v_user "IPYME_FINAL"."USER";
@@ -2982,24 +2982,24 @@ BEGIN
   v_people.p_surname 				:= p_p_surname;
   v_people.p_phone 					:= p_p_name;
   v_people.p_invoice_entity	:= v_invoice_entity.ie_id;
-  v_people.p_title 					:= p_title;
+  v_people.p_title 					:= p_p_title;
 	-- 
 	IF NOT FOUND THEN
 		--
 		SELECT NEXTVAL('"IPYME_FINAL"."PEOPLE_p_id_seq"') INTO v_people.p_id;
 		--
 		INSERT INTO "IPYME_FINAL"."PEOPLE"(p_id
-																			,p_name 
-																			,p_surname
-																			,p_phone
-																			,p_invoice_entity
-																			,p_title)
-															VALUES (v_people.p_id
-																			,v_people.p_name 
-																			,v_people.p_surname
-																			,v_people.p_phone
-																			,v_people.p_invoice_entity
-																			,v_people.p_title);
+                                                    ,p_name 
+                                                    ,p_surname
+                                                    ,p_phone
+                                                    ,p_invoice_entity
+                                                    ,p_title)
+                                            VALUES (v_people.p_id
+                                                    ,v_people.p_name 
+                                                    ,v_people.p_surname
+                                                    ,v_people.p_phone
+                                                    ,v_people.p_invoice_entity
+                                                    ,v_people.p_title);
 		--
 	ELSE
 		--
