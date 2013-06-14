@@ -43,7 +43,10 @@ class MainMenu {
                         'label' => 'Product'
                         ,'icon' => 'icon_product'
                         , 'url' => ''
-                        , 'nodes' => array())
+                        , 'nodes' => array((object) array(
+                                            'label' => 'Item'
+                                            , 'url' => '#/admin/product/item'
+                                            , 'nodes' => array())))
                     , (object) array(
                         'label' => 'Delivery'
                         ,'icon' => 'icon_delivery'
@@ -62,6 +65,10 @@ class MainMenu {
                             (object) array(
                                 'label' => 'Users'
                                 , 'url' => '#/admin/list/user'
+                                , 'nodes' => array())
+                            ,(object) array(
+                                'label' => 'Product Category'
+                                , 'url' => '#/admin/category'
                                 , 'nodes' => array())))))
             , );
         return $aMenuList;

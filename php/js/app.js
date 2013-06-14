@@ -19,6 +19,10 @@ angular.module('iPymeApp', ['iPymeApp.filters', 'iPymeApp.services', 'iPymeApp.d
     .when('/admin', {
         redirectTo: '/admin/list/product'
     })
+    
+        .when('/admin/:_/:_', {redirectTo: '/admin'})
+        .when('/admin/:_', {redirectTo: '/admin'})
+
     .when('/shop', {
         templateUrl: 'tpl/ng.shop.tpl', 
     })

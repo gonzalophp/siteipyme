@@ -8,15 +8,6 @@
                 <tr>
                     <td>ID:</td><td>{{dialogForm.fields.c_id}}</td>
                 </tr>
-                <tr>
-                    <td>Customer (Alias):</td><td><input ng-readonly="dialogForm.readonly" type="text" ng-model="dialogForm.fields.c_customer_name"/></td>
-                </tr>
-                <tr>
-                    <td>Customer ID:</td><td><input ng-readonly="dialogForm.readonly" type="text" ng-model="dialogForm.fields.ie_legal_id"/></td>
-                </tr>
-                <tr>
-                    <td>Invoice Name:</td><td><textarea ng-readonly="dialogForm.readonly" ng-model="dialogForm.fields.ie_invoice_name"></textarea></td>
-                </tr>
             </tbody>
         </table>
     </div>
