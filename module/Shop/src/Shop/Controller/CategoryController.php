@@ -226,10 +226,13 @@ class CategoryController extends \Zend\Mvc\Controller\AbstractActionController {
                             , array(':p_pca_id'                  => $nAttributeId));
                     }
                     foreach($oCategory->attributes->values as $oAttribute){
-                        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'set_product_category_attribute'
-                            , array(':p_pca_id'                  => (($oAttribute->pca_id != -1) ? $oAttribute->pca_id:NULL)
-                                    ,':p_pca_product_category'   => $oCategory->key
-                                    ,':p_pca_attribute'              => $oAttribute->pca_attribute));
+                        $aFunctionParams = array(':p_pca_id'                  => (($oAttribute->pca_id != -1) ? $oAttribute->pca_id:NULL)
+                                                ,':p_pca_product_category'   => $oCategory->key
+                                                ,':p_pca_attribute'              => $oAttribute->pca_attribute);
+                        $oResultSet = $oDataFunctionGateway->getDataRecordSet(
+                            'IPYME_FINAL'
+                            , 'set_product_category_attribute'
+                            , $aFunctionParams);
                     }
                 }
             }

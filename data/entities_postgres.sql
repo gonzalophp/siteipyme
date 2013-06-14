@@ -686,32 +686,122 @@ EUR
 USD
 \.
 
-COPY "PRODUCT_CATEGORY" (pc_id, pc_tax_rate, pc_description, pc_path) FROM stdin;
--1	0.000		 > ALL
-\.
 COPY "PRODUCT_CATEGORY" (pc_tax_rate, pc_description, pc_path) FROM stdin;
-0.000		 > food
-0.000		 > food > vegetables
-0.000		 > food > jars
-0.000		 > food > frozen
-0.000		 > food > breakfast
-0.000		 > food > frozen > meat
-0.000		 > food > frozen > fish
-0.000		 > food > cupboard
-0.000		 > food > cupboard > snacks
-0.000		 > food > cupboard > snacks > nuts
-0.000		 > food > cupboard > snacks > nuts > cashews
-0.000		 > drinks
-0.000		 > drinks > alcohol
-0.000		 > PCHARDWARE
-0.000		 > PCHARDWARE > COMPONENTS
-0.000		 > PCHARDWARE > COMPONENTS > MEMORY
-0.000		 > PCHARDWARE > COMPONENTS > MEMORY > DDR2
-0.000		 > PCHARDWARE > COMPONENTS > MEMORY > DDR3
-0.000		 > PCHARDWARE > COMPONENTS > MOTHERBOARD
-0.000		 > PCHARDWARE > COMPONENTS > CPU
-0.000		 > food > frozen > vegetables
+1.000	ALL	 > ALL
 \.
+
+UPDATE "PRODUCT_CATEGORY"
+SET pc_id = -1
+WHERE pc_id = 1;
+
+COPY "PRODUCT_CATEGORY" (pc_tax_rate, pc_description, pc_path) FROM stdin;
+0.000		 > GROCERIES
+0.000		 > ELECTRONICS
+0.000		 > ELECTRONICS > PC
+0.000		 > ELECTRONICS > PC > MEMORY
+0.000		 > ELECTRONICS > PC > STORAGE
+0.000		 > ELECTRONICS > PC > MONITOR
+0.000		 > ELECTRONICS > PC > CPU
+0.000		 > ELECTRONICS > PC > MOTHERBOARD
+0.000		 > ELECTRONICS > PC > MEMORY > DDR2
+0.000		 > ELECTRONICS > PC > MEMORY > DDR3
+0.000		 > GROCERIES > FROZEN
+0.000		 > GROCERIES > VEGETABLES
+0.000		 > GROCERIES > FISH
+0.000		 > ELECTRONICS > PC > STORAGE > HYBRID
+0.000		 > GROCERIES > FRUIT
+0.000		 > GROCERIES > FROZEN > MEAT
+0.000		 > GROCERIES > FROZEN > FISH
+0.000		 > GROCERIES > FROZEN > VEGETABLE
+0.000		 > GROCERIES > FROZEN > ICECREAM
+0.000		 > GROCERIES > FROZEN > PIZZA
+0.000		 > GROCERIES > CUPBOARD
+0.000		 > GROCERIES > CUPBOARD > PASTA
+0.000		 > GROCERIES > CUPBOARD > SAUCES
+0.000		 > GROCERIES > CUPBOARD > CEREAL
+\.
+
+
+COPY "PRODUCT_CATEGORY_ATTRIBUTE" (pca_product_category, pca_attribute) FROM stdin;
+3	BRAND
+8	SPEED
+8	CORES
+7	SIZE
+8	SOCKET
+6	SATA
+6	SIZE
+2	ORGANIC
+22	BRAND
+24	COOKING
+24	FISH
+24	MEAT
+24	DIP
+5	SIZE
+9	AUDIO
+9	LAN
+9	WIFI
+8	CODENAME
+\.
+
+
+COPY "PRODUCT"(p_ref,p_description,p_long_description,p_image_path,p_category) FROM stdin DELIMITERS '|';
+Intel Core i5-2500K 3.30GHz|Intel Core i5-2500K 3.30GHz|Intel Core i5-2500K 3.30GHz (Sandybridge) Socket LGA1155 Processor - Retail Intel's latest Sandybridge based processor capable of extreme overclocks and low power consumption with integrated HD 3000 graphics.|http://siteipyme/img/CP-360-IN_200.jpg|8
+Intel Core i5-4670K 3.40GHz|Intel Core i5-4670K 3.40GHz|Intel Core i5-4670K 3.40GHz (Haswell) Socket LGA1150 Processor - OEM with FREE Grid 2 PC Game Intel's latest 4th gen CPU, offering better performance, lower power consumption, improved memory overclocking and comes with GRID 2 PC Game FREE!!|http://siteipyme/img/CP-472-IN_200.jpg|8
+Intel Core i3-2130 3.40GHz|Intel Core i3-2130 3.40GHz|Intel Core i3-2130 3.40GHz (Sandybridge) Socket LGA1155 Processor - Retail|http://siteipyme/img/CP-442-IN_60068_350.jpg|8
+Intel Core i7-3770K 3.50GHz|Intel Core i7-3770K 3.50GHz|Intel Core i7-3770K 3.50GHz (Ivybridge) Socket LGA1155 Processor (77W) - Retail|http://siteipyme/img/CP-403-IN_47335_350.jpg|8
+Corsair XMS3 4GB (2x2GB)|Corsair XMS3 4GB (2x2GB)|Corsair XMS3 4GB (2x2GB) DDR3 PC3-10666C9 1333MHz Dual Channel Kit (TW3X4G1333C9A)|http://siteipyme/img/MY-330-CS_41476_350.jpg|11
+Corsair Vengeance Blue 8GB|Corsair Vengeance Blue 8GB|Corsair Vengeance Blue 8GB (2x4GB) DDR3 PC3-12800C9 1600MHz Dual Channel Kit (CMZ8GX3M2A1600C9B)|http://siteipyme/img/MY-300-CS_37478_350.jpg|11
+Corsair Vengeance 8GB (2x4GB)|Corsair Vengeance 8GB (2x4GB)|Corsair Vengeance 8GB (2x4GB) DDR3 PC3-12800C9 1600MHz Dual Channel Kit (CMZ8GX3M2A1600C9)|http://siteipyme/img/MY-299-CS_34876_350.jpg|11
+Corsair Dominator GT 8GB (2x4GB)|Corsair Dominator GT 8GB (2x4GB)|Corsair Dominator GT 8GB (2x4GB) DDR3 PC3-17000C9 2133MHz Dual Channel Kit with DHX Pro Connector (CMT8GX3M2B2133C9)|http://siteipyme/img/MY-333-CS_42439_350.jpg|11
+Avexir MPower Red Series 8GB (2x4GB)|Avexir MPower Red Series 8GB (2x4GB)|Avexir MPower Red Series 8GB (2x4GB) DDR3 PC3-22400C12 2800MHz Dual Channel Memory Kit (AVD3U28001204G-2CI)|http://siteipyme/img/MY-037-AR_67281_350.jpg|11
+Asus VE247H 24"|Asus VE247H 24" Widescreen LED|Asus VE247H 24" Widescreen LED Multimedia Monitor - Black LED Backlit, 1920x1080 Resolution, 10000000:1 Contrast Ratio, 300cd/m² Brightness, 2ms Response Time, 1x Analogue Input, 1x DVI-D Input, 1x HDMI Input, 3 Year On-Site Warranty.|http://siteipyme/img/MO-028-AS_36640_350.jpg|7
+BenQ G2420HDBL 24"|BenQ G2420HDBL 24" Widescreen LED|BenQ G2420HDBL 24" Widescreen LED Monitor - Black|http://siteipyme/img/MO-033-BQ_27524_350.jpg|7
+Iiyama ProLite E2278HD|Iiyama ProLite E2278HD|Iiyama ProLite E2278HD 22" Widescreen LED Monitor - Black|http://siteipyme/img/MO-089-IY_58125_350.jpg|7
+\.
+
+
+
+COPY "PRODUCT_ATTRIBUTE_VALUE"(pav_product,pav_product_category_attribute,pav_value) FROM stdin DELIMITERS '|';
+1|1|INTEL
+1|2|3.30GHZ
+1|3|4
+1|5|LGA1155
+1|18|SANDYBRIDGE
+2|1|INTEL
+2|2|3.40GHZ
+2|3|4
+2|5|LGA1150
+2|18|HASWELL
+3|1|INTEL
+3|2|3.40GHZ
+3|3|2
+3|5|LGA1155
+3|18|SANDYBRIDGE
+4|1|INTEL
+4|2|3.50GHZ
+4|3|4
+4|5|LGA1155
+4|18|IVYBRIDGE
+5|1|CORSAIR
+5|14|4GB
+6|1|CORSAIR
+6|14|8GB
+7|1|CORSAIR
+7|14|8GB
+8|1|CORSAIR
+8|14|8GB
+9|1|AVEXIR
+9|14|8GB
+10|1|ASUS
+10|4|24
+11|1|BENQ
+11|4|24
+12|1|IIYAMA
+12|4|22
+\.
+
+
+
 
 
 
@@ -719,33 +809,6 @@ COPY "CARD_VENDOR" (cv_id, cv_name) FROM stdin;
 1	visa
 2	visa electron
 3	master card
-\.
-
-
---
--- TOC entry 2114 (class 0 OID 31711)
--- Dependencies: 180 2115
--- Data for Name: PRODUCT_CATEGORY_ATTRIBUTE; Type: TABLE DATA; Schema: IPYME_FINAL; Owner: postgres
---
-
-COPY "PRODUCT_CATEGORY_ATTRIBUTE" (pca_product_category, pca_attribute) FROM stdin;
-2	garden peas
-5	corn
-5	oats
-2	carrots
-2	spinach
-2	green beans
-14	RETAIL
-19	CHIPSET
-19	LAN
-19	WIFI
-19	AUDIO
-16	SIZE
-16	SPEED
-16	ECC
-20	CORES
-14	BRAND
-6	chicken
 \.
 
 
