@@ -2,14 +2,17 @@
     
 angular.module('iPymeApp')
 .controller('MainMenuController',['$scope','$location',"ipymeajax", function MainMenuController($scope,$location,ipymeajax) {
-    var requestData = {};
-    ipymeajax('/shop/menu/main', requestData)
+    ipymeajax('/shop/menu/main', {})
     .success(function(responseData){
         $scope.menutree = responseData;
     });
 
     $scope.getLiClass = function (menuitem){
-        return (menuitem.nodes && menuitem.nodes.length > 0) ? 'submenu':'';
+        var aClasses = [];
+        if (menuitem.nodes){
+            (menuitem.nodes.length > 0) && aClasses.push('submenu');
+        }
+        return aClasses.join(' ');
     }
 }])
 .controller('AdminListController',['$scope','$element','$dialog','$routeParams','ipymeajax', function($scope,$element,$dialog,$routeParams,ipymeajax){
@@ -160,7 +163,7 @@ console.log(dialog.data.fields);
         dialog.close(returnCode);
     };
 }])
-.controller('CtrlSignin', ['$scope','ipymeajax','$location','$cookieStore', function ($scope,ipymeajax,$location,$cookieStore) {
+.controller('CtrlSignin', ['$scope','ipymeajax','$location','$cookieStore', '$element', function ($scope,ipymeajax,$location,$cookieStore,$element) {
     $scope.user_data = { user_name:$cookieStore.get('ipyme_u_n')
                         , user_password:$cookieStore.get('ipyme_u_p')
                         , user_remember:false};
@@ -180,6 +183,9 @@ console.log(dialog.data.fields);
             }
         });
     }
+    
+    $element.bind('keyup', function(e){(e.keyCode==13) && $scope.click();});
+    
     $scope.clear = function() {
         $cookieStore.remove('ipyme_u_n');
         $cookieStore.remove('ipyme_u_p');
@@ -191,7 +197,7 @@ console.log(dialog.data.fields);
 
     }
 }])
-.controller('CtrlSignUp', ['$scope','ipymeajax','$location', function ($scope,ipymeajax,$location) {
+.controller('CtrlSignUp', ['$scope','ipymeajax','$location','$element', function ($scope,ipymeajax,$location,$element) {
     $scope.user_data = {
         user_name:''
         , user_email:''
@@ -216,6 +222,8 @@ console.log(dialog.data.fields);
             }
         });
     }
+    
+    $element.bind('keyup', function(e){(e.keyCode==13) && $scope.click();});
 }])
 .controller('CtrlSignUpConfirmation', ['$scope','$location','$routeParams','ipymeajax', function ($scope,$location,$routeParams,ipymeajax) {
     ipymeajax('/user/signup/confirm/'+$routeParams.sessionid, {})
@@ -825,7 +833,7 @@ console.log(dialog.data.fields);
         $scope.model.user_details.addresses[0] && ($scope.model.user_details.country_selected = $scope.model.user_details.addresses[0].country_c_code);
         $scope.model.user_details.address_selected = $scope.model.user_details.addresses[0];
         $scope.model.user_details.card_selected = $scope.model.user_details.card[0];
-        $scope.model.user_details.people_selected = $scope.model.user_details.people[0];
+        $scope.model.user_details.people_selected = ($scope.model.user_details.people.length>0) ? $scope.model.user_details.people[0]:{};
         $scope.model.card_vendors.available = responseData.user_details.card_vendor;
         console.log($scope.model.user_details);
     });
@@ -893,10 +901,7 @@ console.log(dialog.data.fields);
                     }
                     
                     if (form_template == 'account') {
-                        if (start_empty==1) {
-                            $scope.model.user_details.card.push(oReturn.response.card);
-                            $scope.model.user_details.people_selected = oReturn.response.people;
-                        }
+                        $scope.model.user_details.people_selected = oReturn.response.people;
                     }
                 }
                 else if (oReturn.button == 2){

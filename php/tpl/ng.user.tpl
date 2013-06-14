@@ -9,19 +9,19 @@
                 <tr>
                     <td>Title</td>
                     <td>
-                        {{model.user_details.people[0].people_p_title}}
+                        {{model.user_details.people_selected.people_p_title}}
                     </td>
                 </tr>
                 <tr>
                     <td>First Name</td>
                     <td>
-                    {{model.user_details.people[0].people_p_name}}
+                    {{model.user_details.people_selected.people_p_name}}
                     </td>
                 </tr>
                 <tr>
                     <td>surname</td>
                     <td>
-                            {{model.user_details.people[0].people_p_surname}}
+                            {{model.user_details.people_selected.people_p_surname}}
                     </td>
                 </tr>
                 <tr>
@@ -31,7 +31,7 @@
                 <tr>
                     <td>Home phone</td>
                     <td>
-                         {{model.user_details.people[0].people_p_phone}}
+                         {{model.user_details.people_selected.people_p_phone}}
                     </td>
                 </tr>
             </tbody>
@@ -142,7 +142,7 @@
         
         <tabs>
             <pane ng-repeat="pane in model.panes" heading="{{pane.title}}" active="pane.active" >
-                <div ng-show="model.user_details.people.length > 0 || pane.template=='paneaccount'" ng-include="pane.template"></div>
+                <div ng-show="model.user_details.people_selected.people_p_id || pane.template=='paneaccount'" ng-include="pane.template"></div>
             </pane>
         </tabs>
     </div>

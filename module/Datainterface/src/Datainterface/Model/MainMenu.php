@@ -8,17 +8,6 @@ class MainMenu {
     
     public function getMenu($aOptions){
         
-        $oUserMenu = (object) (array_key_exists('username', $aOptions)) ? 
-             array(
-                'label' => $aOptions['username']
-                , 'url' => '#/user/account/'.$aOptions['username']
-                , 'nodes' => array())
-            :array(
-                'label' => 'Sign In'
-                , 'url' => '#/user/signin'
-                , 'nodes' => array());
-                
-                
         $aMenuList = array(
             (object) array(
                 'label' => 'iPyME'
@@ -26,6 +15,7 @@ class MainMenu {
                 , 'nodes' => array(
                     (object) array(
                         'label' => 'Purchase'
+                        ,'icon' => 'icon_purchase'
                         , 'url' => '#/admin/purchase'
                         , 'nodes' => array(
                             (object) array(
@@ -39,6 +29,7 @@ class MainMenu {
                     , (object) array(
                         'label' => 'Sale'
                         , 'url' => '#/admin/sale'
+                        ,'icon' => 'icon_sale'
                         , 'nodes' => array(
                             (object) array(
                                 'label' => 'Customer'
@@ -47,44 +38,32 @@ class MainMenu {
                             , (object) array(
                                 'label' => 'Order'
                                 , 'url' => '#/admin/sale/order'
-                                , 'nodes' => array())
-                            , (object) array(
-                                'label' => 'Delivery'
-                                , 'url' => '#/admin/sale/delivery'
-                                , 'nodes' => array())
-                            , (object) array(
-                                'label' => 'Payment'
-                                , 'url' => '#/admin/sale/payment'
                                 , 'nodes' => array())))
                     , (object) array(
                         'label' => 'Product'
+                        ,'icon' => 'icon_product'
                         , 'url' => ''
-                        , 'nodes' => array(
-                            (object) array(
-                                'label' => 'Stores'
-                                , 'url' => '#/admin/stores'
-                                , 'nodes' => array())
-                            , (object) array(
-                                'label' => 'Products'
-                                , 'url' => '#/admin/list/product'
-                                , 'nodes' => array())
-                            , (object) array(
-                                'label' => 'Category'
-                                , 'url' => '#/admin/category'
-                                , 'nodes' => array())
-                            , (object) array(
-                                'label' => 'Item'
-                                , 'url' => '#/admin/product/item'
-                                , 'nodes' => array())))
+                        , 'nodes' => array())
+                    , (object) array(
+                        'label' => 'Delivery'
+                        ,'icon' => 'icon_delivery'
+                        , 'url' => '#/admin/sale/delivery'
+                        , 'nodes' => array())
+                    , (object) array(
+                        'label' => 'Payment'
+                        ,'icon' => 'icon_payment'
+                        , 'url' => '#/admin/sale/payment'
+                        , 'nodes' => array())
                     , (object) array(
                         'label' => 'Settings'
+                        ,'icon' => 'icon_settings'
                         , 'url' => '#/admin/settings'
                         , 'nodes' => array(
                             (object) array(
                                 'label' => 'Users'
                                 , 'url' => '#/admin/list/user'
                                 , 'nodes' => array())))))
-            , $oUserMenu);
+            , );
         return $aMenuList;
     }
 }

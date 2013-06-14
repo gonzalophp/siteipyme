@@ -162,13 +162,6 @@ div.adminmenu > ul:first-child > li:first-child > a:after   {
     border:5px solid transparent;
 }
 
-div.adminmenu > ul:first-child > li:first-child > ul > li {
-    background-image: url('../img/menuimg.png');
-    background-repeat: no-repeat;
-    background-position: 12px 9px;
-    background-size: 24px 24px;
-}
-
 div.adminmenu li.submenu ul li.submenu ul {
     display:none;
     position:absolute;
@@ -191,3 +184,20 @@ div.adminmenu li.submenu ul li.submenu:after{
 div.adminmenu li.submenu ul > li:hover.submenu> ul {
     display:block;
 }
+
+div[class*="icon_"]  {
+    height:31px;
+    width:31px;
+    top:4px;
+    left:6px;
+    border:0;
+    position: absolute;
+    background-image: url("images/shopicons.png");
+    background-position: -1px -1px
+}
+
+div.icon_settings {background-position: -97px -97px;}
+div.icon_sale { background-position: -65px -65px;}
+div.icon_product {  background-position: -193px -193px;}
+div.icon_purchase {  background-position: -161px -161px;}
+div.icon_delivery {  background-position: -225px -225px;}
