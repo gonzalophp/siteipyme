@@ -801,6 +801,20 @@ COPY "PRODUCT_ATTRIBUTE_VALUE"(pav_product,pav_product_category_attribute,pav_va
 \.
 
 
+COPY "PRICES"(p_price,p_product,p_status,p_currency ) FROM stdin DELIMITERS '|';
+160.000|1|1|1
+180.000|2|1|1
+80.000|3|1|1
+260.000|4|1|1
+38.000|5|1|1
+62.000|6|1|1
+62.000|7|1|1
+95.000|8|1|1
+160.000|9|1|1
+145.000|10|1|1
+182.000|11|1|1
+85.000|12|1|1
+\.
 
 
 
