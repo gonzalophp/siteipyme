@@ -94,7 +94,6 @@ angular.module('iPymeApp')
     } 
 }])
 .controller('FormDialogController',['$scope','dialog','ipymeajax', function FormDialogController($scope, dialog,ipymeajax){
-console.log(dialog.data.fields);
     $scope.dialogForm = {
         readonly:(dialog.readonly==1),
         button_actions:{},
@@ -136,10 +135,8 @@ console.log(dialog.data.fields);
         });
     }
     if (dialog.formContext == 'product'){
-        console.log(dialog.data);
         dialog.data.fields.p_category= dialog.data.categoryselected.id;
         dialog.data.fields.p_category_name= dialog.data.categoryselected.category;
-
 
         $scope.product = {attributes: []
                           ,categoryselected: dialog.data.categoryselected};

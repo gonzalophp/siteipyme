@@ -42,7 +42,7 @@ class MainMenu {
                     , (object) array(
                         'label' => 'Product'
                         ,'icon' => 'icon_product'
-                        , 'url' => ''
+                        , 'url' => '#/admin/product'
                         , 'nodes' => array((object) array(
                                             'label' => 'Item'
                                             , 'url' => '#/admin/product/item'
