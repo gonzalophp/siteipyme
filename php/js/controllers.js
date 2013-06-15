@@ -36,12 +36,14 @@ angular.module('iPymeApp')
         selectedItems: $scope.selectedItems,
     }
     
-    $scope.$watch(function(){return {paginoptions:$scope.gridOptions.pagingOptions, categoryselected:$scope.categoryselected}}
+    $scope.$watch(function(){return {pagingoptions:$scope.gridOptions.pagingOptions, categoryselected:$scope.categoryselected}}
                 , function (newVal, oldVal) {
-                    if ((!oldVal.categoryselected) || (newVal.categoryselected.id != oldVal.categoryselected.id)){
-                        $scope.gridOptions.pagingOptions.currentPage = 1;
+                    if (newVal.pagingoptions.currentPage == oldVal.pagingoptions.currentPage) {
+                        if ((!oldVal.categoryselected) || (newVal.categoryselected.id != oldVal.categoryselected.id)){
+                            $scope.gridOptions.pagingOptions.currentPage = 1;
+                        }
                     }
-                    
+            
             var serviceUrl = '/shop/'+$scope.adminList+((newVal.categoryselected)?'/getProductsByCategory/'+newVal.categoryselected.id:'');
             ipymeajax(serviceUrl
                 ,{pagesize:$scope.gridOptions.pagingOptions.pageSize
