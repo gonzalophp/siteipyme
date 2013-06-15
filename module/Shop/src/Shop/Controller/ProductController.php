@@ -248,7 +248,10 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
         $oResultSet = $oDataFunctionGateway->getDataRecordSet(
                 'IPYME_FINAL'
                 , 'get_product'
-                , array(':pc_id' => $nProductId));
+                , array(':pc_id' => $nProductId
+                        ,':p_pagesize'=>1
+                        ,':p_page'=>1
+                ));
         
         $aProduct = $oResultSet->current();
         $aProduct['p_price'] = number_format($aProduct['p_price'],2);

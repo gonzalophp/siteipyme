@@ -589,24 +589,22 @@ angular.module('iPymeApp')
         if (initialize){
             ipymeajax('/shop/basket/get', {})
             .success(function(responseData){
+                element.find('div.ajax-waiting').remove();
                 if (responseData.valid_session != 0) {
                     $scope.model.basket.id          = responseData.basket.id;
                     $scope.model.basket.products    = responseData.basket.products;
                     $scope.model.basket.initialized = true;
                 }
-                
-                element.divwaiting.remove();
-            });
+            })
         }
         else {
             ipymeajax('/shop/basket/save', $scope.model.basket)
             .success(function(responseData){
+                element.find('div.ajax-waiting').remove();
                 if (responseData.valid_session != 0) {
                     $scope.model.basket.id = responseData.basket.id;
                 }
-                
-                element.divwaiting.remove();
-            });
+            })
         }
     }
     $scope.model.selected_category = {key:-1};

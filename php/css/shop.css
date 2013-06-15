@@ -159,7 +159,7 @@ div.ipymeshop div.ipymeshopbody {
     margin-top:1em;
     margin-left:10%;
     margin-right:10%;
-    min-width: 67em;
+    min-width: 78em;
     padding:1em 0em 1em 0em;
 }
 
@@ -187,6 +187,12 @@ div.carousel-details > a > p {
     text-align: left;
     font-size: initial;
     font-weight: bold;
+    color:#555;    
+}
+
+div.carousel-details > a > p:nth-child(2) {
+    font-size: 1.1em;
+    padding-right: 6em;
 }
 
 div.ipymeshop div.carousel ol.carousel-indicators{
