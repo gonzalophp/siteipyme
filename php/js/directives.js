@@ -167,7 +167,7 @@ angular.module('iPymeApp')
         restrict:'E',
         scope:{product:'=ngModel', addbutton:'=ngAddbutton'},
         replace:true,
-        template:'<table><tbody><tr><td rowspan="3"><a href="#/shop/product/{{product.id}}"><img ng-src="{{product.image_path}}" alt="{{product.longDescription}}"/></a></td><td><a href="#/shop/product/{{product.id}}"><span>{{product.description}}</span></a></td></tr><tr><td><span>{{product.currency}}</span>&nbsp;<span>{{product.price}}</span></td></tr><tr><td><button class="shop addtobasket" ng-click="addbutton(product)">Add</button><quantity class="basketquantity" ng-model="product.quantity"></quantity></td></tr></tbody></table>',
+        template:'<table><tbody><tr><td rowspan="3"><a href="#/shop/product/{{product.id}}"><img ng-src="{{product.image_path}}" alt="{{product.longDescription}}"/></a></td><td><a href="#/shop/product/{{product.id}}"><span>{{product.description}}</span></a></td></tr><tr><td><span>{{product.longDescription}}</span></td><td><span>{{product.currency}}</span>&nbsp;<span>{{product.price}}</span></td></tr><tr><td><button class="shop addtobasket" ng-click="addbutton(product)">Add</button><quantity class="basketquantity" ng-model="product.quantity"></quantity></td></tr></tbody></table>',
         link:function(scope, element, attr) {
         }
     }
@@ -194,7 +194,7 @@ angular.module('iPymeApp')
         restrict:'E',
         scope:{basket:'=ngModel', persist:'='},
         replace:true,
-        template:'<div><p class="ipymeTitle">Basket</p><div class="productlist"><ul><li ng-repeat="basketproduct in basket.products"><basketproduct ng-model="basketproduct" ></basketproduct></li></ul></div><p class="baskettotal">Total: {{basket.total}}</p><button class="shop checkout" ng-click="checkout()">Checkout</button></div>',
+        template:'<div><div ng-show="persist.basketWaitingUpdate" class="ajax-waiting"></div><p class="ipymeTitle">Basket</p><div class="productlist"><ul><li ng-repeat="basketproduct in basket.products"><basketproduct ng-model="basketproduct" ></basketproduct></li></ul></div><p class="baskettotal">Total: {{basket.total}}</p><button class="shop checkout" ng-click="checkout()">Checkout</button></div>',
         link:function(scope, element, attr) {
             scope.basket = {id:0
                             ,total:0

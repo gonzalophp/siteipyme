@@ -585,25 +585,25 @@ angular.module('iPymeApp')
     }
     
     $scope.basketpersist = function(initialize,element){
-        element.prepend(element.divwaiting = angular.element('<div class="ajax-waiting"></div>'));
+        $scope.basketpersist.basketWaitingUpdate = true;
         if (initialize){
             ipymeajax('/shop/basket/get', {})
             .success(function(responseData){
-                element.find('div.ajax-waiting').remove();
                 if (responseData.valid_session != 0) {
                     $scope.model.basket.id          = responseData.basket.id;
                     $scope.model.basket.products    = responseData.basket.products;
                     $scope.model.basket.initialized = true;
                 }
+                $scope.basketpersist.basketWaitingUpdate = false;
             })
         }
         else {
             ipymeajax('/shop/basket/save', $scope.model.basket)
             .success(function(responseData){
-                element.find('div.ajax-waiting').remove();
                 if (responseData.valid_session != 0) {
                     $scope.model.basket.id = responseData.basket.id;
                 }
+                $scope.basketpersist.basketWaitingUpdate = false;
             })
         }
     }
