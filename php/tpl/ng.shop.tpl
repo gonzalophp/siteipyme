@@ -2,7 +2,7 @@
 <div class="ipymeshop">
     <shoptopbar></shoptopbar>
         <div class="ipymeshopbody" ng-controller="ShopController">
-        <div class="carousel" ng-controller="CarouselDemoCtrl">
+        <div class="carousel" ng-controller="CarouselItemsCtrl">
             <carousel interval="100000">
                 <slide ng-repeat="slide in slides" active="slide.active">
                     <div class="carousel-content">

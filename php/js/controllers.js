@@ -18,30 +18,44 @@ angular.module('iPymeApp')
 .controller('AdminListController',['$scope','$element','$dialog','$routeParams','ipymeajax', function($scope,$element,$dialog,$routeParams,ipymeajax){
     $scope.selectedItems = [];
     $scope.adminList = $routeParams.list;
+    $scope.datagrid = [];
+    $scope.columnDefs  = [];
+    
     $scope.gridOptions = {
         enableColumnResize:true,
-//        enablePaging:true,
+        enablePaging:true,
         enableColumnReordering:true,
-//        showFooter:true,
+        showFooter:true,
         multiSelect:false,
-        pagingOptions:{ pageSizes: [5, 10, 20], pageSize: 10, totalServerItems: 0, currentPage: 1 },
+        pagingOptions:{ pageSizes: [5, 10, 20]
+                        , pageSize: 10
+                        , totalServerItems: 0
+                        , currentPage: 1 },
         data: 'datagrid',
         columnDefs:'columnDefs',
         selectedItems: $scope.selectedItems,
     }
-
-    if ($scope.adminList == 'product'){
-        $scope.categoryselected = {id:-1,category:'ALL'};
-        $scope.refreshProductByCategory = function() {
-            ipymeajax('/shop/product/getProductsByCategory/'+$scope.categoryselected.id,{}) 
+    
+    $scope.$watch(function(){return {paginoptions:$scope.gridOptions.pagingOptions, categoryselected:$scope.categoryselected}}
+                , function (newVal, oldVal) {
+                    if ((!oldVal.categoryselected) || (newVal.categoryselected.id != oldVal.categoryselected.id)){
+                        $scope.gridOptions.pagingOptions.currentPage = 1;
+                    }
+                    
+            var serviceUrl = '/shop/'+$scope.adminList+((newVal.categoryselected)?'/getProductsByCategory/'+newVal.categoryselected.id:'');
+            ipymeajax(serviceUrl
+                ,{pagesize:$scope.gridOptions.pagingOptions.pageSize
+                 ,page:$scope.gridOptions.pagingOptions.currentPage}) 
             .success(function(responseData){
+                $scope.columnDefs = responseData.columnDefs;
                 $scope.datagrid = responseData.datagrid;
+                $scope.gridOptions.$gridScope.totalServerItems = (responseData.datagrid) ? responseData.datagrid[0].rowcount:0;
             });
-        }
-    }
+    }, true);
+
+    
         
     $scope.openDialog = function(start_empty, form_template, buttons, readonly) { 
-        console.log(buttons);
         var dialog = $dialog.dialog({templateUrl: 'tpl/forms/ng.'+form_template+'.tpl',
                                      controller: 'FormDialogController'});
 
@@ -78,12 +92,6 @@ angular.module('iPymeApp')
             }
         });
     } 
-    
-    ipymeajax('/shop/'+$scope.adminList,{}) 
-    .success(function(responseData){
-        $scope.columnDefs = responseData.columnDefs;
-        $scope.datagrid = responseData.datagrid;
-    });
 }])
 .controller('FormDialogController',['$scope','dialog','ipymeajax', function FormDialogController($scope, dialog,ipymeajax){
 console.log(dialog.data.fields);
@@ -498,9 +506,9 @@ console.log(dialog.data.fields);
     
 }])
 
-.controller('CarouselDemoCtrl', ['$scope','$element','$location','ipymeajax', function($scope,$element,$location,ipymeajax){    
+.controller('CarouselItemsCtrl', ['$scope','$element','$location','ipymeajax', function($scope,$element,$location,ipymeajax){    
     $scope.slides = [];
-    ipymeajax('/shop/product/getDisplayedProductsByCategory/-1', {})
+    ipymeajax('/shop/product/getDisplayedProductsByCategory/-1', {pagesize:5, page:1})
     .success(function(responseData){
         if (responseData.valid_session == 0) {
             $location.path('/user/signin');
@@ -524,7 +532,6 @@ console.log(dialog.data.fields);
         clickFolderMode: 1,
         onActivate: function(node) {
             $scope.$parent.$parent.categoryselected = {id:node.data.key,category:node.data.title};
-            $scope.$parent.refreshProductByCategory();
             $scope.$root.$$phase || $scope.$root.$apply();
         },
     }).dynatree("getTree");
@@ -554,7 +561,7 @@ console.log(dialog.data.fields);
         }
         ((selected) ?
         (ipymeajax('/shop/product/getDisplayedProductsByAttributeValue', $scope.model.relativeAttributes)):
-        ipymeajax('/shop/product/getDisplayedProductsByCategory/'+$scope.model.selected_category.key, {}))
+        ipymeajax('/shop/product/getDisplayedProductsByCategory/'+$scope.model.selected_category.key, {pagesize:10, page:1}))
         .success(function(responseData){
             $scope.model.displayedProducts = responseData.displayedProducts;
         });
@@ -607,7 +614,7 @@ console.log(dialog.data.fields);
     $scope.$watch('model.selected_category', function(selected_category){
         
        $element.find('div.ipymeshopcenter').prepend($element.divwaiting = angular.element('<div class="ajax-waiting"></div>'));
-       ipymeajax('/shop/product/getDisplayedProductsByCategory/'+selected_category.key, {})
+       ipymeajax('/shop/product/getDisplayedProductsByCategory/'+selected_category.key, {pagesize:10, page:1})
        .success(function(responseData){
             $scope.model.displayedProducts = responseData.displayedProducts;
             $element.divwaiting.remove();

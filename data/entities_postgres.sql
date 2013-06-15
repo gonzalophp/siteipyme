@@ -301,16 +301,16 @@ create type "IPYME_AUX".attribute_value_related AS (
 
 
 create type "IPYME_AUX"."get_product" AS (
-	p_id bigint,
-	p_ref character varying(45),
-	p_description character varying(255),
-	p_long_description character varying(255),
-	p_category bigint,
-	p_image_path text,
-	p_category_name text,
-	p_price numeric(8,3),
-	c_name character varying(100)
-);
+    rowcount bigint,
+    p_id bigint,
+    p_ref character varying(45),
+    p_description character varying(255),
+    p_long_description character varying(255),
+    p_category bigint,
+    p_image_path text,
+    p_category_name text,
+    p_price numeric(8,3),
+    c_name character varying(100));
 
 CREATE TYPE "IPYME_AUX".basket_list_extended AS(bl_id bigint
                                                 ,bl_basket bigint
@@ -1093,31 +1093,51 @@ $BODY$
   ROWS 1000;
 
 
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_product(p_p_id bigint)
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_product(
+p_p_id bigint
+,p_pagesize bigint
+,p_page bigint)
   RETURNS SETOF "IPYME_FINAL"."get_product" AS
 $BODY$
 DECLARE
+v_offset BIGINT;
+v_limit BIGINT;
 BEGIN
 	--
-	RETURN QUERY SELECT P.p_id
-											,P.p_ref
-											,P.p_description
-											,P.p_long_description
-											,P.p_category
-											,P.p_image_path
-											,substr(PC.pc_path,length(PC.pc_path)-strpos("IPYME_FINAL".rev(PC.pc_path),' > ')+2) AS p_category_name
-											,PR.p_price
-											,C.c_name
-								FROM "IPYME_FINAL"."PRODUCT" P
-								JOIN "IPYME_FINAL"."PRODUCT_CATEGORY" PC
-								ON P.p_category = PC.pc_id
-								LEFT JOIN "IPYME_FINAL"."PRICES" PR
-								ON PR.p_product = P.p_id and PR.p_status = 1
-								LEFT JOIN "IPYME_FINAL"."CURRENCY" C
-								ON PR.p_currency = C.c_id
-								WHERE P.p_id = p_p_id
-									OR p_p_id IS NULL
-								;
+	v_limit := p_pagesize;
+	v_offset := (p_page-1)*p_pagesize;
+
+	RETURN QUERY 	SELECT last_value(rownum) over () rowcount
+											,p_id
+											,p_ref
+											,p_description
+											,p_long_description
+											,p_category
+											,p_image_path
+											,p_category_name
+											,p_price
+											,c_name
+								FROM (SELECT row_number() over() rownum
+														,P.p_id
+														,P.p_ref
+														,P.p_description
+														,P.p_long_description
+														,P.p_category
+														,P.p_image_path
+														,substr(PC.pc_path,length(PC.pc_path)-strpos("IPYME_FINAL".rev(PC.pc_path),' > ')+2) AS p_category_name
+														,PR.p_price
+														,C.c_name
+											FROM "IPYME_FINAL"."PRODUCT" P
+											JOIN "IPYME_FINAL"."PRODUCT_CATEGORY" PC
+											ON P.p_category = PC.pc_id
+											LEFT JOIN "IPYME_FINAL"."PRICES" PR
+											ON PR.p_product = P.p_id and PR.p_status = 1
+											LEFT JOIN "IPYME_FINAL"."CURRENCY" C
+											ON PR.p_currency = C.c_id
+											WHERE P.p_id = p_p_id
+												OR p_p_id IS NULL) product
+							OFFSET v_offset
+							LIMIT v_limit;
 	--
 END;
 $BODY$
@@ -1263,11 +1283,7 @@ $BODY$
 
 -- DROP FUNCTION "IPYME_FINAL".set_product(bigint, character varying, character varying, character varying, numeric, character varying);
 
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_product(p_p_id bigint
-, p_p_ref character varying, p_p_description character varying
-, p_p_long_description character varying, p_p_category bigint, p_p_price numeric
-, p_p_image_path text
-, p_c_name text)
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".set_product(p_p_id bigint, p_p_ref character varying, p_p_description character varying, p_p_long_description character varying, p_p_category bigint, p_p_price numeric, p_p_image_path text, p_c_name text)
   RETURNS SETOF "IPYME_FINAL".get_product AS
 $BODY$
 DECLARE
@@ -1841,37 +1857,55 @@ $BODY$
   ROWS 1000;
 
 
-CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_product_by_category(p_p_category bigint)
+CREATE OR REPLACE FUNCTION "IPYME_FINAL".get_product_by_category(p_p_category bigint, p_pagesize bigint, p_page bigint)
   RETURNS SETOF "IPYME_FINAL".get_product AS
 $BODY$
 DECLARE
+v_offset bigint;
+v_limit bigint;
 BEGIN
 	--
-	RETURN QUERY SELECT distinct P.p_id
-											,P.p_ref
-											,P.p_description
-											,P.p_long_description
-											,P.p_category
-											,P.p_image_path
-											,PC3.p_category_name
-											,PR.p_price
-											,C.c_name
-								FROM "IPYME_FINAL"."PRODUCT" P
-								INNER JOIN (select PC1.pc_id 
-														,substr(PC1.pc_path,length(PC1.pc_path)-strpos("IPYME_FINAL".rev(PC1.pc_path),' > ')+2) as p_category_name
-														from "IPYME_FINAL"."PRODUCT_CATEGORY" PC1
-													,(select length(pc_path) as pc_path_length 
-																	,pc_path 
-																	from "IPYME_FINAL"."PRODUCT_CATEGORY" 
-																	where pc_id=p_p_category
-																	OR p_p_category = -1
-																	) PC2
-													WHERE SUBSTR(PC1.pc_path,0,PC2.pc_path_length+1) = PC2.pc_path) PC3
-								ON P.p_category = PC3.pc_id
-								LEFT JOIN "IPYME_FINAL"."PRICES" PR
-								ON PR.p_product = P.p_id and PR.p_status = 1
-								LEFT JOIN "IPYME_FINAL"."CURRENCY" C
-								ON PR.p_currency = C.c_id;								
+	v_offset :=(p_page-1)*p_pagesize;
+	v_limit := p_pagesize;
+	--
+	RETURN QUERY 	SELECT last_value(rownum) over () rowcount
+													,p_id
+													,p_ref
+													,p_description
+													,p_long_description
+													,p_category
+													,p_image_path
+													,p_category_name
+													,p_price
+													,c_name
+						FROM(SELECT row_number() over() rownum,*
+								FROM (SELECT distinct P.p_id
+														,P.p_ref
+														,P.p_description
+														,P.p_long_description
+														,P.p_category
+														,P.p_image_path
+														,PC3.p_category_name
+														,PR.p_price
+														,C.c_name
+											FROM "IPYME_FINAL"."PRODUCT" P
+											INNER JOIN (select PC1.pc_id 
+																	,substr(PC1.pc_path,length(PC1.pc_path)-strpos("IPYME_FINAL".rev(PC1.pc_path),' > ')+2) as p_category_name
+																	from "IPYME_FINAL"."PRODUCT_CATEGORY" PC1
+																,(select length(pc_path) as pc_path_length 
+																				,pc_path 
+																				from "IPYME_FINAL"."PRODUCT_CATEGORY" 
+																				where pc_id = p_p_category
+																				OR p_p_category = -1
+																				) PC2
+																WHERE SUBSTR(PC1.pc_path,0,PC2.pc_path_length+1) = PC2.pc_path) PC3
+											ON P.p_category = PC3.pc_id
+											LEFT JOIN "IPYME_FINAL"."PRICES" PR
+											ON PR.p_product = P.p_id and PR.p_status = 1
+											LEFT JOIN "IPYME_FINAL"."CURRENCY" C
+											ON PR.p_currency = C.c_id) PRODUCTS) PRODUCTS2
+								OFFSET v_offset
+								LIMIT v_limit;
 	--
 END;
 $BODY$
@@ -1964,7 +1998,8 @@ BEGIN
 	--
 	v_a_attribute_id_and_attribute_value := string_to_array(p_category_attribute_id_and_value, '~^~')::TEXT[];
 	--
-	RETURN QUERY 	SELECT P.p_id
+	RETURN QUERY 	SELECT 1::bigint
+											,P.p_id
 											,P.p_ref
 											,P.p_description
 											,P.p_long_description

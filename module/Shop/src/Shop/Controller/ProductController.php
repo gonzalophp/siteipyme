@@ -18,7 +18,23 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
         );
         
         $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
-        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_product', array(':id' => null));
+        
+        $nPage=1;
+        $nPageSize=10;
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            $sJSONDataRequest = $this->getRequest()->getContent();
+            $aRequest = (array)json_decode($sJSONDataRequest, true);
+            if (array_key_exists('pagesize', $aRequest)) $nPageSize = $aRequest['pagesize'];
+            if (array_key_exists('page', $aRequest)) $nPage = $aRequest['page'];
+        }
+        
+        
+        $oResultSet = $oDataFunctionGateway->getDataRecordSet(
+            'IPYME_FINAL'
+            , 'get_product'
+            , array(':id' => null
+                    ,':p_pagesize' => $nPageSize
+                    ,':p_page' => $nPage));
             
         foreach($oResultSet as $aProduct) {
             $aProduct['grid_id'] = $aProduct['p_id'];
@@ -33,7 +49,22 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
     public function getDisplayedProductsByCategoryAction() {
         $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
         $nProductCategoryId =  $this->getEvent()->getRouteMatch()->getParam('id');
-        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_product_by_category', array(':pc_id' => $nProductCategoryId));
+        
+        $nPage=1;
+        $nPageSize=10;
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            $sJSONDataRequest = $this->getRequest()->getContent();
+            $aRequest = (array)json_decode($sJSONDataRequest, true);
+            if (array_key_exists('pagesize', $aRequest)) $nPageSize = $aRequest['pagesize'];
+            if (array_key_exists('page', $aRequest)) $nPage = $aRequest['page'];
+        }
+            
+        $oResultSet = $oDataFunctionGateway->getDataRecordSet(
+                'IPYME_FINAL'
+                , 'get_product_by_category'
+                , array(':pc_id' => $nProductCategoryId
+                        ,':p_pagesize'=> $nPageSize
+                        ,':p_page'=> $nPage));
         
         $aResponse = array('success' =>1, 'displayedProducts' => array());
         foreach($oResultSet as $aProduct) {
@@ -102,7 +133,24 @@ class ProductController extends \Zend\Mvc\Controller\AbstractActionController {
     public function getProductsByCategoryAction() {
         $oDataFunctionGateway = $this->serviceLocator->get('Datainterface\Model\DataFunctionGateway');
         $nProductCategoryId =  $this->getEvent()->getRouteMatch()->getParam('id');
-        $oResultSet = $oDataFunctionGateway->getDataRecordSet('IPYME_FINAL', 'get_product_by_category', array(':pc_id' => $nProductCategoryId));
+        
+        $nPage=1;
+        $nPageSize=10;
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            $sJSONDataRequest = $this->getRequest()->getContent();
+            $aRequest = (array)json_decode($sJSONDataRequest, true);
+            if (array_key_exists('pagesize', $aRequest)) $nPageSize = $aRequest['pagesize'];
+            if (array_key_exists('page', $aRequest)) $nPage = $aRequest['page'];
+        }
+            
+        $oResultSet = $oDataFunctionGateway->getDataRecordSet(
+                'IPYME_FINAL'
+                , 'get_product_by_category'
+                , array(':pc_id' => $nProductCategoryId
+                        ,':p_pagesize'=> $nPageSize
+                        ,':p_page'=> $nPage));
+        
+        
         
         $aResponse = array('success' =>1);
         foreach($oResultSet as $aProduct) {
