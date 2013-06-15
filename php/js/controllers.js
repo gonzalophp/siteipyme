@@ -609,14 +609,13 @@ angular.module('iPymeApp')
     }
     $scope.model.selected_category = {key:-1};
     $scope.$watch('model.selected_category', function(selected_category){
-        
-       $element.find('div.ipymeshopcenter').prepend($element.divwaiting = angular.element('<div class="ajax-waiting"></div>'));
+       $scope.waitingUpdate = true;
        ipymeajax('/shop/product/getDisplayedProductsByCategory/'+selected_category.key, {pagesize:10, page:1})
        .success(function(responseData){
             $scope.model.displayedProducts = responseData.displayedProducts;
-            $element.divwaiting.remove();
             ipymeajax('/shop/category/getAllAvailableAttributeValuesRelated/'+selected_category.key+',', {})
             .success(function(responseData){
+                $scope.waitingUpdate = false;
                 $scope.model.relativeAttributes = responseData.category_attribute;
             });
         });
@@ -730,7 +729,7 @@ angular.module('iPymeApp')
     }
     
     $scope.basketpersist = function(initialize,element){
-        element.prepend(element.divwaiting = angular.element('<div class="ajax-waiting"></div>'));
+        $scope.basketpersist.basketWaitingUpdate = true;
         if (initialize){
             ipymeajax('/shop/basket/get', {})
             .success(function(responseData){
@@ -739,8 +738,7 @@ angular.module('iPymeApp')
                     $scope.model.basket.products    = responseData.basket.products;
                     $scope.model.basket.initialized = true;
                 }
-                
-                element.divwaiting.remove();
+                $scope.basketpersist.basketWaitingUpdate = false;
             });
         }
         else {
@@ -749,8 +747,7 @@ angular.module('iPymeApp')
                 if (responseData.valid_session != 0) {
                     $scope.model.basket.id = responseData.basket.id;
                 }
-                
-                element.divwaiting.remove();
+                $scope.basketpersist.basketWaitingUpdate = false;
             });
         }
     }

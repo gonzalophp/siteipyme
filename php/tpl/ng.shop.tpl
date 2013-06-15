@@ -47,6 +47,7 @@
                         </td>
                         <td>
                             <div class="ipymeshopcenter">
+                                <div ng-show="waitingUpdate" class="ajax-waiting"></div>
                                 <ul ng-repeat="product in model.displayedProducts">
                                     <li>
                                         <displayproduct ng-model="product" ng-addbutton="addToBasket"></displayproduct>
