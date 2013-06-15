@@ -610,11 +610,10 @@ console.log(dialog.data.fields);
        ipymeajax('/shop/product/getDisplayedProductsByCategory/'+selected_category.key, {})
        .success(function(responseData){
             $scope.model.displayedProducts = responseData.displayedProducts;
-            
+            $element.divwaiting.remove();
             ipymeajax('/shop/category/getAllAvailableAttributeValuesRelated/'+selected_category.key+',', {})
             .success(function(responseData){
                 $scope.model.relativeAttributes = responseData.category_attribute;
-                $element.divwaiting.remove();
             });
         });
     });
