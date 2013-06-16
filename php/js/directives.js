@@ -245,7 +245,7 @@ angular.module('iPymeApp')
                 
             windowNode.bind('resize', resize);
             windowNode.bind('scroll', scroll);
-            scope.$on("$destroy", function() {windowNode.unbind('scroll');windowNode.unbind('resize');});
+            scope.$on("$destroy", function() {scope.persist(false,element);windowNode.unbind('scroll');windowNode.unbind('resize');});
             scope.$watch('basket.products', basketchange, true);
             
             resize();
@@ -300,7 +300,7 @@ angular.module('iPymeApp')
                     scope.persist(true);
                 }
                 
-            scope.$on("$destroy", function() {windowNode.unbind('scroll');windowNode.unbind('resize');});
+            scope.$on("$destroy", function() {scope.persist(false);windowNode.unbind('scroll');windowNode.unbind('resize');});
             scope.$watch('model.basket.products', basketchange, true);
             
             initialize();
