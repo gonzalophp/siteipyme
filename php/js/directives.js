@@ -175,12 +175,12 @@ angular.module('iPymeApp')
 .directive('basketproduct', function(){
     return {
         restrict:'E',
-        scope:{product:'=ngModel'},
+        scope:{product:'=ngModel', basket:'=ngBasket'},
         replace:true,
         template:'<table><tbody><tr><td><quantity class="basketquantity" ng-model="product.bl_quantity"></quantity></td><td><a href="#/shop/product/{{product.bl_product}}"><span>{{product.p_description}}</span></a></td><td><span>{{product.c_name}}</span>&nbsp;<span>{{product.total}}</span></td><td><button class="ipymebuttonclose" ng-click="removebutton(product)">x</button></td></tr></tbody></table>',
         link:function(scope, element, attr) {
             scope.removebutton = function() {
-                 scope.$parent.$parent.basket.products.splice(scope.$parent.$index,1);
+                scope.basket.products.splice(scope.$parent.$index,1);
             }
             
             scope.$watch('product.bl_quantity', function(quantity){
@@ -194,7 +194,7 @@ angular.module('iPymeApp')
         restrict:'E',
         scope:{basket:'=ngModel', persist:'='},
         replace:true,
-        template:'<div><div ng-show="persist.basketWaitingUpdate" class="ajax-waiting"></div><p class="ipymeTitle">Basket</p><div class="productlist"><ul><li ng-repeat="basketproduct in basket.products"><basketproduct ng-model="basketproduct" ></basketproduct></li></ul></div><p class="baskettotal">Total: {{basket.total}}</p><button class="shop checkout" ng-click="checkout()">Checkout</button></div>',
+        template:'<div><div ng-show="persist.basketWaitingUpdate" class="ajax-waiting"></div><p class="ipymeTitle">Basket</p><div class="productlist"><ul><li ng-repeat="basketproduct in basket.products"><basketproduct ng-basket="basket" ng-model="basketproduct" ></basketproduct></li></ul></div><p class="baskettotal">Total: {{basket.total}}</p><button class="shop checkout" ng-click="checkout()">Checkout</button></div>',
         link:function(scope, element, attr) {
             scope.basket = {id:0
                             ,total:0
@@ -262,7 +262,7 @@ angular.module('iPymeApp')
                     <p class="ipymeTitle">Basket</p>\
                     <div class="productlist">\
                         <ul>\
-                            <li ng-repeat="basketproduct in model.basket.products"><basketproduct ng-model="basketproduct" ></basketproduct></li>\
+                            <li ng-repeat="basketproduct in model.basket.products"><basketproduct ng-basket="model.basket" ng-model="basketproduct" ></basketproduct></li>\
                         </ul>\
                     </div>\
                         <p class="baskettotal">Total: {{model.basket.total}}</p>\
