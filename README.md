@@ -1,7 +1,18 @@
 ##iPyME
 
 
-Ecommerce soulution for SMB/SME
+E-commerce solution for SMB/SME
+
+* Customer Orders
+* Purchases
+* Product stock
+* Invoices
+* Payment management
+* Product tracking
+* Delivery tracking
+* Multi-currency
+* Multi-company
+* Multi-user
 
 ###Status
 Development
