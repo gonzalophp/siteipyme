@@ -15,11 +15,16 @@ E-commerce solution for SMB/SME
 * Multi-user
 
 ###Status
-Development
+Development - unfinished
 
 ###Demo
 
+Shop
 http://siteipyme-gonzalophp.rhcloud.com/
+
+Admin panel
+http://siteipyme-gonzalophp.rhcloud.com/#/admin
+
 
 Bear in mind this demo is allocated in a free hosting. Performance issues may occur due to sporadic use. Cache data may need to be rebuilt.
 
