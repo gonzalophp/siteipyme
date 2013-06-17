@@ -1,7 +1,8 @@
 <link rel="stylesheet" href="css/shop.css"/>
-<div class="ipymeshop">
+<div class="ipymeshop" ng-controller="ShopController">
+    <loading ng-model="model.loading"></loading>
     <shoptopbar></shoptopbar>
-        <div class="ipymeshopbody" ng-controller="ShopController">
+    <div ng-show="model.loading.complete" class="ipymeshopbody" >
         <div class="carousel" ng-controller="CarouselItemsCtrl">
             <carousel interval="100000">
                 <slide ng-repeat="slide in slides" active="slide.active">

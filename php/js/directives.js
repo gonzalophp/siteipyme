@@ -355,6 +355,21 @@ angular.module('iPymeApp')
         }
     }
 })
+.directive('loading', function(){
+   return {
+       restrict:'E',
+       replace:true,
+       scope:{model:'=ngModel'},
+       template:'<div ng-show="!model.complete" class="loading_blanket">\
+                    <table>\
+                        <tbody>\
+                            <tr><td><p>Loading...</p></td></tr>\
+                            <tr><td><progress value="model.stage" class="progress-striped progress-success active"></progress></td></tr>\
+                        </tbody>\
+                    <table>\
+                </div>',
+   } 
+});
 
                                 
                                 

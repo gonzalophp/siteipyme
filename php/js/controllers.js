@@ -542,10 +542,12 @@ angular.module('iPymeApp')
 }])
 .controller('ShopController',['$scope','$element','$location',"ipymeajax", function($scope,$element,$location,ipymeajax) {
     $scope.model = {}
+    $scope.model.loading = {complete:false, stage:30};
     
     ipymeajax('/shop/category/menu/3', {})
     .success(function(responseData){
         $scope.menutree = responseData;
+        $scope.model.loading.stage+=20;
     });
     
     $scope.attributevalueclick = function(attribute) {
@@ -608,15 +610,19 @@ angular.module('iPymeApp')
         }
     }
     $scope.model.selected_category = {key:-1};
+    $scope.model.loading.stage+=20;
     $scope.$watch('model.selected_category', function(selected_category){
        $scope.waitingUpdate = true;
        ipymeajax('/shop/product/getDisplayedProductsByCategory/'+selected_category.key, {pagesize:10, page:1})
        .success(function(responseData){
+            $scope.model.loading.stage+=20;
             $scope.model.displayedProducts = responseData.displayedProducts;
             ipymeajax('/shop/category/getAllAvailableAttributeValuesRelated/'+selected_category.key+',', {})
             .success(function(responseData){
+                $scope.model.loading.stage+=20;
                 $scope.waitingUpdate = false;
                 $scope.model.relativeAttributes = responseData.category_attribute;
+                $scope.model.loading.complete=true;  
             });
         });
     });
@@ -920,5 +926,8 @@ angular.module('iPymeApp')
     
    
 }])
-
+.controller('loadingCtrl',['$scope',function ($scope) {
+    $scope.loading = {show:true, stage:30};
+    console.log('ddddddddddd');
+}])
 ;

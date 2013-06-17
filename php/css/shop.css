@@ -651,3 +651,23 @@ div.select2-container img {
 div.modal-body {
     overflow: hidden;
 }
+
+div.loading_blanket {
+    display:block;
+    position:absolute;
+    z-index: 10;
+    width:100%;
+    border:solid 1px;
+    background-color: rgba(38, 49, 60,0.99);
+}
+
+div.loading_blanket > table {
+    width:70%;
+    margin:auto;
+    margin-top:300px;
+}
+
+div.loading_blanket > table p {
+    font-size: 12pt;
+    color:white;
+}
