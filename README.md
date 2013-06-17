@@ -6,7 +6,7 @@ Ecommerce soulution for SMB/SME
 ###Status
 Development
 
-###Working Demo
+###Demo
 
 http://siteipyme-gonzalophp.rhcloud.com/
 
