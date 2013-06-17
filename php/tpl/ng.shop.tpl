@@ -16,9 +16,9 @@
                                         <div class="carousel-details">
                                             <a href="#/shop/product/{{slide.id}}">
                                                 <p>{{slide.description}}</p>
-                                                <p>{{slide.longdescription}}</p>
-                                                <p>{{slide.price}}</p>
                                             </a>
+                                            <p>{{slide.longdescription}}</p>
+                                            <p>{{slide.price}}</p>
                                         </div>
                                     </td>
                                 </tr>

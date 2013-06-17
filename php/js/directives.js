@@ -167,7 +167,7 @@ angular.module('iPymeApp')
         restrict:'E',
         scope:{product:'=ngModel', addbutton:'=ngAddbutton'},
         replace:true,
-        template:'<table><tbody><tr><td rowspan="3"><a href="#/shop/product/{{product.id}}"><img ng-src="{{product.image_path}}" alt="{{product.longDescription}}"/></a></td><td><a href="#/shop/product/{{product.id}}"><span>{{product.description}}</span></a></td></tr><tr><td><span>{{product.longDescription}}</span></td><td><span>{{product.currency}}</span>&nbsp;<span>{{product.price}}</span></td></tr><tr><td><button class="shop addtobasket" ng-click="addbutton(product)">Add</button><quantity class="basketquantity" ng-model="product.quantity"></quantity></td></tr></tbody></table>',
+        template:'<table><tbody><tr><td rowspan="3"><a href="#/shop/product/{{product.id}}"><img ng-src="{{product.image_path}}" alt="{{product.longDescription}}"/></a></td><td><a href="#/shop/product/{{product.id}}"><span>{{product.description}}</span></a></td></tr><tr><td><span>{{product.longDescription}}</span></td><td><span>{{product.currency}}</span>&nbsp;<span>{{product.price}}</span></td></tr><tr><td colspan="2"><button class="shop addtobasket" ng-click="addbutton(product)">Add</button><quantity class="basketquantity" ng-model="product.quantity"></quantity></td></tr></tbody></table>',
         link:function(scope, element, attr) {
         }
     }
