@@ -10,6 +10,8 @@ Development
 
 http://siteipyme-gonzalophp.rhcloud.com/
 
+Bear in mind this demo is allocated in a free hosting. Performance issues may occur due to sporadic use. Cache data may need to be rebuilt.
+
 ###Screenshots
 
 <img src="https://raw.github.com/gonzalophp/siteipyme/master/screenshots/shop.png"/>
