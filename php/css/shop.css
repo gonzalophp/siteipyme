@@ -657,8 +657,8 @@ div.loading_blanket {
     position:absolute;
     z-index: 10;
     width:100%;
-    border:solid 1px;
     background-color: rgba(38, 49, 60,0.99);
+    height:100%;
 }
 
 div.loading_blanket > table {
