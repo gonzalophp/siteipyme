@@ -753,18 +753,18 @@ COPY "PRODUCT_CATEGORY_ATTRIBUTE" (pca_product_category, pca_attribute) FROM std
 
 
 COPY "PRODUCT"(p_ref,p_description,p_long_description,p_image_path,p_category) FROM stdin DELIMITERS '|';
-Intel Core i5-2500K 3.30GHz|Intel Core i5-2500K 3.30GHz|Intel Core i5-2500K 3.30GHz (Sandybridge) Socket LGA1155 Processor - Retail Intel's latest Sandybridge based processor capable of extreme overclocks and low power consumption with integrated HD 3000 graphics.|http://siteipyme/img/CP-360-IN_200.jpg|8
-Intel Core i5-4670K 3.40GHz|Intel Core i5-4670K 3.40GHz|Intel Core i5-4670K 3.40GHz (Haswell) Socket LGA1150 Processor - OEM with FREE Grid 2 PC Game Intel's latest 4th gen CPU, offering better performance, lower power consumption, improved memory overclocking and comes with GRID 2 PC Game FREE!!|http://siteipyme/img/CP-472-IN_200.jpg|8
-Intel Core i3-2130 3.40GHz|Intel Core i3-2130 3.40GHz|Intel Core i3-2130 3.40GHz (Sandybridge) Socket LGA1155 Processor - Retail|http://siteipyme/img/CP-442-IN_60068_350.jpg|8
-Intel Core i7-3770K 3.50GHz|Intel Core i7-3770K 3.50GHz|Intel Core i7-3770K 3.50GHz (Ivybridge) Socket LGA1155 Processor (77W) - Retail|http://siteipyme/img/CP-403-IN_47335_350.jpg|8
-Corsair XMS3 4GB (2x2GB)|Corsair XMS3 4GB (2x2GB)|Corsair XMS3 4GB (2x2GB) DDR3 PC3-10666C9 1333MHz Dual Channel Kit (TW3X4G1333C9A)|http://siteipyme/img/MY-330-CS_41476_350.jpg|11
-Corsair Vengeance Blue 8GB|Corsair Vengeance Blue 8GB|Corsair Vengeance Blue 8GB (2x4GB) DDR3 PC3-12800C9 1600MHz Dual Channel Kit (CMZ8GX3M2A1600C9B)|http://siteipyme/img/MY-300-CS_37478_350.jpg|11
-Corsair Vengeance 8GB (2x4GB)|Corsair Vengeance 8GB (2x4GB)|Corsair Vengeance 8GB (2x4GB) DDR3 PC3-12800C9 1600MHz Dual Channel Kit (CMZ8GX3M2A1600C9)|http://siteipyme/img/MY-299-CS_34876_350.jpg|11
-Corsair Dominator GT 8GB (2x4GB)|Corsair Dominator GT 8GB (2x4GB)|Corsair Dominator GT 8GB (2x4GB) DDR3 PC3-17000C9 2133MHz Dual Channel Kit with DHX Pro Connector (CMT8GX3M2B2133C9)|http://siteipyme/img/MY-333-CS_42439_350.jpg|11
-Avexir MPower Red Series 8GB (2x4GB)|Avexir MPower Red Series 8GB (2x4GB)|Avexir MPower Red Series 8GB (2x4GB) DDR3 PC3-22400C12 2800MHz Dual Channel Memory Kit (AVD3U28001204G-2CI)|http://siteipyme/img/MY-037-AR_67281_350.jpg|11
-Asus VE247H 24"|Asus VE247H 24" Widescreen LED|Asus VE247H 24" Widescreen LED Multimedia Monitor - Black LED Backlit, 1920x1080 Resolution, 10000000:1 Contrast Ratio, 300cd/m² Brightness, 2ms Response Time, 1x Analogue Input, 1x DVI-D Input, 1x HDMI Input, 3 Year On-Site Warranty.|http://siteipyme/img/MO-028-AS_36640_350.jpg|7
-BenQ G2420HDBL 24"|BenQ G2420HDBL 24" Widescreen LED|BenQ G2420HDBL 24" Widescreen LED Monitor - Black|http://siteipyme/img/MO-033-BQ_27524_350.jpg|7
-Iiyama ProLite E2278HD|Iiyama ProLite E2278HD|Iiyama ProLite E2278HD 22" Widescreen LED Monitor - Black|http://siteipyme/img/MO-089-IY_58125_350.jpg|7
+Intel Core i5-2500K 3.30GHz|Intel Core i5-2500K 3.30GHz|Intel Core i5-2500K 3.30GHz (Sandybridge) Socket LGA1155 Processor - Retail Intel's latest Sandybridge based processor capable of extreme overclocks and low power consumption with integrated HD 3000 graphics.|/CP-360-IN_200.jpg|8
+Intel Core i5-4670K 3.40GHz|Intel Core i5-4670K 3.40GHz|Intel Core i5-4670K 3.40GHz (Haswell) Socket LGA1150 Processor - OEM with FREE Grid 2 PC Game Intel's latest 4th gen CPU, offering better performance, lower power consumption, improved memory overclocking and comes with GRID 2 PC Game FREE!!|/CP-472-IN_200.jpg|8
+Intel Core i3-2130 3.40GHz|Intel Core i3-2130 3.40GHz|Intel Core i3-2130 3.40GHz (Sandybridge) Socket LGA1155 Processor - Retail|/CP-442-IN_60068_350.jpg|8
+Intel Core i7-3770K 3.50GHz|Intel Core i7-3770K 3.50GHz|Intel Core i7-3770K 3.50GHz (Ivybridge) Socket LGA1155 Processor (77W) - Retail|/CP-403-IN_47335_350.jpg|8
+Corsair XMS3 4GB (2x2GB)|Corsair XMS3 4GB (2x2GB)|Corsair XMS3 4GB (2x2GB) DDR3 PC3-10666C9 1333MHz Dual Channel Kit (TW3X4G1333C9A)|/MY-330-CS_41476_350.jpg|11
+Corsair Vengeance Blue 8GB|Corsair Vengeance Blue 8GB|Corsair Vengeance Blue 8GB (2x4GB) DDR3 PC3-12800C9 1600MHz Dual Channel Kit (CMZ8GX3M2A1600C9B)|/MY-300-CS_37478_350.jpg|11
+Corsair Vengeance 8GB (2x4GB)|Corsair Vengeance 8GB (2x4GB)|Corsair Vengeance 8GB (2x4GB) DDR3 PC3-12800C9 1600MHz Dual Channel Kit (CMZ8GX3M2A1600C9)|/MY-299-CS_34876_350.jpg|11
+Corsair Dominator GT 8GB (2x4GB)|Corsair Dominator GT 8GB (2x4GB)|Corsair Dominator GT 8GB (2x4GB) DDR3 PC3-17000C9 2133MHz Dual Channel Kit with DHX Pro Connector (CMT8GX3M2B2133C9)|/MY-333-CS_42439_350.jpg|11
+Avexir MPower Red Series 8GB (2x4GB)|Avexir MPower Red Series 8GB (2x4GB)|Avexir MPower Red Series 8GB (2x4GB) DDR3 PC3-22400C12 2800MHz Dual Channel Memory Kit (AVD3U28001204G-2CI)|/MY-037-AR_67281_350.jpg|11
+Asus VE247H 24"|Asus VE247H 24" Widescreen LED|Asus VE247H 24" Widescreen LED Multimedia Monitor - Black LED Backlit, 1920x1080 Resolution, 10000000:1 Contrast Ratio, 300cd/m² Brightness, 2ms Response Time, 1x Analogue Input, 1x DVI-D Input, 1x HDMI Input, 3 Year On-Site Warranty.|/MO-028-AS_36640_350.jpg|7
+BenQ G2420HDBL 24"|BenQ G2420HDBL 24" Widescreen LED|BenQ G2420HDBL 24" Widescreen LED Monitor - Black|/MO-033-BQ_27524_350.jpg|7
+Iiyama ProLite E2278HD|Iiyama ProLite E2278HD|Iiyama ProLite E2278HD 22" Widescreen LED Monitor - Black|/MO-089-IY_58125_350.jpg|7
 \.
 
 
@@ -1345,7 +1345,7 @@ BEGIN
 	--
 	PERFORM "IPYME_FINAL".set_price_to_product(v_p_id, p_p_price, p_c_name);
 	--
-	RETURN  QUERY SELECT * FROM "IPYME_FINAL".get_product(v_p_id); 
+	RETURN  QUERY SELECT * FROM "IPYME_FINAL".get_product(v_p_id,1,1); 
 	--
 	EXCEPTION
 		WHEN OTHERS THEN

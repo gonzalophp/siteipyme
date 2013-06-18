@@ -130,12 +130,13 @@ angular.module('iPymeApp')
         }
     }
 })    
-.directive('imageupload', function(){
+.directive('imageupload', function(imageSourceHost){
     return {
         restrict:'E',
-        template:'<form enctype="multipart/form-data"><input style="position:absolute;top:-999em;" name="file" type="file"/><div style="border:solid 1px red;width:100px; height:100px;"><img ng-show="imagepath" ng-src="{{imagepath}}"/></div></form>',
+        template:'<form enctype="multipart/form-data"><input style="position:absolute;top:-999em;" name="file" type="file"/><div style="border:solid 1px red;width:100px; height:100px;"><img ng-show="imagepath" ng-src="{{imageSourceHost}}{{imagepath}}"/></div></form>',
         scope:{imagepath:'=ngModel',imagechange:'='},
         link:function(scope, element, attr){
+            scope.imageSourceHost =  imageSourceHost;
             element.find('input').bind('change', function(e){
                 e.target.files.length && scope.imagechange(new FormData(element.find('form')[0]));
             });
@@ -162,13 +163,14 @@ angular.module('iPymeApp')
         }
     }
 })
-.directive('displayproduct', function(){
+.directive('displayproduct', function(imageSourceHost){
     return {
         restrict:'E',
         scope:{product:'=ngModel', addbutton:'=ngAddbutton'},
         replace:true,
-        template:'<table><tbody><tr><td rowspan="3"><a href="#/shop/product/{{product.id}}"><img ng-src="{{product.image_path}}" alt="{{product.longDescription}}"/></a></td><td><a href="#/shop/product/{{product.id}}"><span>{{product.description}}</span></a></td></tr><tr><td><span>{{product.longDescription}}</span></td><td><span>{{product.currency}}</span>&nbsp;<span>{{product.price}}</span></td></tr><tr><td colspan="2"><button class="shop addtobasket" ng-click="addbutton(product)">Add</button><quantity class="basketquantity" ng-model="product.quantity"></quantity></td></tr></tbody></table>',
+        template:'<table><tbody><tr><td rowspan="3"><a href="#/shop/product/{{product.id}}"><img ng-src="{{imageSourceHost}}{{product.image_path}}" alt="{{product.longDescription}}"/></a></td><td><a href="#/shop/product/{{product.id}}"><span>{{product.description}}</span></a></td></tr><tr><td><span>{{product.longDescription}}</span></td><td><span>{{product.currency}}</span>&nbsp;<span>{{product.price}}</span></td></tr><tr><td colspan="2"><button class="shop addtobasket" ng-click="addbutton(product)">Add</button><quantity class="basketquantity" ng-model="product.quantity"></quantity></td></tr></tbody></table>',
         link:function(scope, element, attr) {
+            scope.imageSourceHost=imageSourceHost;
         }
     }
 })

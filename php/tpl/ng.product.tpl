@@ -2,14 +2,14 @@
 <div class="ipymeshop">
     <shoptopbar></shoptopbar>
     <div class="ipymeshopbody" ng-controller="productController">
-        <div  class="ipymeproduct">
+        <div class="ipymeproduct">
             <table>
                 <tr>
                     <td>
                         <div>
                             <p>{{model.product.p_category_name}}</p>
                             <p>{{model.product.p_ref}}</p>
-                            <p><img ng-src="{{model.product.p_image_path}}"/></p>
+                            <p><img ng-src="{{model.imageSourceHost}}{{model.product.p_image_path}}"/></p>
                             <p>{{model.product.p_description}}</p>
                             <p>{{model.product.p_long_description}}</p>
                             <p>{{model.product.c_name}}&nbsp;{{model.product.p_price}}</p>

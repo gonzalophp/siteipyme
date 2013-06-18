@@ -11,7 +11,7 @@
                             <tbody>
                                 <tr>
                                     <td>
-                                        <a href="#/shop/product/{{slide.id}}"><img ng-src="{{slide.image}}" style="margin:auto;"></a>
+                                        <a href="#/shop/product/{{slide.id}}"><img ng-src="{{imageSourceHost}}{{slide.image}}" style="margin:auto;"></a>
                                     </td>
                                     <td>
                                         <div class="carousel-details">
