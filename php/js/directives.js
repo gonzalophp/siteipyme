@@ -151,7 +151,17 @@ angular.module('iPymeApp')
         restrict:'E',
         scope:{value:'=ngModel'},
         replace:true,
-        template:'<div><button class="minus" ng-click="minus()">-</button><input type="text" ng-model="value"/><button class="more" ng-click="more()">+</button></div>',
+        template:'<div class="quantity">\
+                    <table>\
+                        <tbody>\
+                            <tr>\
+                                <td><button class="minus" ng-click="minus()">-</button></td>\
+                                <td><input type="text" ng-model="value"/></td>\
+                                <td><button class="more" ng-click="more()">+</button></td>\
+                            </tr>\
+                        </tbody>\
+                    </table>\
+                </div>',
         link:function(scope, element, attr) {
             scope.minus = function(){
                 (scope.value>1) && scope.value--;
