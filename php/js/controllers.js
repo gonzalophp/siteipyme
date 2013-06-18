@@ -133,7 +133,7 @@ angular.module('iPymeApp')
     $scope._imagechanged = function(oFormData) {
         ipymeajax('/shop/imageupload', oFormData, true)
         .success(function(responseData){
-            $scope.dialogForm.data.fields.p_image_path=responseData.imagepath;
+            setTimeout(function(){$scope.dialogForm.data.fields.p_image_path=responseData.imagepath},500);
         });
     }
     if (dialog.formContext == 'product'){
