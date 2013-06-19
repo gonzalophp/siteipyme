@@ -6,9 +6,9 @@ div.basket {
 
 div > table {
     border-collapse: separate;
-    width:80%;
-    margin:0% 10% 0% 10%;
-    border:solid 1px red;
+    /*width:80%;*/
+    /*margin:0% 10% 0% 10%;*/
+    /*border:solid 1px red;*/
 }
 
 div.ipymeButtonsGroup button {

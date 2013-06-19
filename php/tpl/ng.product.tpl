@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="css/shop.css"/>
 <div class="ipymeshop">
     <shoptopbar></shoptopbar>
     <div class="ipymeshopbody" ng-controller="productController">

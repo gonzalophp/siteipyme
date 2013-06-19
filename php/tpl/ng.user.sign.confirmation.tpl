@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="css/signin.css"/>
 <div class="ipymedialog">
     <div class="ipymeSignin" ng-controller="CtrlSignUpConfirmation">
         <p class="ipymeTitle">Sign Up Confirmation</p>

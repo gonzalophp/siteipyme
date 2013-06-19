@@ -133,7 +133,7 @@ angular.module('iPymeApp')
 .directive('imageupload', function(){
     return {
         restrict:'E',
-        template:'<form enctype="multipart/form-data"><input style="position:absolute;top:-999em;" name="file" type="file"/><div style="border:solid 1px red;width:100px; height:100px;"><img ng-show="imagepath" ng-src="{{imagepath}}"/></div></form>',
+        template:'<form enctype="multipart/form-data"><input style="position:absolute;top:-999em;" name="file" type="file"/><div class="image_preview"><img ng-show="imagepath" ng-src="{{imagepath}}"/></div></form>',
         scope:{imagepath:'=ngModel',imagechange:'='},
         link:function(scope, element, attr){
             element.find('input').bind('change', function(e){

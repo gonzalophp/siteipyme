@@ -1,5 +1,4 @@
 <main-menu class="adminmenu" ng-controller="MainMenuController"></main-menu>
-<link rel="stylesheet" href="css/category.css"/>
 <div class="container">
     <div class="ipymeCategory" ng-controller="categorytreeeditcontroller">
         <table>

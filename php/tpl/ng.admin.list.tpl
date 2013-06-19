@@ -1,5 +1,4 @@
 <main-menu class="adminmenu" ng-controller="MainMenuController"></main-menu>
-<link rel="stylesheet" href="css/list.css"/>
 <div ng-switch="adminList" class="container" ng-controller="AdminListController">
     <table ng-switch-when="product">
         <tr>

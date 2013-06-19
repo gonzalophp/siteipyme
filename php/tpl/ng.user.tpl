@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="css/shop.css"/>
-<link rel="stylesheet" href="css/flags/flags.css"/>
 <div class="ipymeshop">
     <shoptopbar></shoptopbar>
     

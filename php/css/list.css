@@ -30,7 +30,7 @@ div.container td.ipymeCategory {
 div.container td.ipymeCategory div#categorytree {
     min-width:15em;
     max-width:15em; 
-    height:24em;
+    height:44em;
     /*padding-left: 2em;*/
 }
 
@@ -67,5 +67,5 @@ div.gridStyle {
     width: auto; 
     position:relative;
     margin:auto;
-    height: 20em;
+    height: 40em;
 }

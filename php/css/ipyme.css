@@ -191,3 +191,9 @@ div.ajax-waiting{
     position: absolute;
     background: url('images/ajax-waiting.gif') 50% 50% / 20px rgba(100,100,100,0.3)  no-repeat;
 }
+
+div.image_preview {
+    border:solid 1px #ccc;
+    width:100px; 
+    height:100px;
+}
