@@ -95,7 +95,7 @@ angular.module('iPymeApp')
         });
     } 
 }])
-.controller('FormDialogController',['$scope','dialog','ipymeajax', function FormDialogController($scope, dialog,ipymeajax){
+.controller('FormDialogController',['$scope','dialog','ipymeajax','imageSourceHost', function FormDialogController($scope, dialog,ipymeajax,imageSourceHost){
     $scope.dialogForm = {
         readonly:(dialog.readonly==1),
         button_actions:{},
@@ -133,7 +133,7 @@ angular.module('iPymeApp')
     $scope._imagechanged = function(oFormData) {
         ipymeajax('/shop/imageupload', oFormData, true)
         .success(function(responseData){
-            $scope.dialogForm.data.fields.p_image_path=responseData.imagepath;
+            setTimeout(function(){$scope.dialogForm.data.fields.p_image_path=responseData.imagepath},500);
         });
     }
     if (dialog.formContext == 'product'){
@@ -505,8 +505,9 @@ angular.module('iPymeApp')
     
 }])
 
-.controller('CarouselItemsCtrl', ['$scope','$element','$location','ipymeajax', function($scope,$element,$location,ipymeajax){    
+.controller('CarouselItemsCtrl', ['$scope','$element','$location','ipymeajax','imageSourceHost', function($scope,$element,$location,ipymeajax,imageSourceHost){    
     $scope.slides = [];
+    $scope.imageSourceHost=imageSourceHost;
     ipymeajax('/shop/product/getDisplayedProductsByCategory/-1', {pagesize:5, page:1})
     .success(function(responseData){
         if (responseData.valid_session == 0) {
@@ -703,8 +704,8 @@ angular.module('iPymeApp')
     }
 }])
 
-.controller('productController', ['$scope','$element','$location','ipymeajax','$routeParams', function ($scope, $element, $location,ipymeajax,$routeParams) {
-    $scope.model = {product:{}, basket:{}}
+.controller('productController', ['$scope','$element','$location','ipymeajax','$routeParams','imageSourceHost', function ($scope, $element, $location,ipymeajax,$routeParams,imageSourceHost) {
+    $scope.model = {imageSourceHost:imageSourceHost,product:{}, basket:{}}
     ipymeajax('/shop/product/get/'+$routeParams.id, {})
     .success(function(responseData){
         $scope.model.product = responseData.product;
@@ -841,7 +842,6 @@ angular.module('iPymeApp')
         $scope.model.user_details.card_selected = $scope.model.user_details.card[0];
         $scope.model.user_details.people_selected = ($scope.model.user_details.people.length>0) ? $scope.model.user_details.people[0]:{};
         $scope.model.card_vendors.available = responseData.user_details.card_vendor;
-        console.log($scope.model.user_details);
     });
     
     $scope.addAddress = function() {
@@ -885,7 +885,6 @@ angular.module('iPymeApp')
         dialog.formContext = 'user/'+form_template;
         dialog.data = aData;
         dialog.open().then(function(oReturn) {
-            console.log(oReturn);
             if (oReturn && oReturn.success == 1) {
                 if (oReturn.button == 1){
                     if (form_template == 'address') {
@@ -911,23 +910,9 @@ angular.module('iPymeApp')
                     }
                 }
                 else if (oReturn.button == 2){
-                    console.log('222222222');
                 }
             }
         });
     } 
-    
-    
-    $scope.dale = function() {
-        console.log($scope.model.panes);
-    }
-    
-    
-    
-   
-}])
-.controller('loadingCtrl',['$scope',function ($scope) {
-    $scope.loading = {show:true, stage:30};
-    console.log('ddddddddddd');
 }])
 ;

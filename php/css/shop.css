@@ -341,7 +341,7 @@ div.ipymeshopcenter > ul > li > table > tbody > tr:nth-child(1) > td+td span{
     font-weight: bold;
 }
 
-div.ipymeshopcenter > ul > li > table > tbody > tr td {
+div.ipymeshopcenter > ul > li > table > tbody > tr > td {
     padding:0em 1em 0em 1em;
 }
 

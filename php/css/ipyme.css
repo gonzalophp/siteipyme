@@ -97,8 +97,13 @@ div.ipymeButtonGroup button{
     
 }
 
-div.basketquantity > button.more 
-,div.basketquantity > button.minus 
+div.basketquantity > table > tbody > tr > td{
+    padding:0px 2px 0px 2px !important ;
+    vertical-align: middle !important;
+}
+
+div.basketquantity button.more 
+,div.basketquantity button.minus 
 ,button.ipymebuttonclose 
 {
     position:relative;
@@ -108,26 +113,25 @@ div.basketquantity > button.more
     background-color:transparent;
     border: solid #aaaaaa 1px;
     vertical-align: middle;
-    line-height: 0px;
+    line-height: 10px;
     height:1.1em;
     border-radius: 4px;
     display: table-cell;      
 }
 
 button.ipymebuttonclose {
-    /*float:right;*/
-    right:4px;
+    line-height: 10px;
     padding:0px 2px 1px 2px;
 }
 
 button.ipymebuttonclose:hover{
-    right:4px;
     background-color: #aaa;
     color:white;
     border: solid #aaaaaa 2px;
+    line-height: 8px;
 }
 
-div.basketquantity > button.minus {
+div.basketquantity button.minus {
     padding:0px 3px 0px 3px;
     margin-left:0.3em;
     margin-right: 0.3em;
@@ -135,14 +139,14 @@ div.basketquantity > button.minus {
     color: #555;
 }
 
-div.basketquantity > button.minus:hover{
+div.basketquantity button.minus:hover{
     background-color: #eb4972;
     color:white;
     -webkit-box-shadow: 1px 1px 3px 1px rgba(255, 0, 0, 0.5);
 box-shadow: 1px 1px 3px 1px rgba(255, 0, 0, 0.5);
 }
 
-div.basketquantity > button.more {
+div.basketquantity button.more {
     padding:0px 2px 0px 2px;
     margin-left:0.3em;
     margin-right: 0.3em;
@@ -150,14 +154,14 @@ div.basketquantity > button.more {
     color: #555;
 }
 
-div.basketquantity > button.more:hover {
+div.basketquantity button.more:hover {
     background-color: #15ab10;
     color:white;
     -webkit-box-shadow: 1px 1px 3px 1px rgba(0, 255, 0, 0.5);
     box-shadow: 1px 1px 3px 1px rgba(81, 255, 0, 0.8);
 }
 
-div.basketquantity > input   {
+div.basketquantity input   {
     width:2.0em;
     height:1.5em;
     line-height: 1em;

@@ -130,12 +130,13 @@ angular.module('iPymeApp')
         }
     }
 })    
-.directive('imageupload', function(){
+.directive('imageupload', function(imageSourceHost){
     return {
         restrict:'E',
-        template:'<form enctype="multipart/form-data"><input style="position:absolute;top:-999em;" name="file" type="file"/><div class="image_preview"><img ng-show="imagepath" ng-src="{{imagepath}}"/></div></form>',
+        template:'<form enctype="multipart/form-data"><input style="position:absolute;top:-999em;" name="file" type="file"/><div class="image_preview"><img ng-show="imagepath" ng-src="{{imageSourceHost}}{{imagepath}}"/></div></form>',
         scope:{imagepath:'=ngModel',imagechange:'='},
         link:function(scope, element, attr){
+            scope.imageSourceHost =  imageSourceHost;
             element.find('input').bind('change', function(e){
                 e.target.files.length && scope.imagechange(new FormData(element.find('form')[0]));
             });
@@ -150,7 +151,17 @@ angular.module('iPymeApp')
         restrict:'E',
         scope:{value:'=ngModel'},
         replace:true,
-        template:'<div><button class="minus" ng-click="minus()">-</button><input type="text" ng-model="value"/><button class="more" ng-click="more()">+</button></div>',
+        template:'<div class="quantity">\
+                    <table>\
+                        <tbody>\
+                            <tr>\
+                                <td><button class="minus" ng-click="minus()">-</button></td>\
+                                <td><input type="text" ng-model="value"/></td>\
+                                <td><button class="more" ng-click="more()">+</button></td>\
+                            </tr>\
+                        </tbody>\
+                    </table>\
+                </div>',
         link:function(scope, element, attr) {
             scope.minus = function(){
                 (scope.value>1) && scope.value--;
@@ -162,13 +173,14 @@ angular.module('iPymeApp')
         }
     }
 })
-.directive('displayproduct', function(){
+.directive('displayproduct', function(imageSourceHost){
     return {
         restrict:'E',
         scope:{product:'=ngModel', addbutton:'=ngAddbutton'},
         replace:true,
-        template:'<table><tbody><tr><td rowspan="3"><a href="#/shop/product/{{product.id}}"><img ng-src="{{product.image_path}}" alt="{{product.longDescription}}"/></a></td><td><a href="#/shop/product/{{product.id}}"><span>{{product.description}}</span></a></td></tr><tr><td><span>{{product.longDescription}}</span></td><td><span>{{product.currency}}</span>&nbsp;<span>{{product.price}}</span></td></tr><tr><td colspan="2"><button class="shop addtobasket" ng-click="addbutton(product)">Add</button><quantity class="basketquantity" ng-model="product.quantity"></quantity></td></tr></tbody></table>',
+        template:'<table><tbody><tr><td rowspan="3"><a href="#/shop/product/{{product.id}}"><img ng-src="{{imageSourceHost}}{{product.image_path}}" alt="{{product.longDescription}}"/></a></td><td><a href="#/shop/product/{{product.id}}"><span>{{product.description}}</span></a></td></tr><tr><td><span>{{product.longDescription}}</span></td><td><span>{{product.currency}}</span>&nbsp;<span>{{product.price}}</span></td></tr><tr><td colspan="2"><button class="shop addtobasket" ng-click="addbutton(product)">Add</button><quantity class="basketquantity" ng-model="product.quantity"></quantity></td></tr></tbody></table>',
         link:function(scope, element, attr) {
+            scope.imageSourceHost=imageSourceHost;
         }
     }
 })
