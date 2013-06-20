@@ -381,10 +381,33 @@ angular.module('iPymeApp')
                     <table>\
                 </div>',
    } 
-});
+})
+.directive('spectralbutton', function(){
+   return {
+       restrict:'A',
+       transclude:true,
+       scope:{action:'=spectralbutton',text:'@spectralbuttontext'},
+       template:'<div class="spectral_button">\
+                    <button ng-click="action()" class="shop">{{text}}</button>\
+                </div>',
+        link:function(scope, element, attr) {
+            scope.div_spectro = element.find('div.spectral_button');
+            scope.button_spectro = scope.div_spectro.find('button');
+            var y = scope.div_spectro[0].offsetHeight/2,
+                x = scope.div_spectro[0].offsetLeft+(scope.div_spectro[0].clientWidth/2);
+            scope.div_spectro.on('mousemove', false);
+            element.on('mousemove', function(e) {
+                var opacity = 0;
+                var combinedDiff = Math.abs(parseInt(e.offsetX)-x)+Math.abs(parseInt(e.offsetY)-y);
+                if (combinedDiff < 200){
+                    opacity = new Number(1-(combinedDiff/200)).toFixed(2); 
+                }
 
-                                
-                                
+                scope.button_spectro.css({'background-color':'rgba(50, 97, 197,'+opacity+')',
+                                          'border-color':'rgba(50, 97, 197,'+opacity+')'});
+            });
+        }
+    } 
+})
 
-    
 ;

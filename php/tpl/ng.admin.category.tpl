@@ -7,19 +7,13 @@
                     <td>
                         <div class="ipymeTreeCategories">
                             <p class="ipymeTitle">Category</p>
-                            <div class="ipymeButtonsGroup">
-                                <button class="ipymeButton" ng-click="newCategory()">New</button>
-                            </div>
-                            <div id="categorytree"></div>
+                            <div id="categorytree" spectralbutton="newCategory" spectralbuttontext="New"></div>
                         </div>
                     </td>
                     <td>
                         <div class="ipymeAttributes">
                             <p class="ipymeTitle">Attributes</p>
-                            <div class="ipymeButtonsGroup">
-                                <button class="ipymeButton" ng-click="addAttribute()">Add</button>
-                            </div>
-                            <div class="attributelist">
+                            <div class="attributelist" spectralbutton="addAttribute" spectralbuttontext="Add" ng-transclude>
                                 <ipymeedit edited="editedAttribute" remove="removeAttribute" values="model.current_node.attributes.values" ng-repeat="categoryattribute in model.current_node.attributes.values"></ipymeedit>
                             </div>
                         </div>
