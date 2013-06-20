@@ -648,21 +648,7 @@ angular.module('iPymeApp')
 .controller('basketCtrl', ['$scope','$element','$location','ipymeajax', function ($scope, $element, $location,ipymeajax) {
     $scope.model = {
         iscollapsed:true,
-        customer:{
-            name:'name',
-            surname:'surname',
-            company:'company',
-            dob:new Date('05/28/2012'),
-            add1:'aadd1',
-            add2:'add2',
-            town:'town',
-            postcode:'postcode',
-            country:'country',
-            phone:'045444556',
-            card:{name:'cardname'
-                , number:'cardnumber'
-                , expire:'expire'
-                ,issue:'issue'}
+        user_details:{
         },
         dateoptions:{
             changeYear: true,
@@ -702,6 +688,18 @@ angular.module('iPymeApp')
             console.log(responseData);
         });
     }
+    
+    ipymeajax('/shop/user/get', {})
+    .success(function(responseData){
+        $scope.model.user_details = responseData.user_details;
+        $scope.model.user_details.addresses[0] && ($scope.model.user_details.country_selected = $scope.model.user_details.addresses[0].country_c_code);
+        $scope.model.user_details.address_selected = $scope.model.user_details.addresses[0];
+        $scope.model.user_details.addresses[1] && ($scope.model.user_details.country_selected = $scope.model.user_details.addresses[1].country_c_code);
+        $scope.model.user_details.address_delivery = $scope.model.user_details.addresses[1];
+        $scope.model.user_details.people_selected = ($scope.model.user_details.people.length>0) ? $scope.model.user_details.people[0]:{};
+        $scope.model.user_details.card_selected = $scope.model.user_details.card[0];
+        $scope.model.card_vendors = {available : responseData.user_details.card_vendor};
+    });
 }])
 
 .controller('productController', ['$scope','$element','$location','ipymeajax','$routeParams','imageSourceHost', function ($scope, $element, $location,ipymeajax,$routeParams,imageSourceHost) {
@@ -833,6 +831,7 @@ angular.module('iPymeApp')
     .success(function(responseData){
         $scope.model.countries.available = responseData.available;
     });
+    
     
     ipymeajax('/shop/user/get', {})
     .success(function(responseData){

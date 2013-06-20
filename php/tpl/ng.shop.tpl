@@ -63,7 +63,4 @@
             </table>
         </div>
     </div>
-    <footer>
-        <p>2013 - Gonzalo Grado </p>
-    </footer>
 </div>

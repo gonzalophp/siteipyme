@@ -4,8 +4,30 @@ div.basket {
     margin:0em 1em 2em 1em;
 }
 
-div > table {
+div.paymentcheckout {
+    padding: 1em 2em 1em 2em;
+}
+
+div.paymentcheckout h4:not(:nth-child(1)) {
+    margin-top:2em
+}
+
+div.paymentcheckout > table {
     border-collapse: separate;
+    width:80%;
+    margin:auto;
+    border:solid 1px #ddd;
+    padding: 1em 1em 1em 1em;
+}
+
+div.paymentcheckout > table > tbody > tr > td {
+    width:50%;
+    font-size: 11pt;
+}
+
+div.paymentcheckout > table > tbody > tr > td:nth-child(1) {
+    text-align: right;
+    padding: 0em 2em 0em 0em;
 }
 
 div.ipymeButtonsGroup button {
@@ -21,34 +43,6 @@ div.paymentcheckout{
     border: solid 1px;
     border-radius: 5px;
     margin: 1em 1em 1em 1em;
-}
-
-div.paymentcheckout h4{
-    clear:both;
-    font-weight: bold;
-}
-
-div.paymentcheckout p{
-    clear:both;
-    text-align: initial;
-}
-
-div.paymentcheckout fieldset {
-    padding: 1em 1em 1em 1em;
-}
-
-div.paymentcheckout input {
-    height: 1em;
-    line-height: 1em;
-    padding:0.2em;
-    float:left;
-}
-
-div.paymentcheckout label {
-    float:left;
-    width:30%;
-    text-align: right;
-    margin-right:1em;
 }
 
 div.paymentcheckout button.confirm{

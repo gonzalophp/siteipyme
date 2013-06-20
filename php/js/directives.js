@@ -400,8 +400,8 @@ angular.module('iPymeApp')
             angular.element($window).bind('mousemove', function(e){
                 var pos = scope.div_spectro.offset(),
                     combinedDiff = Math.abs(e.clientX-pos.left)+Math.abs(e.clientY-pos.top),
-                    opacity = (combinedDiff < 200) ? new Number(1-(combinedDiff/200)).toFixed(2):0; 
-                (initOpacity < opacity) && scope.button_spectro.css('opacity',opacity);
+                    opacity = (combinedDiff < 200) ? new Number(1-(combinedDiff/200)).toFixed(2):initOpacity; 
+                scope.button_spectro.css('opacity',opacity);
             });
         }
     } 

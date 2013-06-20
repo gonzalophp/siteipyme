@@ -144,7 +144,4 @@
             </pane>
         </tabs>
     </div>
-    <footer>
-        <p>2013 - Gonzalo Grado </p>
-    </footer>
 </div>
