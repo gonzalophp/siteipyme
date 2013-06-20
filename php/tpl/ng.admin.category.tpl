@@ -21,7 +21,6 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        <button class="ipymeButton" ng-click="getTreeValues()">Refresh</button>
                         <button class="ipymeButton" ng-click="saveCategories()">Save</button>
                     </td>
                 </tr>
