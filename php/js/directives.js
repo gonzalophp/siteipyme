@@ -386,8 +386,8 @@ angular.module('iPymeApp')
    return {
        restrict:'A',
        transclude:true,
-       scope:{action:'=spectralbutton',text:'@spectralbuttontext'},
-       template:'<div class="spectral_button">\
+       scope:{action:'=spectralbutton',text:'@spectralbuttontext', class:'@class'},
+       template:'<div class="spectral_button {{class}}">\
                     <button ng-click="action()" class="shop">{{text}}</button>\
                 </div>',
        link:function(scope, element, attr) {
@@ -399,7 +399,7 @@ angular.module('iPymeApp')
             
             angular.element($window).bind('mousemove', function(e){
                 var pos = scope.div_spectro.offset(),
-                    combinedDiff = Math.abs(e.clientX-pos.left)+Math.abs(e.clientY-pos.top),
+                    combinedDiff = Math.abs(e.clientX+$window.pageXOffset-pos.left)+Math.abs(e.clientY+$window.pageYOffset-pos.top),
                     opacity = (combinedDiff < 200) ? new Number(1-(combinedDiff/200)).toFixed(2):initOpacity; 
                 scope.button_spectro.css('opacity',opacity);
             });

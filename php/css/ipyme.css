@@ -201,3 +201,7 @@ div.image_preview {
     width:100px; 
     height:100px;
 }
+
+footer p {
+    margin-top:2em;
+}

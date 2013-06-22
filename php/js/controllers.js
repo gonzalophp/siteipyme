@@ -645,11 +645,23 @@ angular.module('iPymeApp')
         });
     }
 }])
-.controller('basketCtrl', ['$scope','$element','$location','ipymeajax', function ($scope, $element, $location,ipymeajax) {
+.controller('basketCtrl', ['$scope','$element','$location','ipymeajax','buttonset','opendialog', function ($scope, $element, $location,ipymeajax,buttonset,opendialog) {
+    var select2CountryFormat=function(state) {
+                                    if (!state) return;
+                                    return '<img class="flag flag-'+state.id+'"/>'+state.text;
+                                }
+                                
     $scope.model = {
         iscollapsed:true,
         user_details:{
         },
+        countries:{available:[],
+                    selected:null,
+                    selectcountryoptions:{allowClear: true, 
+                                            placeholder: "Select country",
+                                            formatResult: select2CountryFormat,
+                                            formatSelection: select2CountryFormat,
+                                            escapeMarkup: function(m) { return m; },},},
         dateoptions:{
             changeYear: true,
             changeMonth: true,
@@ -661,6 +673,7 @@ angular.module('iPymeApp')
             showAnim:'clip'
         }
     }
+    
     $scope.basketpersist = function(initialize){
         if (initialize){
             ipymeajax('/shop/basket/get', {})
@@ -688,6 +701,56 @@ angular.module('iPymeApp')
             console.log(responseData);
         });
     }
+    
+                                
+    ipymeajax('/shop/user/getCountries', {})
+    .success(function(responseData){
+        $scope.model.countries.available = responseData.available;
+    });
+    
+    $scope.addInvoiceAddress = function() {
+        var aData = {countries:$scope.model.countries,
+                    fields:{ address_detail_ad_country:{country_c_code: "gb"}}};
+        opendialog($scope, aData,1, 'address', buttonset(['save','cancel']), false);
+    }
+    
+    $scope.editInvoiceAddress = function() {
+         var aData = {countries:$scope.model.countries,
+                    fields:$scope.model.user_details.address_selected};
+        opendialog($scope, aData, 0, 'address', buttonset(['save','cancel']), false);
+    }
+    
+    $scope.addDeliveryAddress = function() {
+        var aData = {countries:$scope.model.countries,
+                    fields:{ address_detail_ad_country:{country_c_code: "gb"}}};
+        opendialog($scope, aData,1, 'address', buttonset(['save','cancel']), false);
+    }
+    
+    $scope.editDeliveryAddress = function() {
+         var aData = {countries:$scope.model.countries,
+                    fields:$scope.model.user_details.address_delivery};
+        opendialog($scope, aData, 0, 'address', buttonset(['save','cancel']), false);
+    }
+    
+    $scope.addPayment = function() {
+        var aData = {card_vendors:$scope.model.card_vendors,
+                    fields:{}};
+        opendialog($scope, aData,1, 'card', buttonset(['save','cancel']), false);
+    }
+    
+    
+    $scope.editPayment = function() {
+        var aData = {card_vendors:$scope.model.card_vendors,
+                    fields:$scope.model.user_details.card_selected};
+        opendialog($scope, aData, 0, 'card', buttonset(['save','cancel']), false);
+    }
+    
+    $scope.editAccount = function() {
+         var aData = {titles:$scope.model.titles,
+                    fields:$scope.model.user_details.people_selected};
+        opendialog($scope, aData, 0, 'account', buttonset(['save','cancel']), false);
+    }
+    
     
     ipymeajax('/shop/user/get', {})
     .success(function(responseData){
@@ -772,7 +835,7 @@ angular.module('iPymeApp')
 .controller('logoutCtrl',['$location', function ($location) {
     $location.path('/shop');
 }])
-.controller('UserController',['$scope','$location', '$dialog','ipymeajax','buttonset', function ($scope,$location,$dialog,ipymeajax,buttonset) {
+.controller('UserController',['$scope','$location', '$dialog','ipymeajax','buttonset','opendialog', function ($scope,$location,$dialog,ipymeajax,buttonset,opendialog) {
     var select2CountryFormat=function(state) {
                                     if (!state) return;
                                     if (!state.id) return state.text; // optgroup
@@ -846,72 +909,34 @@ angular.module('iPymeApp')
     $scope.addAddress = function() {
         var aData = {countries:$scope.model.countries,
                     fields:{ address_detail_ad_country:{country_c_code: "gb"}}};
-        $scope.openDialog(aData,1, 'address', buttonset(['save','cancel']), false);
+        opendialog($scope, aData,1, 'address', buttonset(['save','cancel']), false);
     }
     
     $scope.addPayment = function() {
         var aData = {card_vendors:$scope.model.card_vendors,
                     fields:{}};
-        $scope.openDialog(aData,1, 'card', buttonset(['save','cancel']), false);
+        opendialog($scope, aData,1, 'card', buttonset(['save','cancel']), false);
     }
     
     
     $scope.editPayment = function() {
         var aData = {card_vendors:$scope.model.card_vendors,
                     fields:$scope.model.user_details.card_selected};
-        $scope.openDialog(aData, 0, 'card', buttonset(['save','cancel']), false);
+        opendialog($scope, aData, 0, 'card', buttonset(['save','cancel']), false);
     }
     
     
     $scope.editAddress = function() {
          var aData = {countries:$scope.model.countries,
                     fields:$scope.model.user_details.address_selected};
-        $scope.openDialog(aData, 0, 'address', buttonset(['save','cancel']), false);
+        opendialog($scope, aData, 0, 'address', buttonset(['save','cancel']), false);
     }
     
     $scope.editAccount = function() {
          var aData = {titles:$scope.model.titles,
                     fields:$scope.model.user_details.people_selected};
-        $scope.openDialog(aData, 0, 'account', buttonset(['save','cancel']), false);
+        opendialog($scope, aData, 0, 'account', buttonset(['save','cancel']), false);
     }
-    
-    $scope.openDialog = function(aData, start_empty, form_template, buttons, readonly) { 
-        var dialog = $dialog.dialog({templateUrl: 'tpl/forms/ng.'+form_template+'.tpl',
-                                     controller: 'FormDialogController'});
-
-        dialog.buttons=buttons;
-        dialog.readonly=readonly;
-        dialog.formContext = 'user/'+form_template;
-        dialog.data = aData;
-        dialog.open().then(function(oReturn) {
-            if (oReturn && oReturn.success == 1) {
-                if (oReturn.button == 1){
-                    if (form_template == 'address') {
-                        if (start_empty==1) {
-                            if ($scope.model.user_details.addresses.length > 0)
-                            $scope.model.user_details.addresses.push(oReturn.response.address);
-                            else $scope.model.user_details.addresses=[oReturn.response.address];
-                            $scope.model.user_details.address_selected = oReturn.response.address;
-                        }
-                        $scope.model.user_details.address_selected.address_detail_ad_country = oReturn.response.address.address_detail_ad_country;
-                        
-                        console.log($scope.model.user_details.addresses);
-                    }
-                    if (form_template == 'card') {
-                        if (start_empty==1) {
-                            $scope.model.user_details.card.push(oReturn.response.card);
-                            $scope.model.user_details.card_selected = oReturn.response.card;
-                        }
-                    }
-                    
-                    if (form_template == 'account') {
-                        $scope.model.user_details.people_selected = oReturn.response.people;
-                    }
-                }
-                else if (oReturn.button == 2){
-                }
-            }
-        });
-    } 
+     
 }])
 ;
