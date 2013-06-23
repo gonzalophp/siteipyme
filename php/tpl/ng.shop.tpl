@@ -1,6 +1,6 @@
 <div class="ipymeshop" ng-controller="ShopController">
     <loading ng-model="model.loading"></loading>
-    <shoptopbar></shoptopbar>
+    
     <div ng-show="model.loading.complete" class="ipymeshopbody" >
         <div class="carousel" ng-controller="CarouselItemsCtrl">
             <carousel interval="100000">
@@ -28,7 +28,7 @@
                 </slide>
             </carousel>
         </div>
-        <categorymenu menutree="menutree" menuclick="menuclick" get-li-class="getLiClass" class="shopmenu"></categorymenu>
+        <main-menu menutree="menutree" menuclick="menuclick" class="shopmenu"></main-menu>
         <div class="ipymeshopcolumns">
             <table>
                 <tbody>

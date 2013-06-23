@@ -1,12 +1,11 @@
 <div class="ipymeshop">
-    <shoptopbar></shoptopbar>
     <div class="ipymeshopbody" ng-controller="basketCtrl">
         <div class="basket">
             <basketsummary class="basketsummary" persist="basketpersist" ng-model="model"></basketsummary> 
         </div>
         
         <div class="paymentcheckout"  collapse="model.iscollapsed">
-            <h4>Invoice Details</h4>
+            <h4>Account</h4>
             <div class="ipyme_customer_details">
                 <table>
                     <tbody>
@@ -67,7 +66,7 @@
                     </tbody>
                 </table>
             </div>
-            <h4>Delivery Details</h4>
+            <h4>Delivery Address</h4>
             <div class="ipyme_delivery_address">
                 <div class="add" spectralbutton="addDeliveryAddress" spectralbuttontext="Add"></div>
                 <div class="edit" spectralbutton="editDeliveryAddress" spectralbuttontext="Edit"></div>
@@ -103,7 +102,7 @@
                     </tbody>
                 </table>
             </div>
-            <h4>Payment Details</h4>
+            <h4>Payment</h4>
             <div class="ipyme_payment_details">
                 <div class="add" spectralbutton="addInvoiceAddress" spectralbuttontext="Add"></div>
                 <div class="edit" spectralbutton="editInvoiceAddress" spectralbuttontext="Edit"></div>

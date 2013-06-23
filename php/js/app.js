@@ -6,9 +6,8 @@ angular.module('iPymeApp.filters', []);
 angular.module('iPymeApp.directives',[]);
 
 // Declare app level module which depends on filters, and services
-angular.module('iPymeApp', ['iPymeApp.filters', 'iPymeApp.services', 'iPymeApp.directives','iPymeApp.Menu', 'ngGrid', 'ngCookies','ui.bootstrap','ui.date','ui.select2']).
-  config(['$routeProvider', function($routeProvider) {
-
+angular.module('iPymeApp', ['iPymeApp.filters', 'iPymeApp.services', 'iPymeApp.directives','iPymeApp.Menu', 'ngGrid', 'ngCookies','ui.bootstrap','ui.date','ui.select2'])
+.config(['$routeProvider', function($routeProvider) {
     $routeProvider
     .when('/admin/list/:list', {
         templateUrl: 'tpl/ng.admin.list.tpl', 
@@ -52,4 +51,13 @@ angular.module('iPymeApp', ['iPymeApp.filters', 'iPymeApp.services', 'iPymeApp.d
         redirectTo: '/shop'
 //        redirectTo: '/test'
     });
-  }]);
+}]);
+
+angular.module('iPymeApp')
+.run(['$rootScope','$location', function($rootScope,$location){
+   $rootScope.model = {user:{u_valid_session: 0 
+                            , name:""
+                            , admin: 0
+                            , initialized:0},
+                       location:$location}
+}]);

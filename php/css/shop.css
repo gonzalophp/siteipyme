@@ -253,6 +253,9 @@ div.ipymeshopcolumns > table > tbody > tr > td:nth-child(2) {
 
 div.ipymeshopcolumns > table > tbody > tr > td:nth-child(3) {
     width: 15%;
+}
+
+td.basket {
     min-width:27em;
     padding: 1em 1em 1em 1em;
 }
@@ -404,6 +407,10 @@ div.ipymeshopright div.productlist {
 
 div.productlist  > ul {
     margin:0.5em;
+}
+
+div.productlist  > ul > li > table > tbody > tr > td {
+    padding:0;
 }
 
 div.productlist  > ul > li {

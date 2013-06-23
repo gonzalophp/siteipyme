@@ -35,6 +35,10 @@
         <script src="js/directives.js"></script>
     </head>
     <body>
+        <div ng-switch on="adminpanel" ng-controller="MainMenuController">
+            <shoptopbar ng-switch-when="0"></shoptopbar>
+            <main-menu ng-switch-when="1" menutree="menutree" menuclick="menuclick" class="adminmenu"></main-menu>
+        </div>
         <ng-view></ng-view>
         <footer>
             <p>2013 - Gonzalo Grado </p>

@@ -1,5 +1,4 @@
 <div class="ipymeshop">
-    <shoptopbar></shoptopbar>
     <div class="ipymeshopbody" ng-controller="productController">
         <div class="ipymeproduct">
             <table>

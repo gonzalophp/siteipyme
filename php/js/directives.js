@@ -3,19 +3,11 @@
 /* Directives */
 
 angular.module('iPymeApp.Menu') 
-    .directive('mainMenu', function($http) {
+    .directive('mainMenu', function() {
         return { 
             restrict:'E',
             replace:true,
-            scope:{menuitem:'='},
-            templateUrl:'tpl/ng.main_menu.tpl',
-        }
-    })
-    .directive('categorymenu', function($http) {
-        return { 
-            restrict:'E',
-            replace:true,
-            scope:{menuitem:'=', menutree:'=', menuclick:'=', getLiClass:'='},
+            scope:{menuitem:'=', menutree:'=', menuclick:'='},
             templateUrl:'tpl/ng.main_menu.tpl',
         }
     })
@@ -239,7 +231,7 @@ angular.module('iPymeApp')
                 ,scroll = function() {
                     var windowTop = windowNode.scrollTop()
                     , tdBasketTop = $('td.basket').offset().top
-                    , floatingTop = (windowTop > tdBasketTop) ? windowTop - tdBasketTop : 0;
+                    , floatingTop = (windowTop > tdBasketTop) ? windowTop - tdBasketTop-10 : 0;
 
                     if (floatingTop+(parseInt(element.css('height')))+20 < parseInt(element.parents('div.ipymeshopcolumns').css('height'))){
                         element.stop().animate({"marginTop": floatingTop + "px"}, "slow" );	
@@ -319,7 +311,7 @@ angular.module('iPymeApp')
         }
     }
 })
-.directive('shoptopbar', function(ipymeajax,$window,$location){
+.directive('shoptopbar', function(ipymeajax,$window,$location, $rootScope){
     return {
         restrict:'E',
         scope:{},
@@ -356,14 +348,22 @@ angular.module('iPymeApp')
                 $location.path('/admin');
             }
             
-            scope.user = {u_valid_session: 0 
-                        , name:""
-                        , admin: 0};
-            ipymeajax('/user/authenticate', {})
-            .success(function(responseData){
-                scope.user = responseData;
-                scope.user.initialized=1;
-            });
+            if (!$rootScope.model.user.initialized) {
+                ipymeajax('/user/authenticate', {})
+                .success(function(responseData){
+                    $rootScope.model.user = responseData;
+                    scope.user = $rootScope.model.user;
+                    scope.user.initialized=1;
+                });
+            }
+            
+            
+            scope.user = $rootScope.model.user;
+            localStorage.setItem('aaaa',JSON.stringify(scope.user));
+            console.log(localStorage);
+            console.log(Date.now());
+            
+            console.log(JSON.parse(localStorage.getItem('aaaa')));
         }
     }
 })
@@ -386,7 +386,7 @@ angular.module('iPymeApp')
    return {
        restrict:'A',
        transclude:true,
-       scope:{action:'=spectralbutton',text:'@spectralbuttontext', class:'@class'},
+       scope:{action:'=spectralbutton', text:'@spectralbuttontext', class:'@class'},
        template:'<div class="spectral_button {{class}}">\
                     <button ng-click="action()" class="shop">{{text}}</button>\
                 </div>',
@@ -395,13 +395,20 @@ angular.module('iPymeApp')
             scope.button_spectro = scope.div_spectro.find('button');
             var y = scope.div_spectro[0].offsetHeight/2,
                 x = scope.div_spectro[0].offsetLeft+(scope.div_spectro[0].clientWidth/2),
-                initOpacity = scope.button_spectro.css('opacity');
-            
+                initOpacity = scope.button_spectro.css('opacity'),
+                opacity=0;
+            scope.button_spectro.bind('mousemove', function(e){
+                scope.button_spectro.css('opacity',1);
+                return false;
+            });
             angular.element($window).bind('mousemove', function(e){
                 var pos = scope.div_spectro.offset(),
-                    combinedDiff = Math.abs(e.clientX+$window.pageXOffset-pos.left)+Math.abs(e.clientY+$window.pageYOffset-pos.top),
-                    opacity = (combinedDiff < 200) ? new Number(1-(combinedDiff/200)).toFixed(2):initOpacity; 
-                scope.button_spectro.css('opacity',opacity);
+                    combinedDiff = Math.abs(e.clientX+$window.pageXOffset-pos.left)+Math.abs(e.clientY+$window.pageYOffset-pos.top);
+                if (combinedDiff < 150) {
+                    opacity = new Number(1-(combinedDiff/150)).toFixed(2);
+                    if (opacity < initOpacity){opacity = initOpacity;}
+                    scope.button_spectro.css('opacity',opacity);
+                } 
             });
         }
     } 

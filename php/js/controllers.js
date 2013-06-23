@@ -1,19 +1,17 @@
 'use strict';
     
 angular.module('iPymeApp')
-.controller('MainMenuController',['$scope','$location',"ipymeajax", function MainMenuController($scope,$location,ipymeajax) {
+.controller('MainMenuController',['$scope',"ipymeajax",'$routeParams','$location', function ($scope,ipymeajax,$routeParams,$location) {
     ipymeajax('/shop/menu/main', {})
     .success(function(responseData){
         $scope.menutree = responseData;
     });
-
-    $scope.getLiClass = function (menuitem){
-        var aClasses = [];
-        if (menuitem.nodes){
-            (menuitem.nodes.length > 0) && aClasses.push('submenu');
-        }
-        return aClasses.join(' ');
-    }
+    
+    $scope.routeParams = $routeParams;
+    
+    $scope.$watch('routeParams', function(){
+        $scope.adminpanel = ($location.absUrl().search('/admin') >= 0) ? 1:0;
+    }, true);
 }])
 .controller('AdminListController',['$scope','$element','$dialog','$routeParams','ipymeajax', function($scope,$element,$dialog,$routeParams,ipymeajax){
     $scope.selectedItems = [];
@@ -631,10 +629,6 @@ angular.module('iPymeApp')
     $scope.menuclick = function(menuitem) {
         $scope.model.selected_category = menuitem;
         $scope.$$phase || $scope.$apply();
-    }
-    
-    $scope.getLiClass = function (menuitem){
-        return (menuitem.nodes && menuitem.nodes.length > 0) ? 'submenu':'';
     }
 }])
 .controller('imageuploadCtrl', ['$scope','$element','ipymeajax', function ($scope, $element,ipymeajax) {

@@ -1,4 +1,3 @@
-<main-menu class="adminmenu" ng-controller="MainMenuController"></main-menu>
 <div class="container">
     <div class="ipymeCategory" ng-controller="categorytreeeditcontroller">
         <table>

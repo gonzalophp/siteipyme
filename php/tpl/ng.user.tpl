@@ -1,6 +1,4 @@
 <div class="ipymeshop">
-    <shoptopbar></shoptopbar>
-    
     <script type="text/ng-template" id="paneaccount">
         <table>
             <tbody>
