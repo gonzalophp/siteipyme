@@ -29,6 +29,10 @@ div.adminmenu > ul > li {
     height:40px;
 }
 
+div.adminmenu > ul > li.user {
+    float:right;
+}
+
 div.adminmenu > ul > li.submenu > a {
     padding-right:10px
 }

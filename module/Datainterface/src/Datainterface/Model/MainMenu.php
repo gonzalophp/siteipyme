@@ -7,7 +7,11 @@ class MainMenu {
     }
     
     public function getMenu($aOptions){
-        
+        $aUser = (object) array(
+                    'label' => $aOptions['username']
+                    , 'url' => '#/user'
+                    , 'type' => 'user'
+                    , 'nodes' => array());
         $aMenuList = array(
             (object) array(
                 'label' => 'iPyME'
@@ -70,7 +74,10 @@ class MainMenu {
                                 'label' => 'Product Category'
                                 , 'url' => '#/admin/category'
                                 , 'nodes' => array())))))
-            , );
+            ,);
+        
+        array_push($aMenuList,$aUser);
+                
         return $aMenuList;
     }
 }

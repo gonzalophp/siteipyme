@@ -168,7 +168,7 @@ angular.module('iPymeApp')
         dialog.close(returnCode);
     };
 }])
-.controller('CtrlSignin', ['$scope','ipymeajax','$location','$cookieStore', '$element', function ($scope,ipymeajax,$location,$cookieStore,$element) {
+.controller('CtrlSignin', ['$scope','ipymeajax','$location','$cookieStore', '$element','$rootScope', function ($scope,ipymeajax,$location,$cookieStore,$element,$rootScope) {
     $scope.user_data = { user_name:$cookieStore.get('ipyme_u_n')
                         , user_password:$cookieStore.get('ipyme_u_p')
                         , user_remember:false};
@@ -179,6 +179,12 @@ angular.module('iPymeApp')
                                   ,hash_user_password:hash_password})
         .success(function(responseData){
             if (responseData.u_authenticated == 1){
+                
+                console.log(responseData);
+                    $rootScope.model.user = responseData;
+                    $rootScope.model.user.initialized=1;
+                
+                
                 $scope.user_data.user_sessionid = responseData.u_sessionid;
                 if ($scope.user_data.user_remember) {
                     $cookieStore.put('ipyme_u_n',$scope.user_data.user_name);
@@ -559,11 +565,13 @@ angular.module('iPymeApp')
                 (rel[k1].attributes[k2].selected == 1) && (selected++);
             }
         }
+        $scope.waitingUpdate = true;
         ((selected) ?
         (ipymeajax('/shop/product/getDisplayedProductsByAttributeValue', $scope.model.relativeAttributes)):
         ipymeajax('/shop/product/getDisplayedProductsByCategory/'+$scope.model.selected_category.key, {pagesize:10, page:1}))
         .success(function(responseData){
             $scope.model.displayedProducts = responseData.displayedProducts;
+            $scope.waitingUpdate = false;
         });
     }
     

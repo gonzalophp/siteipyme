@@ -36,8 +36,8 @@
     </head>
     <body>
         <div ng-switch on="adminpanel" ng-controller="MainMenuController">
-            <shoptopbar ng-switch-when="0"></shoptopbar>
-            <main-menu ng-switch-when="1" menutree="menutree" menuclick="menuclick" class="adminmenu"></main-menu>
+            <div ng-switch-when="0"><shoptopbar></shoptopbar></div>
+            <div ng-switch-when="1"><main-menu menutree="menutree" menuclick="menuclick" class="adminmenu"></main-menu></div>
         </div>
         <ng-view></ng-view>
         <footer>

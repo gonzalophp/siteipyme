@@ -7,7 +7,7 @@ class SigninController extends \Zend\Mvc\Controller\AbstractActionController {
 //        $this->getRequest()->setContent('{"user_name":"gonzalo","user_password":"gonzalo","user_remember":false}');
 //        $this->getRequest()->getHeaders()->addHeaderLine('X_REQUESTED_WITH','XMLHttpRequest');
         
-        $bAuthenticated = false;
+        $aUser = array();
         if ($this->getRequest()->isXmlHttpRequest() && ($sJSONDataRequest = $this->getRequest()->getContent())) {
             $oDataRequest = json_decode($sJSONDataRequest);
                     
@@ -25,10 +25,11 @@ class SigninController extends \Zend\Mvc\Controller\AbstractActionController {
                 'IPYME_FINAL'
                 , 'user_login'
                 , $aFunctionParams);
-            
-            $bAuthenticated = ($oResultSet->count() == 1);
+            $aUser = $oResultSet->current();
         }
-        $aResponse =  array('u_authenticated'    => ($bAuthenticated ? 1 : 0));
+        $aResponse =  array('u_authenticated'   => ((count($aUser)>0) ? 1 : 0),
+                            "name"              => (array_key_exists('u_name', $aUser)?$aUser['u_name']:''),
+                            "admin"             => (array_key_exists('u_admin', $aUser)?$aUser['u_admin']:0));
         
         return new \Zend\View\Model\JsonModel($aResponse);
     }

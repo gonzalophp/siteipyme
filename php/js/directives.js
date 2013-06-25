@@ -331,6 +331,8 @@ angular.module('iPymeApp')
             scope.logout = function(){
                 ipymeajax('/user/logout', {})
                 .success(function(responseData){
+                    scope.user = {name:'', admin:0, initialized:1};
+                    $rootScope.model.user = scope.user;
                     $location.path('/user/logout');
                 });
             }
@@ -357,6 +359,9 @@ angular.module('iPymeApp')
                 });
             }
             
+            $rootScope.$watch('model.user',function(newValue){
+                scope.user = newValue;
+            },true);
             
             scope.user = $rootScope.model.user;
             localStorage.setItem('aaaa',JSON.stringify(scope.user));

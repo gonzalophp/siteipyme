@@ -9,13 +9,6 @@ class MenuController extends \Zend\Mvc\Controller\AbstractActionController {
         return new \Zend\View\Model\JsonModel($aMenuList);
     }
     
-    public function shopAction() {
-        $oUser = $this->getServiceLocator()->get('User\Model\UserCredentials')->getUserDetails();
-        $oMenuList = new \Datainterface\Model\ShopMenu;
-        $aMenuList= $oMenuList->getMenu(is_null($oUser['u_name'])?array():array('username' => $oUser['u_name']));
-        return new \Zend\View\Model\JsonModel($aMenuList);
-    }
-    
     public function providerAction() {
         $aResponse = array('menuitems' => array(array('form'        => 'admin.provider'
                                                      ,'displayName' => 'New'
