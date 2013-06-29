@@ -6,10 +6,6 @@ div.paymentcheckout {
     padding: 1em 2em 1em 2em;
 }
 
-div.paymentcheckout h4:not(:nth-child(1)) {
-    margin-top:2em
-}
-
 div.paymentcheckout > div {
     border-collapse: separate;
     width:80%;
@@ -52,6 +48,7 @@ div.paymentcheckout{
 
 div.paymentcheckout button.confirm{
     float:right;
+    margin-top:2em;
 }
 
 div.spectral_button button{
@@ -67,4 +64,16 @@ div.paymentcheckout div div.edit {
     margin-top:-0.5em;
     left:calc(12% + 70px);
     left:-webkit-calc(12% + 70px);
+}
+
+div.paymentcheckout > div  {
+    position:relative;
+}
+
+div.account_button {
+    position: absolute;
+    top:0.5em;
+    right:0.5em;
+    width:100%;
+    text-align: right;
 }

@@ -657,6 +657,7 @@ angular.module('iPymeApp')
         iscollapsed:true,
         user_details:{
         },
+        titles:['Mr.','Mrs.','Ms.'],
         countries:{available:[],
                     selected:null,
                     selectcountryoptions:{allowClear: true, 
@@ -664,16 +665,6 @@ angular.module('iPymeApp')
                                             formatResult: select2CountryFormat,
                                             formatSelection: select2CountryFormat,
                                             escapeMarkup: function(m) { return m; },},},
-        dateoptions:{
-            changeYear: true,
-            changeMonth: true,
-            yearRange: '1900:-0',
-            showOn: "button",
-            buttonImage: "css/images/calendar.gif",
-            buttonImageOnly: true,
-            dateFormat:'dd/mm/yy',
-            showAnim:'clip'
-        }
     }
     
     $scope.basketpersist = function(initialize){
@@ -713,38 +704,45 @@ angular.module('iPymeApp')
     $scope.addInvoiceAddress = function() {
         var aData = {countries:$scope.model.countries,
                     fields:{ address_detail_ad_country:{country_c_code: "gb"}}};
-        opendialog($scope, aData,1, 'address', buttonset(['save','cancel']), false);
+        opendialog($scope, aData,1, 'address', buttonset(['save','cancel']), false,'address_selected');
     }
     
     $scope.editInvoiceAddress = function() {
          var aData = {countries:$scope.model.countries,
                     fields:$scope.model.user_details.address_selected};
-        opendialog($scope, aData, 0, 'address', buttonset(['save','cancel']), false);
+        opendialog($scope, aData, 0, 'address', buttonset(['save','cancel']), false,'address_selected');
     }
     
     $scope.addDeliveryAddress = function() {
         var aData = {countries:$scope.model.countries,
                     fields:{ address_detail_ad_country:{country_c_code: "gb"}}};
-        opendialog($scope, aData,1, 'address', buttonset(['save','cancel']), false);
+        opendialog($scope, aData,1, 'address', buttonset(['save','cancel']), false,'address_delivery');
     }
     
     $scope.editDeliveryAddress = function() {
          var aData = {countries:$scope.model.countries,
                     fields:$scope.model.user_details.address_delivery};
-        opendialog($scope, aData, 0, 'address', buttonset(['save','cancel']), false);
+        opendialog($scope, aData, 0, 'address', buttonset(['save','cancel']), false,'address_delivery');
     }
+    
+    $scope.$watch('model.user_details.addresses', function(newValue, oldValue) {
+        console.log(newValue, oldValue);
+        if (oldValue && (oldValue.length == 0) && (newValue.length > 0)){
+            $scope.model.user_details.address_delivery = newValue[0];
+        }
+    }, true);
     
     $scope.addPayment = function() {
         var aData = {card_vendors:$scope.model.card_vendors,
                     fields:{}};
-        opendialog($scope, aData,1, 'card', buttonset(['save','cancel']), false);
+        opendialog($scope, aData,1, 'card', buttonset(['save','cancel']), false,'card_selected');
     }
     
     
     $scope.editPayment = function() {
         var aData = {card_vendors:$scope.model.card_vendors,
                     fields:$scope.model.user_details.card_selected};
-        opendialog($scope, aData, 0, 'card', buttonset(['save','cancel']), false);
+        opendialog($scope, aData, 0, 'card', buttonset(['save','cancel']), false,'card_selected');
     }
     
     $scope.editAccount = function() {
@@ -758,9 +756,8 @@ angular.module('iPymeApp')
     .success(function(responseData){
         $scope.model.user_details = responseData.user_details;
         $scope.model.user_details.addresses[0] && ($scope.model.user_details.country_selected = $scope.model.user_details.addresses[0].country_c_code);
-        $scope.model.user_details.address_selected = $scope.model.user_details.addresses[0];
-        $scope.model.user_details.addresses[1] && ($scope.model.user_details.country_selected = $scope.model.user_details.addresses[1].country_c_code);
-        $scope.model.user_details.address_delivery = $scope.model.user_details.addresses[1];
+        $scope.model.user_details.address_selected = ($scope.model.user_details.addresses.length > 0) ? $scope.model.user_details.addresses[0] : {};
+        $scope.model.user_details.address_delivery = $scope.model.user_details.addresses[0];
         $scope.model.user_details.people_selected = ($scope.model.user_details.people.length>0) ? $scope.model.user_details.people[0]:{};
         $scope.model.user_details.card_selected = $scope.model.user_details.card[0];
         $scope.model.card_vendors = {available : responseData.user_details.card_vendor};

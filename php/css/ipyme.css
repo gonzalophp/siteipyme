@@ -1,7 +1,5 @@
-@import "menu.css";
-
-* {
-    font-size: 13px;
+body {
+    font-size: 10px;
 }
 
 .ipymeButton {

@@ -42,7 +42,7 @@ angular.module('iPymeApp')
 })
 
 .factory('opendialog', function($dialog) {
-    return function($scope,aData, start_empty, form_template, buttons, readonly){
+    return function($scope,aData, start_empty, form_template, buttons, readonly, objecttarget){
             var dialog = $dialog.dialog({templateUrl: 'tpl/forms/ng.'+form_template+'.tpl',
                                      controller: 'FormDialogController'});
 
@@ -58,16 +58,14 @@ angular.module('iPymeApp')
                             if ($scope.model.user_details.addresses.length > 0)
                             $scope.model.user_details.addresses.push(oReturn.response.address);
                             else $scope.model.user_details.addresses=[oReturn.response.address];
-                            $scope.model.user_details.address_selected = oReturn.response.address;
+                            $scope.model.user_details[objecttarget] = oReturn.response.address;
                         }
-                        $scope.model.user_details.address_selected.address_detail_ad_country = oReturn.response.address.address_detail_ad_country;
-
-                        console.log($scope.model.user_details.addresses);
+                        $scope.model.user_details[objecttarget].address_detail_ad_country = oReturn.response.address.address_detail_ad_country;
                     }
                     if (form_template == 'card') {
                         if (start_empty==1) {
                             $scope.model.user_details.card.push(oReturn.response.card);
-                            $scope.model.user_details.card_selected = oReturn.response.card;
+                            $scope.model.user_details[objecttarget] = oReturn.response.card;
                         }
                     }
 

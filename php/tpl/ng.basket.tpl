@@ -3,11 +3,14 @@
         <div class="basket">
             <basketsummary class="basketsummary" persist="basketpersist" ng-model="model"></basketsummary> 
         </div>
-        
-        <div class="paymentcheckout"  collapse="model.iscollapsed">
-            <h4>Account</h4>
+        <div class="paymentcheckout" ng-hide="model.iscollapsed" collapse="model.iscollapsed">
             <div class="ipyme_customer_details">
-                <table>
+                <h4>Account</h4>
+                <div class="account_button">
+                    <button ng-show="model.user_details.people_selected.people_p_id == undefined" class="shop add" ng-click="editAccount()">Add Invoice Account Details</button>
+                    <button ng-show="model.user_details.people_selected.people_p_id > 0" class="shop edit" ng-click="editAccount()">Edit</button>
+                </div>
+                <table ng-show="model.user_details.people_selected.people_p_id > 0">
                     <tbody>
                         <tr>
                             <td>Title</td>
@@ -24,18 +27,20 @@
                         <tr>
                             <td>surname</td>
                             <td>
-                                    {{model.user_details.people_selected.people_p_surname}}
+                                {{model.user_details.people_selected.people_p_surname}}
                             </td>
                         </tr>
                      </tbody>
                 </table>
+                <!--<pre>{{model.user_details}}</pre>-->
             </div>
-            <hr/>
-            <h4>Invoice Address</h4>
-            <div class="ipyme_invoice_address">
-                <div class="add" spectralbutton="addInvoiceAddress" spectralbuttontext="Add"></div>
-                <div class="edit" spectralbutton="editInvoiceAddress" spectralbuttontext="Edit"></div>
-                <table>
+            <div ng-show="model.user_details.people_selected.people_p_id > 0" class="ipyme_invoice_address">
+                <h4>Invoice Address</h4>
+                <div class="account_button">
+                    <button class="shop add" ng-click="addInvoiceAddress()">Add Address</button>
+                    <button ng-show="model.user_details.address_selected.address_detail_ad_id > 0" class="shop edit" ng-click="editInvoiceAddress()">Edit</button>
+                </div>
+                <table ng-show="model.user_details.address_selected.address_detail_ad_id > 0">
                     <tbody>
                         <tr>
                             <td>Address</td>
@@ -66,11 +71,13 @@
                     </tbody>
                 </table>
             </div>
-            <h4>Delivery Address</h4>
-            <div class="ipyme_delivery_address">
-                <div class="add" spectralbutton="addDeliveryAddress" spectralbuttontext="Add"></div>
-                <div class="edit" spectralbutton="editDeliveryAddress" spectralbuttontext="Edit"></div>
-                <table>
+            <div ng-show="model.user_details.people_selected.people_p_id > 0" class="ipyme_delivery_address">
+                <h4>Delivery Address</h4>
+                <div class="account_button">
+                    <button class="shop add" ng-click="addDeliveryAddress()">Add Address</button>
+                    <button ng-show="model.user_details.address_delivery.address_detail_ad_id > 0" class="shop edit" ng-click="editDeliveryAddress()">Edit</button>
+                </div>
+                <table ng-show="model.user_details.address_delivery.address_detail_ad_id > 0">
                     <tbody>
                         <tr>
                             <td>Address</td>
@@ -102,11 +109,13 @@
                     </tbody>
                 </table>
             </div>
-            <h4>Payment</h4>
-            <div class="ipyme_payment_details">
-                <div class="add" spectralbutton="addInvoiceAddress" spectralbuttontext="Add"></div>
-                <div class="edit" spectralbutton="editInvoiceAddress" spectralbuttontext="Edit"></div>
-                <table ng-show="model.user_details.address_selected">
+            <div ng-show="model.user_details.people_selected.people_p_id > 0" class="ipyme_payment_details">
+                <h4>Payment</h4>
+                <div class="account_button">
+                    <button class="shop add" ng-click="addPayment()">Add Card</button>
+                    <button ng-show="model.user_details.card_selected.card_c_id > 0" class="shop edit" ng-click="editPayment()">Edit</button>
+                </div>
+                <table ng-show="model.user_details.card_selected">
                     <tbody>
                         <tr>
                             <td>Description</td>
@@ -137,8 +146,7 @@
                     </tbody>
                 </table>
             </div>
-            <hr/>
-            <p><button class="shop confirm" ng-click="confirm()">Confirm</button></p>
+            <p ng-show="model.user_details.people_selected.people_p_id > 0 && model.user_details.card_selected.card_c_id > 0 && model.user_details.address_delivery.address_detail_ad_id > 0 && model.user_details.address_selected.address_detail_ad_id > 0"><button class="shop confirm" ng-click="confirm()">Confirm Payment</button></p>
         </div>
     </div>
 </div>
