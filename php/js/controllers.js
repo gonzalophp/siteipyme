@@ -239,7 +239,6 @@ angular.module('iPymeApp')
 .controller('CtrlSignUpConfirmation', ['$scope','$location','$routeParams','ipymeajax', function ($scope,$location,$routeParams,ipymeajax) {
     ipymeajax('/user/signup/confirm/'+$routeParams.sessionid, {})
     .success(function(responseData){
-        console.log(responseData);
         $scope.signup_confirmation=responseData.signup_confirmation;
         if ($scope.signup_confirmation==1) {
             setTimeout(function(){$scope.$apply(function() { $location.path("/admin/product/catalog")})},5000);

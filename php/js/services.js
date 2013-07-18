@@ -1,13 +1,10 @@
-<?php header('Content-Type:application/javascript');?>
 'use strict';
 
 /* Services */
 
 angular.module('iPymeApp.services')
-.value('backendSourceHost','<?php echo "http://{$_SERVER['SERVER_NAME']}/backend.php";?>')
-.value('imageSourceHost','<?php echo "http://{$_SERVER['SERVER_NAME']}/img";?>');
-
-angular.module('iPymeApp')
+.factory('backendSourceHost',function($location){return 'http://'+$location.host()+'/backend.php'})
+.factory('imageSourceHost',function($location){return 'http://'+$location.host()+'/img'})
 .factory('getParentByTagName',function() { 
     return function(childNode,tagName){
         for (var node=childNode; node.nodeName!==tagName; node=node.parentNode);
@@ -34,8 +31,7 @@ angular.module('iPymeApp')
                                  delete:{action: "delete",class: "btn-danger",displayName: "Delete"},},
             aButtonSet =[];
         for(var key in buttons) {
-        console.log(buttons[key]);
-        aButtonSet.push(aAvailableButtons[buttons[key]]);
+            aButtonSet.push(aAvailableButtons[buttons[key]]);
         }
         return aButtonSet;
     }
