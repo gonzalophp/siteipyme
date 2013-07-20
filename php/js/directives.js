@@ -211,11 +211,11 @@ angular.module('iPymeApp')
             }
             
             scope.persistTimeOut = function(){
-                scope.persist(false,element);
+                scope.persist(false);
             }
             
             scope.checkout = function() {
-                scope.persist(false,element);
+                scope.persist(false);
                 $location.path( "/basket" );
             }
             
@@ -244,12 +244,12 @@ angular.module('iPymeApp')
                     if (scope.basket.initialized) scope.countDownToPersist();
                 }
                 ,initialize = function() {
-                    scope.persist(true, element);
+                    scope.persist(true);
                 }
                 
             windowNode.bind('resize', resize);
             windowNode.bind('scroll', scroll);
-            scope.$on("$destroy", function() {scope.persist(false,element);windowNode.unbind('scroll');windowNode.unbind('resize');});
+            scope.$on("$destroy", function() {scope.persist(false);windowNode.unbind('scroll');windowNode.unbind('resize');});
             scope.$watch('basket.products', basketchange, true);
             
             resize();

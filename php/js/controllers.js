@@ -218,7 +218,6 @@ angular.module('iPymeApp')
     $scope.click = function() {
         ipymeajax('/user/signup', $scope.user_data)
         .success(function(responseData){
-            console.log(responseData);
             if (responseData.signup_success == 1){
                 $scope.error_message = 'Check your email inbox to complete the registration';
                 setTimeout($location.path("#/user/signin"), 3000);
@@ -592,7 +591,7 @@ angular.module('iPymeApp')
                                                         , c_name:product.currency});
     }
     
-    $scope.basketpersist = function(initialize,element){
+    $scope.basketpersist = function(initialize){
         $scope.basketpersist.basketWaitingUpdate = true;
         if (initialize){
             ipymeajax('/shop/basket/get', {})
@@ -616,7 +615,6 @@ angular.module('iPymeApp')
         }
     }
     $scope.model.selected_category = {key:-1};
-    $scope.model.loading.stage+=20;
     $scope.$watch('model.selected_category', function(selected_category){
        $scope.waitingUpdate = true;
        ipymeajax('/shop/product/getDisplayedProductsByCategory/'+selected_category.key, {pagesize:10, page:1})
