@@ -272,7 +272,7 @@ angular.module('iPymeApp')
                         <p class="baskettotal">Total: {{model.basket.total}}</p>\
                         <div class="ipymeButtonsGroup">\n\
                             <button class="shop backtoshop" ng-click="redirect(\'/shop\')">Continue Shopping</button>\
-                            <button class="shop proceedtopay" ng-click="model.iscollapsed = !model.iscollapsed">Proceed to Payment</button>\
+                            <button class=" proceedtopay" ng-click="pay()"><img src="https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif" align="left" style="margin-right:7px;"></button>\
                         </div>\
                 </div>',
         link:function(scope, element, attr) {
@@ -291,9 +291,70 @@ angular.module('iPymeApp')
                 $location.path(path);
             }
             
-            var windowNode = angular.element($window)
-                ,innerHeight = 0
+            scope.pay = function(){
+                simpleCart.empty();
                 
+                simpleCart({
+                    checkout: { 
+                        type: "PayPal" , 
+                        email: "ipymesoft-uk@gmail.com" ,
+
+                        // use paypal sandbox, default is false
+                        sandbox: true , 
+
+                        // http method for form, "POST" or "GET", default is "POST"
+                        method: "GET" , 
+
+                        // url to return to on successful checkout, default is null
+                        success: 'http://ipyme.uk.to/' , 
+                        currency: "GBP",
+                        // url to return to on cancelled checkout, default is null
+                        cancel: $location.absUrl()
+                        ,
+                       
+                    } 
+                });
+                
+
+
+                simpleCart.currency({
+                  code: "GBP" ,
+                  symbol: "£" ,
+                  name: "UK Pound"
+                });
+                
+                for(var i=0;i<scope.model.basket.products.length;i++){
+                    
+                    console.log(scope.model.basket.products[i]);
+                    
+                    simpleCart.add({ 
+                        name: scope.model.basket.products[i].p_ref ,
+                        price: scope.model.basket.products[i].p_price ,
+                        size: scope.model.basket.products[i].p_ref ,
+                        quantity: scope.model.basket.products[i].bl_quantity
+                    });
+
+                    
+//                    $$hashKey: "00B"
+//                    bl_basket: 18
+//                    bl_id: 19
+//                    bl_product: 2
+//                    bl_quantity: "4"
+//                    c_name: "GBP"
+//                    p_category: 8
+//                    p_description: "Intel Core i5-4670K 3.40GHz"
+//                    p_image_path: "/CP-472-IN_200.jpg"
+//                    p_long_description: "Intel Core i5-4670K 3.40GHz (Haswell) Socket LGA1150 Processor - OEM with FREE Grid 2 PC Game Intel's latest 4th gen CPU, offering better performance, lower power consumption, improved memory overclocking and comes with GRID 2 PC Game FREE!!"
+//                    p_price: "180.000"
+//                    p_ref: "Intel Core i5-4670K 3.40GHz"
+//                    total: 720
+
+                }
+                
+                simpleCart.checkout();
+            }
+            
+            var windowNode = angular.element($window)
                 ,basketchange = function(){
                     var total=0, p = scope.model.basket.products;
                     for(var i in p) total += p[i].total;

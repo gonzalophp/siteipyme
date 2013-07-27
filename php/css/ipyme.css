@@ -1415,3 +1415,7 @@ div.icon_product {  background-position: -193px -193px;}
 div.icon_purchase {  background-position: -161px -161px;}
 div.icon_delivery {  background-position: -225px -225px;}
 div.icon_payment {  background-position: -1px -1px;}
+
+div.ipymepayment_logo img {
+    width:100%;
+}

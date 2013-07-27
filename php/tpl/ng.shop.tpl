@@ -56,6 +56,11 @@
                             </div>
                         </td>
                         <td class="basket">
+                            <div class="ipymepayment_logo">
+                                <a href="https://www.paypal.com/uk/webapps/mpp/paypal-popup" title="How PayPal Works" onclick="javascript:window.open('https://www.paypal.com/uk/webapps/mpp/paypal-popup','WIPaypal','toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=1060, height=700'); return false;">
+                                    <img src="https://www.paypalobjects.com/webstatic/mktg/logo/AM_SbyPP_mc_vs_ms_ae_UK.jpg" border="0" alt="PayPal Acceptance Mark" width="200">
+                                </a>
+                            </div>
                             <basket class="ipymeshopright" persist="basketpersist" ng-model="model.basket"></basket> 
                         </td>
                     </tr>

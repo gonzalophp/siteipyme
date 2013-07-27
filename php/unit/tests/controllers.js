@@ -483,4 +483,186 @@ describe('iPymeApp.controllers', function() {
         });
         
     });
+    
+    
+    describe('productController', function() {
+        var imageSourceHost;
+        beforeEach(inject(function($rootScope, $injector) {
+            ipymeajax = $injector.get('ipymeajax');
+            imageSourceHost = $injector.get('imageSourceHost');
+            $scope = $rootScope.$new();
+            $httpBackend = $injector.get('$httpBackend');
+            $httpBackend.resetExpectations();
+        }));
+
+        afterEach(function() {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        });
+        describe('Shop Products', function() {
+            it('Product properties initialized', inject(function($controller) {
+                
+                $routeParams = {id:'ABC'}
+                $httpBackend.expectPOST('http://server/backend.php/shop/product/get/'+$routeParams.id).respond({product: {p_id:111, p_description:'2', price:3}});
+                $controller('productController', {
+                    $scope: $scope,
+                    $location:$location,
+                    ipymeajax: ipymeajax,
+                    $routeParams:$routeParams,
+                    imageSourceHost:imageSourceHost
+                });
+                
+                $httpBackend.expectPOST('http://server/backend.php/shop/basket/get')
+                        .respond({basket:{id:222, products: [{bl_product:11
+                                                            , p_description:22
+                                                            , bl_quantity:33
+                                                            , p_price:33*44
+                                                            , c_name:55}]}});
+                /* Initialize basket*/                                        
+                $scope.basketpersist(true);
+                expect($scope.basketpersist.basketWaitingUpdate).toEqual(true);
+                $httpBackend.flush();
+                expect($scope.basketpersist.basketWaitingUpdate).toEqual(false);
+                
+                expect($scope.model.product).toEqual({p_id:111, p_description:'2', price:3, quantity:1});
+                expect($scope.model.basket.products.length).toEqual(1);
+               
+                $scope.addbutton({p_id:111, p_description:'2', p_price:3, quantity:5});
+                expect($scope.model.basket.products[1]).toEqual({bl_product:111
+                                                                , p_description:'2'
+                                                                , bl_quantity:5
+                                                                , p_price:3
+                                                                , c_name:undefined});
+                                                            
+                $scope.addbutton({p_id:222, p_description:'222222', p_price:10, quantity:2, c_name:999});
+                expect($scope.model.basket.products[2]).toEqual({bl_product:222
+                                                                , p_description:'222222'
+                                                                , bl_quantity:2
+                                                                , p_price:10
+                                                                , c_name:999});
+                expect($scope.model.basket.products.length).toEqual(3);
+                
+                
+                
+                
+                $httpBackend.expectPOST('http://server/backend.php/shop/basket/save')
+                        .respond({basket:{id:222, products: [{bl_product:11
+                                                            , p_description:22
+                                                            , bl_quantity:33
+                                                            , p_price:33*44
+                                                            , c_name:55},
+                                                            {bl_product:111
+                                                            , p_description:'2'
+                                                            , bl_quantity:5
+                                                            , p_price:3
+                                                            , c_name:undefined},
+                                                            {bl_product:222
+                                                            , p_description:'222222'
+                                                            , bl_quantity:2
+                                                            , p_price:10
+                                                            , c_name:999}
+                                                        ]}});
+                $scope.basketpersist(false);
+                $httpBackend.flush();
+                
+                expect($scope.model.basket.products.length).toEqual(3);
+            }));
+        });
+    });
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    describe('ShopMenuController', function() {
+        beforeEach(inject(function($rootScope, $injector) {
+            ipymeajax = $injector.get('ipymeajax');
+            $scope = $rootScope.$new();
+            $httpBackend = $injector.get('$httpBackend');
+            $httpBackend.resetExpectations();
+        }));
+
+        afterEach(function() {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        });
+        
+        describe('Shop Menu controller', function() {
+            it('Shop Menu is initialized with data from the backend', inject(function($controller) {
+                
+                $httpBackend.expectPOST('http://server/backend.php/shop/menu/shop').respond('ABCDE');
+                $controller('ShopMenuController', {
+                    $scope: $scope,
+                    ipymeajax: ipymeajax,
+                });
+                
+                $httpBackend.flush();
+                expect($scope.menutree).toEqual('ABCDE');
+                
+            }));
+            
+            
+        });
+    });
+    
+    
+    describe('logoutCtrl', function() {
+        describe('logoutCtrl', function() {
+            it('Redirects to /shop', inject(function($controller) {
+                $controller('logoutCtrl', {
+                    $location: $location,
+                });
+                expect($location.absUrl()).toEqual('/shop');
+            }));
+        });
+    });
+    
+    
+    
+    
+    
+    describe('basketCtrl', function() {
+        beforeEach(inject(function($rootScope, $injector) {
+            ipymeajax = $injector.get('ipymeajax');
+            $scope = $rootScope.$new();
+            $httpBackend = $injector.get('$httpBackend');
+            $httpBackend.resetExpectations();
+        }));
+
+        afterEach(function() {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        });
+        
+//        describe('Shop Menu controller', function() {
+//            it('Shop Menu is initialized with data from the backend', inject(function($controller) {
+//                
+//                $httpBackend.expectPOST('http://server/backend.php/shop/menu/shop').respond('ABCDE');
+//                $controller('basketCtrl', {
+//                    $scope: $scope,
+//                    ipymeajax: ipymeajax,
+//                });
+//                
+//                $httpBackend.flush();
+//                expect($scope.menutree).toEqual('ABCDE');
+//                
+//            }));
+//            
+//            
+//        });
+
+
+
+    });
 });

@@ -644,7 +644,7 @@ angular.module('iPymeApp')
         });
     }
 }])
-.controller('basketCtrl', ['$scope','$element','$location','ipymeajax','buttonset','opendialog', function ($scope, $element, $location,ipymeajax,buttonset,opendialog) {
+.controller('basketCtrl', ['$scope','ipymeajax','buttonset','opendialog', function ($scope, ipymeajax,buttonset,opendialog) {
     var select2CountryFormat=function(state) {
                                     if (!state) return;
                                     return '<img class="flag flag-'+state.id+'"/>'+state.text;
@@ -761,7 +761,7 @@ angular.module('iPymeApp')
     });
 }])
 
-.controller('productController', ['$scope','$element','$location','ipymeajax','$routeParams','imageSourceHost', function ($scope, $element, $location,ipymeajax,$routeParams,imageSourceHost) {
+.controller('productController', ['$scope','$location','ipymeajax','$routeParams','imageSourceHost', function ($scope, $location,ipymeajax,$routeParams,imageSourceHost) {
     $scope.model = {imageSourceHost:imageSourceHost,product:{}, basket:{}}
     ipymeajax('/shop/product/get/'+$routeParams.id, {})
     .success(function(responseData){
@@ -775,7 +775,6 @@ angular.module('iPymeApp')
     
     $scope.addbutton = function(product) {
         var bInBasket = false, p = $scope.model.basket.products;
-        console.log(p,product);
         for(var i in p){
             if (p[i].bl_product == product.p_id) {
                 p[i].bl_quantity = parseFloat(p[i].bl_quantity)+product.quantity;
@@ -787,12 +786,11 @@ angular.module('iPymeApp')
         bInBasket || $scope.model.basket.products.push({bl_product:product.p_id
                                                         , p_description:product.p_description
                                                         , bl_quantity:product.quantity
-                                                        , p_price:product.quantity*product.p_price
-                                                        , total:product.price
+                                                        , p_price:product.p_price
                                                         , c_name:product.c_name});
     }
     
-    $scope.basketpersist = function(initialize,element){
+    $scope.basketpersist = function(initialize){
         $scope.basketpersist.basketWaitingUpdate = true;
         if (initialize){
             ipymeajax('/shop/basket/get', {})
@@ -817,16 +815,11 @@ angular.module('iPymeApp')
     }
  
 }])
-.controller('ShopMenuController',['$scope','$location',"ipymeajax", function ($scope,$location,ipymeajax) {
-    var requestData = {};
-    ipymeajax('/shop/menu/shop', requestData)
+.controller('ShopMenuController',['$scope',"ipymeajax", function ($scope,ipymeajax) {
+    ipymeajax('/shop/menu/shop', {})
     .success(function(responseData){
         $scope.menutree = responseData;
     });
-
-    $scope.getLiClass = function (menuitem){
-        return (menuitem.nodes && menuitem.nodes.length > 0) ? 'submenu':'';
-    }
 }])
 .controller('logoutCtrl',['$location', function ($location) {
     $location.path('/shop');
